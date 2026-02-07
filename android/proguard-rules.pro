@@ -50,3 +50,78 @@
 # These two lines are used with mapping files; see https://developer.android.com/build/shrink-code#retracing
 -keepattributes LineNumberTable,SourceFile
 -renamesourcefileattribute SourceFile
+
+# ========== Kryo Serialization Rules ==========
+# Keep all Kryo classes and their methods
+-keep class com.esotericsoftware.** { *; }
+-dontwarn com.esotericsoftware.**
+
+# Keep all your game classes that get serialized over the network
+-keep class com.noiprocs.** { *; }
+-keepclassmembers class com.noiprocs.** { *; }
+
+# Keep Netty classes
+-keep class io.netty.** { *; }
+-dontwarn io.netty.**
+
+# Keep all fields and methods for reflection (Kryo needs this)
+-keepattributes *Annotation*
+-keepattributes Signature
+-keepattributes InnerClasses
+-keepattributes EnclosingMethod
+
+# Kryo needs these
+-dontwarn sun.misc.**
+-dontwarn java.beans.**
+-dontwarn javax.naming.**
+
+# Keep serializable classes
+-keepclassmembers class * implements java.io.Serializable {
+    static final long serialVersionUID;
+    private static final java.io.ObjectStreamField[] serialPersistentFields;
+    private void writeObject(java.io.ObjectOutputStream);
+    private void readObject(java.io.ObjectInputStream);
+    java.lang.Object writeReplace();
+    java.lang.Object readResolve();
+}
+
+# Keep enums
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+# ========== Apache Commons Pool 2 - Disable JMX ==========
+# Android doesn't have java.lang.management.ManagementFactory
+-dontwarn java.lang.management.**
+-dontwarn javax.management.**
+
+# Stub out JMX registration methods in Commons Pool
+-assumenosideeffects class org.apache.commons.pool2.impl.BaseGenericObjectPool {
+    void jmxRegister();
+    void jmxUnregister();
+}
+
+# ========== Desktop-Only Terminal Libraries ==========
+# These libraries are for desktop terminal/console and don't work on Android
+-dontwarn org.jline.**
+-dontwarn com.sun.jna.**
+-dontwarn org.fusesource.jansi.**
+-dontwarn org.graalvm.nativeimage.**
+
+# ========== LZ4 Compression Library ==========
+# Keep all LZ4 classes - needed for network compression
+-keep class net.jpountz.** { *; }
+-dontwarn net.jpountz.**
+
+# Keep LZ4 native methods
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
+# LZ4 uses JNI and native libraries
+-keep class net.jpountz.lz4.LZ4Factory { *; }
+-keep class net.jpountz.lz4.LZ4Compressor { *; }
+-keep class net.jpountz.lz4.LZ4FastDecompressor { *; }
+-keep class net.jpountz.lz4.LZ4SafeDecompressor { *; }
+-keep class net.jpountz.lz4.LZ4UnknownSizeDecompressor { *; }

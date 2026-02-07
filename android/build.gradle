@@ -25,14 +25,16 @@ android {
   packagingOptions {
 		resources {
 			excludes += ['META-INF/robovm/ios/robovm.xml', 'META-INF/DEPENDENCIES.txt', 'META-INF/DEPENDENCIES',
-                   'META-INF/dependencies.txt', '**/*.gwt.xml']
+                   'META-INF/dependencies.txt', '**/*.gwt.xml', 'META-INF/INDEX.LIST', 'META-INF/*.SF',
+                   'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/io.netty.versions.properties',
+                   'log4j2.xml', 'log4j2-test.xml', 'log4j.properties', 'META-INF/log4j-provider.properties']
 			pickFirsts += ['META-INF/LICENSE.txt', 'META-INF/LICENSE', 'META-INF/license.txt', 'META-INF/LGPL2.1',
                      'META-INF/NOTICE.txt', 'META-INF/NOTICE', 'META-INF/notice.txt']
 		}
   }
   defaultConfig {
     applicationId 'com.noiprocs'
-    minSdkVersion 21
+    minSdkVersion 26
     targetSdkVersion 35
     versionCode 1
     versionName "1.0"
@@ -43,6 +45,10 @@ android {
     coreLibraryDesugaringEnabled = true
   }
   buildTypes {
+    debug {
+      minifyEnabled true  // Enable to apply ProGuard rules for Android compatibility
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
     release {
       minifyEnabled true
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -60,12 +66,29 @@ configurations { natives }
 dependencies {
   coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
   implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
-  implementation project(':core')
+  implementation(project(':core')) {
+    exclude group: 'org.apache.logging.log4j'
+    exclude group: 'log4j'
+    // Exclude desktop-only terminal libraries
+    exclude group: 'org.jline'
+    exclude group: 'net.java.dev.jna'
+    exclude group: 'org.fusesource.jansi'
+  }
+
+  // Use SLF4J 2.x with simple logger (Android-compatible)
+  implementation 'org.slf4j:slf4j-api:2.0.9'
+  implementation 'org.slf4j:slf4j-simple:2.0.9'
 
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
+
+  // FreeType natives for Android
+  natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-arm64-v8a"
+  natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a"
+  natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
+  natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
 
 }
 
