@@ -2,11 +2,14 @@ package com.noiprocs;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.noiprocs.core.GameContext;
 import com.noiprocs.input.InputController;
@@ -17,6 +20,8 @@ import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class LibGDXApp extends ApplicationAdapter {
+  private static final String FONT_CHARACTERS_JSON = "font-characters.json";
+
   private SpriteBatch batch;
   private BitmapFont font;
   private LibGDXGameScreen gameScreen;
@@ -132,6 +137,13 @@ public class LibGDXApp extends ApplicationAdapter {
     inputController.handleInput(gameContext, gameScreen);
   }
 
+  private String loadFontCharacters() {
+    FileHandle fontCharsFile = Gdx.files.classpath(FONT_CHARACTERS_JSON);
+    JsonReader jsonReader = new JsonReader();
+    JsonValue root = jsonReader.parse(fontCharsFile);
+    return root.getString("characters");
+  }
+
   private BitmapFont generateMonospaceFont() {
     // Prioritize fonts that match Java's "monospaced" logical font
     // On macOS: Menlo (modern) or Courier (legacy)
@@ -169,12 +181,7 @@ public class LibGDXApp extends ApplicationAdapter {
     FreeTypeFontParameter parameter = new FreeTypeFontParameter();
     parameter.size = 12;
     parameter.mono = true;
-    parameter.characters =
-        " !\"#$%&'()*+,-./0123456789:;<=>?@"
-            + "ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`"
-            + "abcdefghijklmnopqrstuvwxyz{|}~"
-            + "∙│═╱╲▀▄█▌▐▒▓▲◊░"
-            + "╔╗╚╝║╠╣"; // Double-line box drawing characters for HUD borders
+    parameter.characters = loadFontCharacters();
     parameter.color = Color.WHITE;
 
     BitmapFont monoFont = generator.generateFont(parameter);
