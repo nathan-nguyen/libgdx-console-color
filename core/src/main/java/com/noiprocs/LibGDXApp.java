@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -11,6 +12,8 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFont
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.noiprocs.core.GameContext;
 import com.noiprocs.input.InputController;
 import com.noiprocs.ui.console.ConsoleUIConfig;
@@ -22,12 +25,23 @@ import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 public class LibGDXApp extends ApplicationAdapter {
   private static final String FONT_CHARACTERS_JSON = "font-characters.json";
 
+  // Virtual screen dimensions (matches desktop window size)
+  private static final float VIRTUAL_WIDTH = 440f;
+  private static final float VIRTUAL_HEIGHT = 690f;
+
+  // Desktop monospace character aspect ratio (width / height)
+  // Calculated from desktop fonts: charWidth / charHeight
+  // For Menlo/Courier at size 12 with height 15: ~7.2 / 15 = 0.48
+  private static final float DESKTOP_CHAR_ASPECT_RATIO = 0.47f;
+
   private SpriteBatch batch;
   private BitmapFont font;
   private LibGDXGameScreen gameScreen;
   private GameContext gameContext;
   private Thread gameThread;
   private InputController inputController;
+  private OrthographicCamera camera;
+  private Viewport viewport;
 
   // Configuration from command line
   private String platform;
@@ -57,6 +71,12 @@ public class LibGDXApp extends ApplicationAdapter {
 
   @Override
   public void create() {
+    // Setup camera and viewport for proper scaling
+    camera = new OrthographicCamera();
+    camera.setToOrtho(false, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+    viewport = new FitViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera);
+    viewport.apply();
+
     batch = new SpriteBatch();
 
     // Generate a monospace font using FreeType
@@ -96,6 +116,11 @@ public class LibGDXApp extends ApplicationAdapter {
     // Target line height: 690 / 46 = 15 pixels
     charHeight = 15f;
 
+    // Android: Override charWidth to match desktop aspect ratio
+    if ("android".equals(platform)) {
+      charWidth = charHeight * DESKTOP_CHAR_ASPECT_RATIO;
+    }
+
     ConsoleUIConfig.CLEAR_SCREEN = false;
 
     gameScreen = new LibGDXGameScreen();
@@ -125,6 +150,10 @@ public class LibGDXApp extends ApplicationAdapter {
     // Clear screen
     ScreenUtils.clear(0f, 0f, 0f, 1f);
 
+    // Update camera
+    camera.update();
+    batch.setProjectionMatrix(camera.combined);
+
     // Render game screen
     batch.begin();
     gameScreen.render(0);
@@ -148,6 +177,7 @@ public class LibGDXApp extends ApplicationAdapter {
     // Prioritize fonts that match Java's "monospaced" logical font
     // On macOS: Menlo (modern) or Courier (legacy)
     // On Windows: Courier New
+    // On Android: RobotoMono or DroidSansMono
     String[] monospaceFonts =
         new String[] {
           "/System/Library/Fonts/Menlo.ttc", // macOS default monospaced (modern)
@@ -155,7 +185,10 @@ public class LibGDXApp extends ApplicationAdapter {
           "/System/Library/Fonts/Supplemental/Courier New.ttf", // macOS Courier New
           "C:/Windows/Fonts/cour.ttf", // Windows Courier
           "C:/Windows/Fonts/consola.ttf", // Windows Consolas
-          "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf" // Linux
+          "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", // Linux
+          "/system/fonts/RobotoMono-Regular.ttf", // Android (newer versions)
+          "/system/fonts/DroidSansMono.ttf", // Android (older versions)
+          "/system/fonts/CutiveMono-Regular.ttf" // Android (alternative)
         };
 
     FreeTypeFontGenerator generator = null;
@@ -189,6 +222,12 @@ public class LibGDXApp extends ApplicationAdapter {
     monoFont.setUseIntegerPositions(true);
     // No scaling - match Swing's natural rendering
     return monoFont;
+  }
+
+  @Override
+  public void resize(int width, int height) {
+    // Update viewport when screen size changes (important for Android)
+    viewport.update(width, height);
   }
 
   @Override

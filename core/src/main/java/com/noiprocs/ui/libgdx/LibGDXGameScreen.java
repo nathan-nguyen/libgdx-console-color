@@ -59,6 +59,9 @@ public class LibGDXGameScreen implements GameScreenInterface {
     this.constructScreen((PlayerModel) playerModel);
   }
 
+  // Virtual screen dimensions (should match LibGDXApp constants)
+  private static final float VIRTUAL_HEIGHT = 690f;
+
   /**
    * Renders the game screen using libGDX rendering API.
    *
@@ -72,7 +75,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
     Model playerModel = gameContext.modelManager.getModel(gameContext.username);
     if (playerModel == null) return;
 
-    float y = com.badlogic.gdx.Gdx.graphics.getHeight() - 5; // Start from top
+    float y = VIRTUAL_HEIGHT - 5; // Start from top (using virtual coordinates)
     float x = 5;
 
     // 1. Render player info HUD (may contain multiple lines separated by \n)
