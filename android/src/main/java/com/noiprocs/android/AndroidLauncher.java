@@ -21,6 +21,12 @@ public class AndroidLauncher extends AndroidApplication {
         String username = "player";
         String hostname = "192.168.50.49";
         int port = 8080;
-        initialize(new LibGDXApp(PLATFORM, username, TYPE, hostname, port), configuration);
+
+        // Create Android-specific touch input controller
+        TouchInputController inputController = new TouchInputController();
+
+        initialize(
+            new LibGDXApp(PLATFORM, username, TYPE, hostname, port, inputController),
+            configuration);
     }
 }

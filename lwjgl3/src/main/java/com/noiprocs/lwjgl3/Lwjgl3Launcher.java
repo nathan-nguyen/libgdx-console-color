@@ -29,8 +29,12 @@ public class Lwjgl3Launcher {
 
   private static Lwjgl3Application createApplication(
       String platform, String username, String type, String hostname, int port) {
+    // Create desktop-specific keyboard input controller
+    DesktopKeyboardInputController inputController = new DesktopKeyboardInputController();
+
     return new Lwjgl3Application(
-        new LibGDXApp(platform, username, type, hostname, port), getDefaultConfiguration());
+        new LibGDXApp(platform, username, type, hostname, port, inputController),
+        getDefaultConfiguration());
   }
 
   private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
