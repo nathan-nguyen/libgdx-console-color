@@ -75,14 +75,14 @@ public class LibGDXGameScreen implements GameScreenInterface {
     if (playerModel == null) return;
 
     float y = VIRTUAL_HEIGHT - 5; // Start from top (using virtual coordinates)
-    float x = 5;
+    float x = 0;
 
     // 1. Render player info HUD (may contain multiple lines separated by \n)
     String playerInfo = hud.getPlayerInfo((PlayerModel) playerModel);
     font.setColor(Color.WHITE);
     String[] playerInfoLines = playerInfo.split("\n");
     for (String line : playerInfoLines) {
-      renderMonospaceLine(batch, font, line, x, y, charWidth);
+      renderMonospaceLine(batch, font, line, 10, y, charWidth);
       y -= charHeight;
     }
 

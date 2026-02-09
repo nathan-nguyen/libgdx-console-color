@@ -86,10 +86,9 @@ public class DesktopKeyboardInputController implements InputController {
       if (!gameScreen.hud.equipmentHud.isEquipmentSelected()) {
         for (int i = 0; i < 4; i++) {
           if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1 + i)) {
-            int targetSlot = i;
             int currentSlot = gameScreen.hud.equipmentHud.getSelectedSlot();
-            if (targetSlot != currentSlot) {
-              gameContext.controlManager.swapInventorySlots(currentSlot, targetSlot);
+            if (currentSlot != i) {
+              gameContext.controlManager.swapInventorySlots(currentSlot, i);
             }
             return;
           }
