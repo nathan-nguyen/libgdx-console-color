@@ -17,30 +17,14 @@ public class FontGenerator {
   private BitmapFont font;
 
   /**
-   * Generates a monospace bitmap font using system fonts.
+   * Generates a monospace bitmap font using the bundled DejaVu Sans Mono font.
    *
-   * <p>Prioritizes fonts that match Java's "monospaced" logical font across different platforms.
-   *
-   * @return A configured BitmapFont suitable for monospace text rendering
+   * @return A configured BitmapFont suitable for monospace text rendering with full Unicode support
    */
   public BitmapFont generateMonospaceFont() {
-    String[] monospaceFonts = ResourceLoader.loadMonospaceFonts();
-
-    FreeTypeFontGenerator generator = null;
-    for (String fontPath : monospaceFonts) {
-      try {
-        if (Gdx.files.absolute(fontPath).exists()) {
-          generator = new FreeTypeFontGenerator(Gdx.files.absolute(fontPath));
-          break;
-        }
-      } catch (Exception e) {
-        // Try next
-      }
-    }
-
-    if (generator == null) {
-      throw new RuntimeException("No monospace font found on this system");
-    }
+    // Load bundled DejaVu Sans Mono font from assets
+    FreeTypeFontGenerator generator =
+        new FreeTypeFontGenerator(Gdx.files.internal("DejaVuSansMono.ttf"));
 
     FreeTypeFontParameter parameter = new FreeTypeFontParameter();
     parameter.size = FONT_SIZE;
