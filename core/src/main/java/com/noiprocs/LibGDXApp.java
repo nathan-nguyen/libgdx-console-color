@@ -28,6 +28,7 @@ public class LibGDXApp extends ApplicationAdapter {
   private final InputController inputController;
   private OrthographicCamera camera;
   private Viewport viewport;
+  private Runnable renderVirtualControls; // For Android touch controls
 
   // Configuration from command line
   private final String platform;
@@ -49,6 +50,46 @@ public class LibGDXApp extends ApplicationAdapter {
     this.hostname = hostname;
     this.port = port;
     this.inputController = inputController;
+  }
+
+  /** Get the viewport for coordinate conversion (used by input controllers). */
+  public Viewport getViewport() {
+    return viewport;
+  }
+
+  /** Get the camera for rendering virtual controls. */
+  public OrthographicCamera getCamera() {
+    return camera;
+  }
+
+  /** Get the sprite batch for rendering. */
+  public SpriteBatch getBatch() {
+    return batch;
+  }
+
+  /** Get the font for rendering text. */
+  public BitmapFont getFont() {
+    return font;
+  }
+
+  /** Get the game screen for HUD state access. */
+  public LibGDXGameScreen getGameScreen() {
+    return gameScreen;
+  }
+
+  /** Get the game context. */
+  public GameContext getGameContext() {
+    return gameContext;
+  }
+
+  /** Get the input controller. */
+  public InputController getInputController() {
+    return inputController;
+  }
+
+  /** Set the virtual control renderer callback (for Android platform). */
+  public void setVirtualControlsRenderer(Runnable renderer) {
+    this.renderVirtualControls = renderer;
   }
 
   @Override
@@ -101,11 +142,18 @@ public class LibGDXApp extends ApplicationAdapter {
     gameScreen.render(0);
     gameScreen.renderWithBatch(batch, font, FontGenerator.CHAR_WIDTH, FontGenerator.CHAR_HEIGHT);
     batch.end();
+
+    // Render virtual controls if available (Android only)
+    if (renderVirtualControls != null) {
+      renderVirtualControls.run();
+    }
   }
 
   private void handleInput() {
     // Delegate to platform-specific input controller
-    inputController.handleInput(gameContext, gameScreen);
+    if (inputController != null) {
+      inputController.handleInput(gameContext, gameScreen);
+    }
   }
 
   @Override
