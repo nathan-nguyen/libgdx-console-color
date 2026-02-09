@@ -41,8 +41,7 @@ public class Lwjgl3Launcher {
     Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
     configuration.setTitle("libgdx-console-color");
     configuration.useVsync(true);
-    configuration.setForegroundFPS(
-        Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate + 1);
+    configuration.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate + 1);
 
     // Match Swing window size exactly (440x690)
     // With margins removed, content should now fill the window perfectly

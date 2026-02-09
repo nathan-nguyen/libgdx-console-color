@@ -8,7 +8,7 @@ buildscript {
   }
   dependencies {
     classpath "com.android.tools.build:gradle:8.9.3"
-
+    classpath "com.diffplug.spotless:spotless-plugin-gradle:6.23.3"
   }
 }
 
@@ -27,7 +27,18 @@ allprojects {
 
 configure(subprojects - project(':android')) {
   apply plugin: 'java-library'
+  apply plugin: 'com.diffplug.spotless'
   java.sourceCompatibility = 8
+
+  spotless {
+    java {
+      target 'src/**/*.java'
+      googleJavaFormat()
+      removeUnusedImports()
+      trimTrailingWhitespace()
+      endWithNewline()
+    }
+  }
 
   // From https://lyze.dev/2021/04/29/libGDX-Internal-Assets-List/
   // The article can be helpful when using assets.txt in your project.

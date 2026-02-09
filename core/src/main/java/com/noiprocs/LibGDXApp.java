@@ -237,4 +237,3 @@ public class LibGDXApp extends ApplicationAdapter {
     // Game thread will be terminated when application exits
   }
 }
-

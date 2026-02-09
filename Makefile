@@ -7,7 +7,7 @@ export
 # Gradle command
 GRADLE = ./gradlew
 
-.PHONY: help build clean test run run-client run-server run-android
+.PHONY: help build clean test run run-client run-server run-android format check-format
 
 # Default target
 help:
@@ -15,6 +15,8 @@ help:
 	@echo "  make build         - Clean and build the project"
 	@echo "  make compile       - Compile without cleaning"
 	@echo "  make test          - Run tests"
+	@echo "  make format        - Format all Java source files"
+	@echo "  make check-format  - Check if code is formatted correctly"
 	@echo "  make run           - Run desktop version with current settings (TYPE=$(TYPE))"
 	@echo "  make run-client    - Run as client (desktop)"
 	@echo "  make run-server    - Run as server (desktop)"
@@ -52,3 +54,9 @@ run-android:
 	$(GRADLE) android:assembleDebug
 	@echo "APK built at: android/build/outputs/apk/debug/android-debug.apk"
 	@echo "To install: adb install -r android/build/outputs/apk/debug/android-debug.apk"
+
+format:
+	$(GRADLE) spotlessApply
+
+check-format:
+	$(GRADLE) spotlessCheck

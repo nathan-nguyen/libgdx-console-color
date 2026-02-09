@@ -38,8 +38,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
   static {
     for (Map.Entry<Character, ColorMapper.RGB> entry : ColorMapper.COLOR_MAP.entrySet()) {
       ColorMapper.RGB rgb = entry.getValue();
-      COLOR_CHAR_MAP.put(
-          entry.getKey(), new Color(rgb.r / 255f, rgb.g / 255f, rgb.b / 255f, 1f));
+      COLOR_CHAR_MAP.put(entry.getKey(), new Color(rgb.r / 255f, rgb.g / 255f, rgb.b / 255f, 1f));
     }
   }
 
@@ -115,9 +114,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
     }
   }
 
-  /**
-   * Renders a line of text with fixed character width (monospace)
-   */
+  /** Renders a line of text with fixed character width (monospace) */
   private void renderMonospaceLine(
       SpriteBatch batch, BitmapFont font, String text, float x, float y, float charWidth) {
     Color originalColor = batch.getColor().cpy();
