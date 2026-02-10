@@ -188,6 +188,13 @@ public enum ControlZone {
   }
 
   /**
+   * Check if this is a quick slot zone (1-4).
+   */
+  public boolean isQuickSlot() {
+    return this == QUICK_SLOT_1 || this == QUICK_SLOT_2 || this == QUICK_SLOT_3 || this == QUICK_SLOT_4;
+  }
+
+  /**
    * Find the zone containing the given point, prioritizing HUD controls if requested.
    *
    * @param x Virtual screen X coordinate
@@ -197,7 +204,8 @@ public enum ControlZone {
    */
   public static ControlZone findZone(float x, float y, boolean hudMode) {
     for (ControlZone zone : values()) {
-      if (hudMode && !zone.isHudControl()) {
+      if (hudMode && !zone.isHudControl() && !zone.isQuickSlot()) {
+        // In HUD mode, allow HUD controls and quick slot buttons
         continue;
       }
       if (!hudMode && zone.isHudControl()) {

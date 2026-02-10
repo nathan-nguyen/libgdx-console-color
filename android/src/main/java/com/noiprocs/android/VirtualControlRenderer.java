@@ -79,9 +79,10 @@ public class VirtualControlRenderer {
    * @param batch SpriteBatch for rendering text labels
    * @param font Font for rendering labels
    * @param showEquipmentAction Whether to show the equipment action button (chest interaction)
+   * @param showQuickSlots Whether to show quick slot buttons 1-4 (equipment HUD)
    */
   public void renderHudControls(
-      Set<ControlZone> activeZones, SpriteBatch batch, BitmapFont font, boolean showEquipmentAction) {
+      Set<ControlZone> activeZones, SpriteBatch batch, BitmapFont font, boolean showEquipmentAction, boolean showQuickSlots) {
     shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 
     // Render navigation arrows
@@ -100,6 +101,14 @@ public class VirtualControlRenderer {
       renderZone(ControlZone.HUD_EQUIPMENT_ACTION, activeZones.contains(ControlZone.HUD_EQUIPMENT_ACTION), COLOR_HUD, COLOR_HUD_ACTIVE);
     }
 
+    // Render quick slot buttons if in equipment mode
+    if (showQuickSlots) {
+      renderZone(ControlZone.QUICK_SLOT_1, activeZones.contains(ControlZone.QUICK_SLOT_1), COLOR_QUICK, COLOR_QUICK_ACTIVE);
+      renderZone(ControlZone.QUICK_SLOT_2, activeZones.contains(ControlZone.QUICK_SLOT_2), COLOR_QUICK, COLOR_QUICK_ACTIVE);
+      renderZone(ControlZone.QUICK_SLOT_3, activeZones.contains(ControlZone.QUICK_SLOT_3), COLOR_QUICK, COLOR_QUICK_ACTIVE);
+      renderZone(ControlZone.QUICK_SLOT_4, activeZones.contains(ControlZone.QUICK_SLOT_4), COLOR_QUICK, COLOR_QUICK_ACTIVE);
+    }
+
     shapeRenderer.end();
 
     // Render labels
@@ -113,6 +122,12 @@ public class VirtualControlRenderer {
     renderLabel(batch, font, "TAB", ControlZone.HUD_TAB);
     if (showEquipmentAction) {
       renderLabel(batch, font, "E", ControlZone.HUD_EQUIPMENT_ACTION);
+    }
+    if (showQuickSlots) {
+      renderLabel(batch, font, "1", ControlZone.QUICK_SLOT_1);
+      renderLabel(batch, font, "2", ControlZone.QUICK_SLOT_2);
+      renderLabel(batch, font, "3", ControlZone.QUICK_SLOT_3);
+      renderLabel(batch, font, "4", ControlZone.QUICK_SLOT_4);
     }
     batch.end();
   }

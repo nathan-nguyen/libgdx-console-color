@@ -57,10 +57,11 @@ class AndroidApp extends LibGDXApp {
 
     if (touchState.isHudMode()) {
       // Render HUD navigation controls
-      boolean showEquipmentAction =
-          touchState.getHudType(getGameScreen()) == TouchState.HudType.CHEST;
+      TouchState.HudType hudType = touchState.getHudType(getGameScreen());
+      boolean showEquipmentAction = hudType == TouchState.HudType.CHEST;
+      boolean showQuickSlots = hudType == TouchState.HudType.EQUIPMENT;
       virtualControlRenderer.renderHudControls(
-          touchState.getActiveZones(), getBatch(), getFont(), showEquipmentAction);
+          touchState.getActiveZones(), getBatch(), getFont(), showEquipmentAction, showQuickSlots);
     } else {
       // Render game controls
       virtualControlRenderer.renderGameControls(
