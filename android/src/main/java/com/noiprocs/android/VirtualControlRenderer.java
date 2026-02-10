@@ -15,37 +15,35 @@ import java.util.Set;
 public class VirtualControlRenderer {
   private final ShapeRenderer shapeRenderer;
 
-  // Colors for different control states
-  private static final Color COLOR_INACTIVE = new Color(1f, 1f, 1f, 0.2f);
-  private static final Color COLOR_ACTIVE = new Color(1f, 1f, 1f, 0.5f);
-  private static final Color COLOR_DPAD = new Color(0.3f, 0.6f, 1f, 0.3f);
-  private static final Color COLOR_DPAD_ACTIVE = new Color(0.3f, 0.6f, 1f, 0.6f);
-  private static final Color COLOR_ACTION = new Color(1f, 0.3f, 0.3f, 0.3f);
-  private static final Color COLOR_ACTION_ACTIVE = new Color(1f, 0.3f, 0.3f, 0.6f);
-  private static final Color COLOR_QUICK = new Color(0.3f, 1f, 0.3f, 0.3f);
-  private static final Color COLOR_QUICK_ACTIVE = new Color(0.3f, 1f, 0.3f, 0.6f);
-  private static final Color COLOR_HUD = new Color(1f, 1f, 0.3f, 0.3f);
-  private static final Color COLOR_HUD_ACTIVE = new Color(1f, 1f, 0.3f, 0.6f);
+  // Colors for different control states (outline only, transparent backgrounds)
+  private static final Color COLOR_INACTIVE = new Color(1f, 1f, 1f, 0.3f);
+  private static final Color COLOR_ACTIVE = new Color(1f, 1f, 1f, 0.7f);
+  private static final Color COLOR_DPAD = new Color(0.3f, 0.6f, 1f, 0.5f);
+  private static final Color COLOR_DPAD_ACTIVE = new Color(0.3f, 0.6f, 1f, 1.0f);
+  private static final Color COLOR_ACTION = new Color(1f, 0.3f, 0.3f, 0.5f);
+  private static final Color COLOR_ACTION_ACTIVE = new Color(1f, 0.3f, 0.3f, 1.0f);
+  private static final Color COLOR_QUICK = new Color(0.3f, 1f, 0.3f, 0.5f);
+  private static final Color COLOR_QUICK_ACTIVE = new Color(0.3f, 1f, 0.3f, 1.0f);
+  private static final Color COLOR_HUD = new Color(1f, 1f, 0.3f, 0.5f);
+  private static final Color COLOR_HUD_ACTIVE = new Color(1f, 1f, 0.3f, 1.0f);
 
   public VirtualControlRenderer() {
     this.shapeRenderer = new ShapeRenderer();
   }
 
   /**
-   * Render game controls (D-pad, action buttons, quick actions).
+   * Render game controls (joystick, action buttons, quick actions).
    *
    * @param activeZones Set of currently active zones
    * @param batch SpriteBatch for rendering text labels
    * @param font Font for rendering labels
+   * @param touchState Touch state for joystick position
    */
-  public void renderGameControls(Set<ControlZone> activeZones, SpriteBatch batch, BitmapFont font) {
-    shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+  public void renderGameControls(Set<ControlZone> activeZones, SpriteBatch batch, BitmapFont font, TouchState touchState) {
+    shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 
-    // Render D-pad
-    renderZone(ControlZone.DPAD_UP, activeZones.contains(ControlZone.DPAD_UP), COLOR_DPAD, COLOR_DPAD_ACTIVE);
-    renderZone(ControlZone.DPAD_DOWN, activeZones.contains(ControlZone.DPAD_DOWN), COLOR_DPAD, COLOR_DPAD_ACTIVE);
-    renderZone(ControlZone.DPAD_LEFT, activeZones.contains(ControlZone.DPAD_LEFT), COLOR_DPAD, COLOR_DPAD_ACTIVE);
-    renderZone(ControlZone.DPAD_RIGHT, activeZones.contains(ControlZone.DPAD_RIGHT), COLOR_DPAD, COLOR_DPAD_ACTIVE);
+    // Render joystick
+    renderJoystick(touchState);
 
     // Render action buttons
     renderZone(ControlZone.ACTION_SPACE, activeZones.contains(ControlZone.ACTION_SPACE), COLOR_ACTION, COLOR_ACTION_ACTIVE);
@@ -63,10 +61,6 @@ public class VirtualControlRenderer {
 
     // Render labels
     batch.begin();
-    renderLabel(batch, font, "W", ControlZone.DPAD_UP);
-    renderLabel(batch, font, "S", ControlZone.DPAD_DOWN);
-    renderLabel(batch, font, "A", ControlZone.DPAD_LEFT);
-    renderLabel(batch, font, "D", ControlZone.DPAD_RIGHT);
     renderLabel(batch, font, "SPC", ControlZone.ACTION_SPACE);
     renderLabel(batch, font, "F", ControlZone.ACTION_FIRE);
     renderLabel(batch, font, "T", ControlZone.ACTION_TOGGLE);
@@ -88,7 +82,7 @@ public class VirtualControlRenderer {
    */
   public void renderHudControls(
       Set<ControlZone> activeZones, SpriteBatch batch, BitmapFont font, boolean showEquipmentAction) {
-    shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+    shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 
     // Render navigation arrows
     renderZone(ControlZone.HUD_UP, activeZones.contains(ControlZone.HUD_UP), COLOR_HUD, COLOR_HUD_ACTIVE);
@@ -138,6 +132,27 @@ public class VirtualControlRenderer {
       Circle circle = (Circle) shape;
       shapeRenderer.circle(circle.x, circle.y, circle.radius, 32);
     }
+  }
+
+  /**
+   * Render joystick (outer circle + inner knob).
+   */
+  private void renderJoystick(TouchState touchState) {
+    com.badlogic.gdx.math.Circle joystickCircle = (com.badlogic.gdx.math.Circle) ControlZone.JOYSTICK.getShape();
+
+    // Draw outer circle (boundary)
+    shapeRenderer.setColor(COLOR_DPAD);
+    shapeRenderer.circle(joystickCircle.x, joystickCircle.y, joystickCircle.radius, 32);
+
+    // Draw inner knob based on touch offset
+    com.badlogic.gdx.math.Vector2 offset = touchState.getJoystickOffset();
+    float knobX = joystickCircle.x + offset.x * joystickCircle.radius * 0.6f;
+    float knobY = joystickCircle.y + offset.y * joystickCircle.radius * 0.6f;
+    float knobRadius = joystickCircle.radius * 0.25f;
+
+    Color knobColor = touchState.isJoystickActive() ? COLOR_DPAD_ACTIVE : COLOR_DPAD;
+    shapeRenderer.setColor(knobColor);
+    shapeRenderer.circle(knobX, knobY, knobRadius, 24);
   }
 
   /**

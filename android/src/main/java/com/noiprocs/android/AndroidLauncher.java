@@ -64,7 +64,7 @@ class AndroidApp extends LibGDXApp {
     } else {
       // Render game controls
       virtualControlRenderer.renderGameControls(
-          touchState.getActiveZones(), getBatch(), getFont());
+          touchState.getActiveZones(), getBatch(), getFont(), touchState);
     }
   }
 

@@ -26,12 +26,17 @@ public class TouchInputController implements InputController {
 
   @Override
   public void handleInput(GameContext gameContext, LibGDXGameScreen gameScreen) {
+    // Save previous pointer state for release detection
+    touchState.savePointerState();
+
     // Update HUD mode state
     touchState.updateHudMode(gameScreen);
     boolean hudMode = touchState.isHudMode();
 
     // Track which zones are currently touched this frame
     boolean[] zonesTouched = new boolean[ControlZone.values().length];
+    float joystickTouchX = 0;
+    float joystickTouchY = 0;
 
     // Process all active touch pointers (up to 5 simultaneous touches)
     for (int i = 0; i < 5; i++) {
@@ -48,6 +53,12 @@ public class TouchInputController implements InputController {
         if (zone != null) {
           touchState.updatePointer(i, zone);
           zonesTouched[zone.ordinal()] = true;
+
+          // Track joystick touch position for rendering
+          if (zone == ControlZone.JOYSTICK && !hudMode) {
+            joystickTouchX = x;
+            joystickTouchY = y;
+          }
         } else {
           touchState.updatePointer(i, null);
         }
@@ -61,42 +72,57 @@ public class TouchInputController implements InputController {
     if (hudMode) {
       handleHudInput(gameContext, gameScreen, zonesTouched);
     } else {
-      handleGameInput(gameContext, gameScreen, zonesTouched);
+      handleGameInput(gameContext, gameScreen, zonesTouched, joystickTouchX, joystickTouchY);
     }
   }
 
   /**
    * Handle game input (movement, actions, quick slots).
    */
-  private void handleGameInput(GameContext gameContext, LibGDXGameScreen gameScreen, boolean[] zonesTouched) {
+  private void handleGameInput(GameContext gameContext, LibGDXGameScreen gameScreen, boolean[] zonesTouched, float joystickTouchX, float joystickTouchY) {
     // Track if any movement is currently active
     boolean anyMovementActive = false;
+    char joystickDirection = '\0';
 
-    // Check for equipment button (E) to open inventory - handle separately
-    if (zonesTouched[ControlZone.QUICK_EQUIPMENT.ordinal()]) {
-      if (!touchState.isCommandPressed('e')) {
-        touchState.pressCommand('e');
-        gameScreen.hud.equipmentHud.open();
+    // Handle joystick input
+    if (zonesTouched[ControlZone.JOYSTICK.ordinal()]) {
+      joystickDirection = ControlZone.JOYSTICK.getJoystickDirection(joystickTouchX, joystickTouchY);
+      com.badlogic.gdx.math.Vector2 offset = ControlZone.JOYSTICK.getJoystickOffset(joystickTouchX, joystickTouchY);
+      touchState.updateJoystick(joystickTouchX, joystickTouchY, offset);
+
+      if (joystickDirection != '\0') {
+        anyMovementActive = true;
+        // Send movement command if direction changed
+        if (!touchState.isCommandPressed(joystickDirection)) {
+          // Clear old movement commands
+          touchState.clearCommand('w');
+          touchState.clearCommand('a');
+          touchState.clearCommand('s');
+          touchState.clearCommand('d');
+          // Set new direction
+          touchState.pressCommand(joystickDirection);
+          gameContext.controlManager.processInput(
+              new InputCommand(gameContext.username, joystickDirection));
+        }
       }
     } else {
-      if (touchState.isCommandPressed('e')) {
-        touchState.clearCommand('e');
-      }
+      touchState.clearJoystick();
+    }
+
+
+    // Check for equipment button (E) to open inventory - trigger on release
+    if (touchState.wasZoneReleased(ControlZone.QUICK_EQUIPMENT)) {
+      gameScreen.hud.equipmentHud.open();
     }
 
     // Process each zone and send commands for newly pressed zones
     for (ControlZone zone : ControlZone.values()) {
-      if (!zone.isGameControl() || zone == ControlZone.QUICK_EQUIPMENT) {
-        continue; // Skip HUD controls and equipment button (already handled)
+      if (!zone.isGameControl() || zone == ControlZone.QUICK_EQUIPMENT || zone.isJoystick() || zone.isDpad()) {
+        continue; // Skip HUD controls, equipment button, joystick, and D-pad (handled separately)
       }
 
       char command = zone.getCommand();
       boolean isTouched = zonesTouched[zone.ordinal()];
-
-      // Track if this is a movement zone
-      if (zone.isDpad() && isTouched) {
-        anyMovementActive = true;
-      }
 
       if (isTouched) {
         // For all controls, send command if not already pressed
@@ -113,9 +139,14 @@ public class TouchInputController implements InputController {
       }
     }
 
-    // Send halt command if movement stopped (D-pad released)
+    // Send halt command if movement stopped (joystick released)
     if (touchState.wasMovementActive() && !anyMovementActive) {
       gameContext.controlManager.processInput(new InputCommand(gameContext.username, "h"));
+      // Clear all movement commands
+      touchState.clearCommand('w');
+      touchState.clearCommand('a');
+      touchState.clearCommand('s');
+      touchState.clearCommand('d');
     }
 
     // Update movement state for next frame
@@ -152,15 +183,15 @@ public class TouchInputController implements InputController {
    * Handle crafting HUD input.
    */
   private void handleCraftingHudInput(LibGDXGameScreen gameScreen, boolean[] zonesTouched) {
-    // Check for close button
-    if (zoneWasTapped(ControlZone.HUD_CLOSE, zonesTouched)) {
+    // Check for close button - trigger on release
+    if (touchState.wasZoneReleased(ControlZone.HUD_CLOSE)) {
       gameScreen.hud.craftingHud.close();
       touchState.clear();
       return;
     }
 
     // Check for tab button
-    if (zoneWasTapped(ControlZone.HUD_TAB, zonesTouched)) {
+    if (touchState.wasZoneReleased(ControlZone.HUD_TAB)) {
       gameScreen.hud.craftingHud.close();
       gameScreen.hud.equipmentHud.open();
       touchState.clear();
@@ -193,15 +224,15 @@ public class TouchInputController implements InputController {
    */
   private void handleEquipmentHudInput(
       GameContext gameContext, LibGDXGameScreen gameScreen, boolean[] zonesTouched) {
-    // Check for close button
-    if (zoneWasTapped(ControlZone.HUD_CLOSE, zonesTouched)) {
+    // Check for close button - trigger on release
+    if (touchState.wasZoneReleased(ControlZone.HUD_CLOSE)) {
       gameScreen.hud.equipmentHud.close();
       touchState.clear();
       return;
     }
 
     // Check for tab button
-    if (zoneWasTapped(ControlZone.HUD_TAB, zonesTouched)) {
+    if (touchState.wasZoneReleased(ControlZone.HUD_TAB)) {
       gameScreen.hud.equipmentHud.close();
       gameScreen.hud.craftingHud.open();
       touchState.clear();
@@ -246,8 +277,8 @@ public class TouchInputController implements InputController {
    * Handle chest interaction HUD input.
    */
   private void handleChestHudInput(LibGDXGameScreen gameScreen, boolean[] zonesTouched) {
-    // Check for close button
-    if (zoneWasTapped(ControlZone.HUD_CLOSE, zonesTouched)) {
+    // Check for close button - trigger on release
+    if (touchState.wasZoneReleased(ControlZone.HUD_CLOSE)) {
       gameScreen.hud.inventoryInteractionHud.close();
       touchState.clear();
       return;
