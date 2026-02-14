@@ -3,60 +3,107 @@ package com.noiprocs.android;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.noiprocs.resources.UIConfig;
 
 /**
  * Defines all touch control zones and their screen positions.
- * Coordinates are in virtual screen space (440x690 pixels).
- * LibGDX uses bottom-left origin: (0,0) is bottom-left, (440,690) is top-right.
+ * Positions are scaled based on actual virtual screen dimensions.
+ * LibGDX uses bottom-left origin: (0,0) is bottom-left.
  */
 public enum ControlZone {
   // Joystick (bottom left - replaces D-pad)
-  JOYSTICK(new Circle(82.5f, 87.5f, 80f), '\0'),  // Centered in D-pad area
+  JOYSTICK('\0'),
 
   // D-pad zones (kept for compatibility, but not used in game mode)
-  DPAD_UP(new Rectangle(55, 115, 55, 55), 'w'),       // y=115, bottom at 115, top at 170
-  DPAD_DOWN(new Rectangle(55, 5, 55, 55), 's'),       // y=5, bottom at 5 (TOUCHING border)
-  DPAD_LEFT(new Rectangle(5, 60, 55, 55), 'a'),       // y=60, bottom at 60, top at 115
-  DPAD_RIGHT(new Rectangle(105, 60, 55, 55), 'd'),     // y=60, bottom at 60, top at 115
+  DPAD_UP('w'),
+  DPAD_DOWN('s'),
+  DPAD_LEFT('a'),
+  DPAD_RIGHT('d'),
 
   // Action buttons (bottom right, circular)
-  ACTION_SPACE(new Circle(340, 75, 32), ' '),     // Primary action - center
-  ACTION_FIRE(new Circle(395, 115, 28), 'f'),     // Fire - upper right
-  ACTION_TOGGLE(new Circle(395, 35, 28), 't'),    // Toggle - lower right
+  ACTION_SPACE(' '),
+  ACTION_FIRE('f'),
+  ACTION_TOGGLE('t'),
 
   // Quick actions (top right corner - E button, touching top map border)
-  QUICK_EQUIPMENT(new Rectangle(390, 600, 45, 45), 'e'),  // y=600, top at 645 (below border at ~650)
+  QUICK_EQUIPMENT('e'),
 
   // Inventory slots (top left, horizontal row, touching top map border)
-  QUICK_SLOT_1(new Rectangle(5, 600, 45, 45), '1'),       // y=600, top at 645 (below border at ~650)
-  QUICK_SLOT_2(new Rectangle(55, 600, 45, 45), '2'),      // y=600, top at 645 (below border at ~650)
-  QUICK_SLOT_3(new Rectangle(105, 600, 45, 45), '3'),     // y=600, top at 645 (below border at ~650)
-  QUICK_SLOT_4(new Rectangle(155, 600, 45, 45), '4'),     // y=600, top at 645 (below border at ~650)
+  QUICK_SLOT_1('1'),
+  QUICK_SLOT_2('2'),
+  QUICK_SLOT_3('3'),
+  QUICK_SLOT_4('4'),
 
   // HUD navigation (context-aware, shown when HUD is active)
-  // Positioned at bottom, touching bottom border from above (same as DPAD)
-  HUD_UP(new Rectangle(55, 115, 55, 55), 'w'),         // y=115, bottom at 115, top at 170
-  HUD_DOWN(new Rectangle(55, 5, 55, 55), 's'),         // y=5, bottom at 5 (TOUCHING border)
-  HUD_LEFT(new Rectangle(5, 60, 55, 55), 'a'),         // y=60, bottom at 60, top at 115
-  HUD_RIGHT(new Rectangle(105, 60, 55, 55), 'd'),       // y=60, bottom at 60, top at 115
+  HUD_UP('w'),
+  HUD_DOWN('s'),
+  HUD_LEFT('a'),
+  HUD_RIGHT('d'),
 
   // Action buttons positioned to match game controls
-  HUD_TAB(new Circle(340, 75, 32), '\t'),              // Same position as ACTION_SPACE
-  HUD_CONFIRM(new Circle(395, 115, 28), '\n'),         // Same position as ACTION_FIRE (F)
-  HUD_CLOSE(new Rectangle(390, 600, 45, 45), (char) 27), // Same position as QUICK_EQUIPMENT (E), y=600, top at 645
-  HUD_EQUIPMENT_ACTION(new Rectangle(385, 350, 50, 50), 'e'); // For chest interaction
+  HUD_TAB('\t'),
+  HUD_CONFIRM('\n'),
+  HUD_CLOSE((char) 27),
+  HUD_EQUIPMENT_ACTION('e');
 
-  private final Object shape; // Either Rectangle or Circle
+  private Object shape; // Either Rectangle or Circle (calculated dynamically)
   private final char command;
 
-  ControlZone(Rectangle rect, char command) {
-    this.shape = rect;
+  ControlZone(char command) {
     this.command = command;
   }
 
-  ControlZone(Circle circle, char command) {
-    this.shape = circle;
-    this.command = command;
+  /**
+   * Initialize all control zone positions based on actual virtual screen dimensions.
+   * Must be called before using any control zones.
+   *
+   * @param virtualWidth Actual virtual screen width
+   * @param virtualHeight Actual virtual screen height
+   */
+  public static void initializePositions(float virtualWidth, float virtualHeight) {
+    // Calculate scale factors based on base dimensions from UIConfig
+    float scaleX = virtualWidth / UIConfig.BASE_VIRTUAL_WIDTH;
+    float scaleY = virtualHeight / UIConfig.BASE_VIRTUAL_HEIGHT;
+
+    // Joystick (bottom left)
+    JOYSTICK.shape = new Circle(100, 100, 80f * Math.min(scaleX, scaleY));
+
+    // D-pad zones
+    DPAD_UP.shape = new Rectangle(55 * scaleX, 115 * scaleY, 55 * scaleX, 55 * scaleY);
+    DPAD_DOWN.shape = new Rectangle(55 * scaleX, 5 * scaleY, 55 * scaleX, 55 * scaleY);
+    DPAD_LEFT.shape = new Rectangle(5 * scaleX, 60 * scaleY, 55 * scaleX, 55 * scaleY);
+    DPAD_RIGHT.shape = new Rectangle(105 * scaleX, 60 * scaleY, 55 * scaleX, 55 * scaleY);
+
+    // Action buttons (bottom right, circular)
+    float actionScale = Math.min(scaleX, scaleY);
+    ACTION_SPACE.shape = new Circle(virtualWidth - 100, 75 * scaleY, 32 * actionScale);
+    ACTION_FIRE.shape = new Circle(virtualWidth - 45, 115 * scaleY, 28 * actionScale);
+    ACTION_TOGGLE.shape = new Circle(virtualWidth - 45, 35 * scaleY, 28 * actionScale);
+
+    float touchTopBorderY = virtualHeight - 90;
+    float squareButtonDimension = Math.min(45 * scaleX, 45 * scaleY);
+    // Quick actions (top right corner)
+    QUICK_EQUIPMENT.shape = new Rectangle(virtualWidth - 5 - squareButtonDimension, touchTopBorderY, squareButtonDimension, squareButtonDimension);
+
+    // Inventory slots (top left, horizontal row)
+    float quickSlotPaddingLeft = 5;
+    QUICK_SLOT_1.shape = new Rectangle(quickSlotPaddingLeft * 1 + squareButtonDimension * 0, touchTopBorderY, squareButtonDimension, squareButtonDimension);
+    QUICK_SLOT_2.shape = new Rectangle(quickSlotPaddingLeft * 2 + squareButtonDimension * 1, touchTopBorderY, squareButtonDimension, squareButtonDimension);
+    QUICK_SLOT_3.shape = new Rectangle(quickSlotPaddingLeft * 3 + squareButtonDimension * 2, touchTopBorderY, squareButtonDimension, squareButtonDimension);
+    QUICK_SLOT_4.shape = new Rectangle(quickSlotPaddingLeft * 4 + squareButtonDimension * 3, touchTopBorderY, squareButtonDimension, squareButtonDimension);
+
+    // HUD navigation (same as D-pad)
+    HUD_UP.shape = new Rectangle(55 * scaleX, 115 * scaleY, 55 * scaleX, 55 * scaleY);
+    HUD_DOWN.shape = new Rectangle(55 * scaleX, 5 * scaleY, 55 * scaleX, 55 * scaleY);
+    HUD_LEFT.shape = new Rectangle(5 * scaleX, 60 * scaleY, 55 * scaleX, 55 * scaleY);
+    HUD_RIGHT.shape = new Rectangle(105 * scaleX, 60 * scaleY, 55 * scaleX, 55 * scaleY);
+
+    // HUD action buttons
+    float equipButtonDimension = Math.min(50 * scaleX, 50 * scaleY);
+    HUD_TAB.shape = new Circle(virtualWidth - 100, 75 * scaleY, 32 * actionScale);
+    HUD_CONFIRM.shape = new Circle(virtualWidth - 45, 115 * scaleY, 28 * actionScale);
+    HUD_CLOSE.shape = new Rectangle(virtualWidth - 5 - squareButtonDimension, touchTopBorderY, squareButtonDimension, squareButtonDimension);
+    HUD_EQUIPMENT_ACTION.shape = new Rectangle(virtualWidth - 55, 350 * scaleY, equipButtonDimension, equipButtonDimension);
   }
 
   /**

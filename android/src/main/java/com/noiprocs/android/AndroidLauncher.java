@@ -60,6 +60,9 @@ class AndroidApp extends LibGDXApp {
       virtualHeight = UIConfig.BASE_VIRTUAL_HEIGHT;
       virtualWidth = UIConfig.BASE_VIRTUAL_HEIGHT / screenAspectRatio;
     }
+
+    // Initialize control zone positions based on scaled virtual dimensions
+    ControlZone.initializePositions(virtualWidth, virtualHeight);
   }
 
   @Override
