@@ -18,7 +18,7 @@ public class AndroidLauncher extends AndroidApplication {
 
     // Get parameters from intent or use defaults
     String username = "player";
-    String hostname = "192.168.50.49";
+    String hostname = "192.168.1.3";
     int port = 8080;
 
     // Create AndroidApp which extends LibGDXApp with touch controls

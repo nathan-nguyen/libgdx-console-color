@@ -1,9 +1,5 @@
 package com.noiprocs.ui.libgdx;
 
-import static com.noiprocs.ui.console.ConsoleUIConfig.HEIGHT;
-import static com.noiprocs.ui.console.ConsoleUIConfig.RENDER_RANGE;
-import static com.noiprocs.ui.console.ConsoleUIConfig.WIDTH;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -27,10 +23,22 @@ import org.slf4j.LoggerFactory;
 
 public class LibGDXGameScreen implements GameScreenInterface {
   private static final Logger logger = LoggerFactory.getLogger(LibGDXGameScreen.class);
-  protected final char[][] map = new char[HEIGHT][WIDTH];
-  protected final char[][] colorMap = new char[HEIGHT][WIDTH];
+  protected final int height;
+  protected final int width;
+  protected final int renderRange;
+  protected final char[][] map;
+  protected final char[][] colorMap;
+
   protected GameContext gameContext;
   public HUD hud;
+
+  public LibGDXGameScreen(int height, int width, int renderRange) {
+    this.height = height;
+    this.width = width;
+    this.renderRange = renderRange;
+    this.map = new char[height][width];
+    this.colorMap = new char[height][width];
+  }
 
   // Color character to libGDX Color mapping
   private static final Map<Character, Color> COLOR_CHAR_MAP = new HashMap<>();
@@ -45,7 +53,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
   @Override
   public void setGameContext(GameContext gameContext) {
     this.gameContext = gameContext;
-    this.hud = new HUD(gameContext);
+    this.hud = new HUD(gameContext, this.width);
   }
 
   @Override
@@ -91,18 +99,18 @@ public class LibGDXGameScreen implements GameScreenInterface {
 
     // 3. Build border string
     StringBuilder borderSb = new StringBuilder();
-    for (int j = 0; j < WIDTH + 2; j++) {
+    for (int j = 0; j < width + 2; j++) {
       borderSb.append('-');
     }
 
     // 4. Render map with borders (matching Swing's approach)
     // Total lines: 1 top border + HEIGHT map rows + 1 bottom border
-    for (int i = 0; i < HEIGHT + 2; i++) {
+    for (int i = 0; i < height + 2; i++) {
       // Check if we should render overlay line instead (like Swing)
       if (overlayLines != null && i < overlayLines.size()) {
         font.setColor(Color.WHITE);
         renderMonospaceLine(batch, font, overlayLines.get(i), x, y, charWidth);
-      } else if (i == 0 || i == HEIGHT + 1) {
+      } else if (i == 0 || i == height + 1) {
         // Top or bottom border
         font.setColor(Color.WHITE);
         renderMonospaceLine(batch, font, borderSb.toString(), x, y, charWidth);
@@ -141,7 +149,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
     currentX += charWidth;
 
     // Map content with colors - render each character individually for monospace
-    for (int j = 0; j < WIDTH; j++) {
+    for (int j = 0; j < width; j++) {
       char ch = map[mapRow][j] == 0 ? ' ' : map[mapRow][j];
       char colorChar = colorMap[mapRow][j];
 
@@ -187,8 +195,8 @@ public class LibGDXGameScreen implements GameScreenInterface {
   protected void constructScreen(PlayerModel playerModel) {
     // Get list of visible objects not far from player
     // Render order: Models with smaller posX render first.
-    int offsetX = playerModel.position.x - HEIGHT / 2;
-    int offsetY = playerModel.position.y - WIDTH / 2;
+    int offsetX = playerModel.position.x - height / 2;
+    int offsetY = playerModel.position.y - width / 2;
     this.clearMap();
 
     List<Model> renderableModelList =
@@ -198,7 +206,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
             .filter(
                 model ->
                     model.isVisible
-                        && model.position.manhattanDistanceTo(playerModel.position) <= RENDER_RANGE)
+                        && model.position.manhattanDistanceTo(playerModel.position) <= renderRange)
             .sorted(Comparator.comparingInt(u -> u.position.x))
             .collect(Collectors.toList());
 
@@ -214,8 +222,8 @@ public class LibGDXGameScreen implements GameScreenInterface {
 
       // Main player sprite position is always fixed and does not depend on current model position
       if (model.id.equals(playerModel.id)) {
-        posX = HEIGHT / 2 - consoleTexture.offsetX;
-        posY = WIDTH / 2 - consoleTexture.offsetY;
+        posX = height / 2 - consoleTexture.offsetX;
+        posY = width / 2 - consoleTexture.offsetY;
       }
 
       // Check if model has active hurt event and use red color override
@@ -230,8 +238,8 @@ public class LibGDXGameScreen implements GameScreenInterface {
   }
 
   private void clearMap() {
-    for (int i = 0; i < HEIGHT; ++i) {
-      for (int j = 0; j < WIDTH; ++j) {
+    for (int i = 0; i < height; ++i) {
+      for (int j = 0; j < width; ++j) {
         map[i][j] = 0;
         colorMap[i][j] = 0;
       }
@@ -245,7 +253,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
         if (texture[i][j] == 0) continue;
         int x = posX + i;
         int y = posY + j;
-        if (x >= 0 && x < HEIGHT && y >= 0 && y < WIDTH) {
+        if (x >= 0 && x < height && y >= 0 && y < width) {
           map[x][y] = texture[i][j];
           // Use override color if provided, otherwise use sprite's color map
           if (overrideColor != 0) {

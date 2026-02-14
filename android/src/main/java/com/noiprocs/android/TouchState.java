@@ -31,6 +31,7 @@ public class TouchState {
   private Vector2 joystickPosition = new Vector2(); // Current touch position on joystick
   private Vector2 joystickOffset = new Vector2();   // Normalized offset from center
   private boolean joystickActive = false;           // Whether joystick is being touched
+  private Integer joystickPointerId = null;         // Which pointer owns the joystick
 
   /**
    * Save current pointer state before processing new frame.
@@ -186,6 +187,7 @@ public class TouchState {
   public void clearJoystick() {
     joystickActive = false;
     joystickOffset.set(0, 0);
+    joystickPointerId = null;
   }
 
   /**
@@ -200,6 +202,27 @@ public class TouchState {
    */
   public boolean isJoystickActive() {
     return joystickActive;
+  }
+
+  /**
+   * Set which pointer owns the joystick.
+   */
+  public void setJoystickPointer(int pointerId) {
+    joystickPointerId = pointerId;
+  }
+
+  /**
+   * Get the pointer ID that owns the joystick.
+   */
+  public Integer getJoystickPointerId() {
+    return joystickPointerId;
+  }
+
+  /**
+   * Check if a pointer is the joystick pointer.
+   */
+  public boolean isJoystickPointer(int pointerId) {
+    return joystickPointerId != null && joystickPointerId == pointerId;
   }
 
   /**

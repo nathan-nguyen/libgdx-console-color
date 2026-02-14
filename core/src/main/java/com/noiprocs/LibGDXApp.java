@@ -106,7 +106,7 @@ public class LibGDXApp extends ApplicationAdapter {
     FontGenerator fontGenerator = new FontGenerator();
     font = fontGenerator.generateMonospaceFont();
     ConsoleUIConfig.CLEAR_SCREEN = false;
-    gameScreen = new LibGDXGameScreen();
+    gameScreen = new LibGDXGameScreen(40, 60, 120);
 
     // Initialize gameContext
     gameContext =

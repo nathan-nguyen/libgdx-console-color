@@ -50,20 +50,33 @@ public class TouchInputController implements InputController {
 
         // Find which zone this touch is in
         ControlZone zone = ControlZone.findZone(x, y, hudMode);
+
+        // If this pointer is the joystick pointer, keep it as joystick even if outside the zone
+        if (!hudMode && touchState.isJoystickPointer(i)) {
+          zone = ControlZone.JOYSTICK;
+        }
+
         if (zone != null) {
           touchState.updatePointer(i, zone);
           zonesTouched[zone.ordinal()] = true;
 
-          // Track joystick touch position for rendering
+          // Track joystick touch position for rendering and set joystick pointer
           if (zone == ControlZone.JOYSTICK && !hudMode) {
             joystickTouchX = x;
             joystickTouchY = y;
+            // Claim this pointer for the joystick if not already claimed
+            if (touchState.getJoystickPointerId() == null) {
+              touchState.setJoystickPointer(i);
+            }
           }
         } else {
           touchState.updatePointer(i, null);
         }
       } else {
-        // Pointer is not active
+        // Pointer is not active - if this was the joystick pointer, clear it
+        if (touchState.isJoystickPointer(i)) {
+          touchState.clearJoystick();
+        }
         touchState.updatePointer(i, null);
       }
     }

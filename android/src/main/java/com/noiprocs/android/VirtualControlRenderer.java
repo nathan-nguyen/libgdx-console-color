@@ -1,5 +1,6 @@
 package com.noiprocs.android;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -41,6 +42,7 @@ public class VirtualControlRenderer {
    */
   public void renderGameControls(Set<ControlZone> activeZones, SpriteBatch batch, BitmapFont font, TouchState touchState) {
     shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+    Gdx.gl.glLineWidth(3.0f); // Make borders bolder
 
     // Render joystick
     renderJoystick(touchState);
@@ -61,9 +63,9 @@ public class VirtualControlRenderer {
 
     // Render labels
     batch.begin();
-    renderLabel(batch, font, "SPC", ControlZone.ACTION_SPACE);
-    renderLabel(batch, font, "F", ControlZone.ACTION_FIRE);
-    renderLabel(batch, font, "T", ControlZone.ACTION_TOGGLE);
+    renderLabel(batch, font, "Interact", ControlZone.ACTION_SPACE);
+    renderLabel(batch, font, "Attack", ControlZone.ACTION_FIRE);
+    renderLabel(batch, font, "Use Item", ControlZone.ACTION_TOGGLE);
     renderLabel(batch, font, "E", ControlZone.QUICK_EQUIPMENT);
     renderLabel(batch, font, "1", ControlZone.QUICK_SLOT_1);
     renderLabel(batch, font, "2", ControlZone.QUICK_SLOT_2);
@@ -84,6 +86,7 @@ public class VirtualControlRenderer {
   public void renderHudControls(
       Set<ControlZone> activeZones, SpriteBatch batch, BitmapFont font, boolean showEquipmentAction, boolean showQuickSlots) {
     shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+    Gdx.gl.glLineWidth(3.0f); // Make borders bolder
 
     // Render navigation arrows
     renderZone(ControlZone.HUD_UP, activeZones.contains(ControlZone.HUD_UP), COLOR_HUD, COLOR_HUD_ACTIVE);
