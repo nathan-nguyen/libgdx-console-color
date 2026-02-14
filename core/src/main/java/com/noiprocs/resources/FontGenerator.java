@@ -9,10 +9,6 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFont
 /** Utility class for generating fonts. */
 public class FontGenerator {
   private static final int FONT_SIZE = 12;
-  // Total lines: 44 (2 player info + 40 map + 2 border), window height: 690
-  public static final float CHAR_HEIGHT = 690f / 44;
-  // Total columns: 62 (2 border + 60 map), window width: 440
-  public static final float CHAR_WIDTH = 440f / 62;
 
   private BitmapFont font;
 
@@ -55,10 +51,10 @@ public class FontGenerator {
       }
       for (BitmapFont.Glyph glyph : page) {
         if (glyph != null) {
-          glyph.xadvance = (int) CHAR_WIDTH;
+          glyph.xadvance = (int) UIConfig.CHAR_WIDTH;
         }
       }
     }
-    fontData.spaceXadvance = CHAR_HEIGHT;
+    fontData.spaceXadvance = UIConfig.CHAR_HEIGHT;
   }
 }

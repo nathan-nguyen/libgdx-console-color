@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.noiprocs.core.GameContext;
 import com.noiprocs.input.InputController;
 import com.noiprocs.resources.FontGenerator;
+import com.noiprocs.resources.UIConfig;
 import com.noiprocs.ui.console.ConsoleUIConfig;
 import com.noiprocs.ui.console.hitbox.ConsoleHitboxManager;
 import com.noiprocs.ui.console.sprite.ConsoleSpriteManager;
@@ -17,9 +18,9 @@ import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class LibGDXApp extends ApplicationAdapter {
-  // Virtual screen dimensions (matches desktop window size)
-  private static final float VIRTUAL_WIDTH = 440f;
-  private static final float VIRTUAL_HEIGHT = 690f;
+  // Virtual screen dimensions (scaled for device)
+  protected float virtualWidth;
+  protected float virtualHeight;
 
   private SpriteBatch batch;
   private BitmapFont font;
@@ -92,12 +93,24 @@ public class LibGDXApp extends ApplicationAdapter {
     this.renderVirtualControls = renderer;
   }
 
+  /**
+   * Initializes virtual dimensions. Can be overridden by subclasses for platform-specific scaling.
+   * Default implementation uses base dimensions.
+   */
+  protected void initializeVirtualDimensions() {
+    virtualWidth = UIConfig.BASE_VIRTUAL_WIDTH;
+    virtualHeight = UIConfig.BASE_VIRTUAL_HEIGHT;
+  }
+
   @Override
   public void create() {
+    // Initialize virtual dimensions (can be overridden by subclasses before calling super.create())
+    initializeVirtualDimensions();
+
     // Setup camera and viewport for proper scaling
     camera = new OrthographicCamera();
-    camera.setToOrtho(false, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
-    viewport = new FitViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera);
+    camera.setToOrtho(false, virtualWidth, virtualHeight);
+    viewport = new FitViewport(virtualWidth, virtualHeight, camera);
     viewport.apply();
 
     batch = new SpriteBatch();
@@ -106,7 +119,12 @@ public class LibGDXApp extends ApplicationAdapter {
     FontGenerator fontGenerator = new FontGenerator();
     font = fontGenerator.generateMonospaceFont();
     ConsoleUIConfig.CLEAR_SCREEN = false;
-    gameScreen = new LibGDXGameScreen(40, 60, 120);
+
+    // Calculate game screen dimensions based on virtual screen size and character size
+    int screenHeight =
+        Math.round(virtualHeight / UIConfig.CHAR_HEIGHT) - 4; // 4: 2 border + 2 player info
+    int screenWidth = Math.round(virtualWidth / UIConfig.CHAR_WIDTH) - 2; // 2: 2 borders
+    gameScreen = new LibGDXGameScreen(screenHeight, screenWidth, 120);
 
     // Initialize gameContext
     gameContext =
@@ -140,7 +158,8 @@ public class LibGDXApp extends ApplicationAdapter {
     // Render game screen
     batch.begin();
     gameScreen.render(0);
-    gameScreen.renderWithBatch(batch, font, FontGenerator.CHAR_WIDTH, FontGenerator.CHAR_HEIGHT);
+    gameScreen.renderWithBatch(
+        batch, font, UIConfig.CHAR_WIDTH, UIConfig.CHAR_HEIGHT, virtualHeight);
     batch.end();
 
     // Render virtual controls if available (Android only)

@@ -66,9 +66,6 @@ public class LibGDXGameScreen implements GameScreenInterface {
     this.constructScreen((PlayerModel) playerModel);
   }
 
-  // Virtual screen dimensions (should match LibGDXApp constants)
-  private static final float VIRTUAL_HEIGHT = 690f;
-
   /**
    * Renders the game screen using libGDX rendering API.
    *
@@ -76,13 +73,14 @@ public class LibGDXGameScreen implements GameScreenInterface {
    * @param font BitmapFont for rendering characters
    * @param charWidth Width of a character in pixels (fixed for monospace)
    * @param charHeight Height of a character in pixels
+   * @param virtualHeight Virtual screen height (scaled for device)
    */
   public void renderWithBatch(
-      SpriteBatch batch, BitmapFont font, float charWidth, float charHeight) {
+      SpriteBatch batch, BitmapFont font, float charWidth, float charHeight, float virtualHeight) {
     Model playerModel = gameContext.modelManager.getModel(gameContext.username);
     if (playerModel == null) return;
 
-    float y = VIRTUAL_HEIGHT - 5; // Start from top (using virtual coordinates)
+    float y = virtualHeight - 5; // Start from top (using virtual coordinates)
     float x = 0;
 
     // 1. Render player info HUD (may contain multiple lines separated by \n)

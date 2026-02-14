@@ -1,9 +1,11 @@
 package com.noiprocs.android;
 
 import android.os.Bundle;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.noiprocs.LibGDXApp;
+import com.noiprocs.resources.UIConfig;
 
 /** Launches the Android application with touch controls. */
 public class AndroidLauncher extends AndroidApplication {
@@ -37,6 +39,27 @@ class AndroidApp extends LibGDXApp {
 
   public AndroidApp(String platform, String username, String type, String hostname, int port) {
     super(platform, username, type, hostname, port, null);
+  }
+
+  @Override
+  protected void initializeVirtualDimensions() {
+    // Get actual screen dimensions
+    float screenWidth = Gdx.graphics.getWidth();
+    float screenHeight = Gdx.graphics.getHeight();
+
+    // Calculate aspect ratios
+    float baseAspectRatio = UIConfig.BASE_VIRTUAL_HEIGHT / UIConfig.BASE_VIRTUAL_WIDTH;
+    float screenAspectRatio = screenHeight / screenWidth;
+
+    if (screenAspectRatio > baseAspectRatio) {
+      // Screen is taller - fit width, scale height
+      virtualWidth = UIConfig.BASE_VIRTUAL_WIDTH;
+      virtualHeight = UIConfig.BASE_VIRTUAL_WIDTH * screenAspectRatio;
+    } else {
+      // Screen is wider - fit height, scale width
+      virtualHeight = UIConfig.BASE_VIRTUAL_HEIGHT;
+      virtualWidth = UIConfig.BASE_VIRTUAL_HEIGHT / screenAspectRatio;
+    }
   }
 
   @Override
