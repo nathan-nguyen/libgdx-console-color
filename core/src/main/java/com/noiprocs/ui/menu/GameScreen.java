@@ -1,7 +1,14 @@
 package com.noiprocs.ui.menu;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.noiprocs.LibGDXApp;
 import com.noiprocs.core.GameContext;
@@ -25,6 +32,10 @@ public class GameScreen implements Screen {
   private LibGDXGameScreen gameScreen;
   private GameContext gameContext;
   private Thread gameThread;
+  private Stage uiStage;
+  private Skin skin;
+  private MenuOverlay menuOverlay;
+  private Table buttonTable;
 
   public GameScreen(
       LibGDXApp app, String username, String hostname, int port, String type, String platform) {
@@ -69,8 +80,41 @@ public class GameScreen implements Screen {
     gameThread = new Thread(gameContext::run);
     gameThread.start();
 
-    // Set input processor to null (InputController polls directly)
-    Gdx.input.setInputProcessor(null);
+    setupUI();
+  }
+
+  private void setupUI() {
+    uiStage = new Stage(app.getViewport(), app.getBatch());
+    skin = UIStyleHelper.createSkin(app.getFont());
+
+    TextButton menuButton = new TextButton("!!!", skin);
+    menuButton.addListener(
+        new ClickListener() {
+          @Override
+          public void clicked(InputEvent event, float x, float y) {
+            toggleMenu();
+          }
+        });
+
+    buttonTable = new Table();
+    buttonTable.setFillParent(true);
+    buttonTable.top().right().pad(10);
+    buttonTable.add(menuButton).size(50, 50);
+    uiStage.addActor(buttonTable);
+
+    menuOverlay = new MenuOverlay(app, skin);
+    menuOverlay.setOnClose(() -> buttonTable.setVisible(true));
+    uiStage.addActor(menuOverlay);
+
+    InputMultiplexer multiplexer = new InputMultiplexer();
+    multiplexer.addProcessor(uiStage);
+    Gdx.input.setInputProcessor(multiplexer);
+  }
+
+  private void toggleMenu() {
+    boolean show = !menuOverlay.isVisible();
+    menuOverlay.setVisible(show);
+    buttonTable.setVisible(!show);
   }
 
   @Override
@@ -100,6 +144,10 @@ public class GameScreen implements Screen {
 
     // Render virtual controls if available (Android only)
     app.renderVirtualControls();
+
+    // Render UI overlay
+    uiStage.act(delta);
+    uiStage.draw();
   }
 
   @Override
@@ -136,7 +184,14 @@ public class GameScreen implements Screen {
     app.setGameScreen(null);
     app.setGameContext(null);
 
-    // Cleanup game resources
+    // Cleanup resources
+    if (uiStage != null) {
+      uiStage.dispose();
+    }
+    if (skin != null) {
+      skin.dispose();
+    }
+
     gameContext = null;
     gameScreen = null;
   }
