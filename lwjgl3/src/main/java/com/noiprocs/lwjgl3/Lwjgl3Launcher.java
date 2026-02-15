@@ -10,31 +10,16 @@ public class Lwjgl3Launcher {
     if (StartupHelper.startNewJvmIfRequired())
       return; // This handles macOS support and helps on Windows.
 
-    // Parse command line arguments
-    if (args.length < 5) {
-      System.err.println(
-          "Usage: java Lwjgl3Launcher <platform> <username> <type> <hostname> <port>");
-      System.err.println("Example: java Lwjgl3Launcher pc noiprocs client 192.168.50.255 8080");
-      System.exit(1);
-    }
-
-    String platform = args[0];
-    String username = args[1];
-    String type = args[2];
-    String hostname = args[3];
-    int port = Integer.parseInt(args[4]);
-
-    createApplication(platform, username, type, hostname, port);
+    // Settings are now managed by SettingsManager and loaded from the main menu
+    createApplication();
   }
 
-  private static Lwjgl3Application createApplication(
-      String platform, String username, String type, String hostname, int port) {
+  private static Lwjgl3Application createApplication() {
     // Create desktop-specific keyboard input controller
     DesktopKeyboardInputController inputController = new DesktopKeyboardInputController();
 
     return new Lwjgl3Application(
-        new LibGDXApp(platform, username, type, hostname, port, inputController),
-        getDefaultConfiguration());
+        new LibGDXApp("pc", "client", inputController), getDefaultConfiguration());
   }
 
   private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {

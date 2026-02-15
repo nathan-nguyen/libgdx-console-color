@@ -1,23 +1,24 @@
 package com.noiprocs;
 
-import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.noiprocs.core.GameContext;
 import com.noiprocs.input.InputController;
 import com.noiprocs.resources.FontGenerator;
 import com.noiprocs.resources.UIConfig;
+import com.noiprocs.settings.SettingsManager;
 import com.noiprocs.ui.console.ConsoleUIConfig;
-import com.noiprocs.ui.console.hitbox.ConsoleHitboxManager;
-import com.noiprocs.ui.console.sprite.ConsoleSpriteManager;
 import com.noiprocs.ui.libgdx.LibGDXGameScreen;
+import com.noiprocs.ui.menu.GameScreen;
+import com.noiprocs.ui.menu.MainMenuScreen;
+import com.noiprocs.ui.menu.SettingsScreen;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
-public class LibGDXApp extends ApplicationAdapter {
+public class LibGDXApp extends Game {
   // Virtual screen dimensions (scaled for device)
   protected float virtualWidth;
   protected float virtualHeight;
@@ -30,26 +31,15 @@ public class LibGDXApp extends ApplicationAdapter {
   private OrthographicCamera camera;
   private Viewport viewport;
   private Runnable renderVirtualControls; // For Android touch controls
+  private SettingsManager settingsManager;
 
-  // Configuration from command line
+  // Configuration
   private final String platform;
-  private final String username;
   private final String type;
-  private final String hostname;
-  private final int port;
 
-  public LibGDXApp(
-      String platform,
-      String username,
-      String type,
-      String hostname,
-      int port,
-      InputController inputController) {
+  public LibGDXApp(String platform, String type, InputController inputController) {
     this.platform = platform;
-    this.username = username;
     this.type = type;
-    this.hostname = hostname;
-    this.port = port;
     this.inputController = inputController;
   }
 
@@ -78,9 +68,19 @@ public class LibGDXApp extends ApplicationAdapter {
     return gameScreen;
   }
 
+  /** Set the game screen (called by GameScreen wrapper). */
+  public void setGameScreen(LibGDXGameScreen gameScreen) {
+    this.gameScreen = gameScreen;
+  }
+
   /** Get the game context. */
   public GameContext getGameContext() {
     return gameContext;
+  }
+
+  /** Set the game context (called by GameScreen wrapper). */
+  public void setGameContext(GameContext gameContext) {
+    this.gameContext = gameContext;
   }
 
   /** Get the input controller. */
@@ -120,65 +120,45 @@ public class LibGDXApp extends ApplicationAdapter {
     font = fontGenerator.generateMonospaceFont();
     ConsoleUIConfig.CLEAR_SCREEN = false;
 
-    // Calculate game screen dimensions based on virtual screen size and character size
-    int screenHeight =
-        Math.round(virtualHeight / UIConfig.CHAR_HEIGHT) - 4; // 4: 2 border + 2 player info
-    int screenWidth = Math.round(virtualWidth / UIConfig.CHAR_WIDTH) - 2; // 2: 2 borders
-    gameScreen = new LibGDXGameScreen(screenHeight, screenWidth, 120);
+    // Initialize settings manager
+    settingsManager = new SettingsManager();
 
-    // Initialize gameContext
-    gameContext =
-        GameContext.build(
-            platform,
-            username,
-            type,
-            hostname,
-            port,
-            new ConsoleHitboxManager(),
-            new ConsoleSpriteManager(),
-            gameScreen);
-
-    // Start game thread
-    Thread gameThread = new Thread(gameContext::run);
-    gameThread.start();
+    // Launch main menu screen
+    setScreen(new MainMenuScreen(this));
   }
 
-  @Override
-  public void render() {
-    // Handle input
-    handleInput();
+  /** Get the settings manager. */
+  public SettingsManager getSettingsManager() {
+    return settingsManager;
+  }
 
-    // Clear screen
-    ScreenUtils.clear(0f, 0f, 0f, 1f);
+  /** Navigate to main menu screen. */
+  public void showMainMenu() {
+    setScreen(new MainMenuScreen(this));
+  }
 
-    // Update camera
-    camera.update();
-    batch.setProjectionMatrix(camera.combined);
+  /** Navigate to settings screen. */
+  public void showSettings() {
+    setScreen(new SettingsScreen(this));
+  }
 
-    // Render game screen
-    batch.begin();
-    gameScreen.render(0);
-    gameScreen.renderWithBatch(
-        batch, font, UIConfig.CHAR_WIDTH, UIConfig.CHAR_HEIGHT, virtualHeight);
-    batch.end();
+  /** Navigate to game screen with current settings. */
+  public void showGame() {
+    setScreen(
+        new GameScreen(
+            this,
+            settingsManager.getUsername(),
+            settingsManager.getHostname(),
+            settingsManager.getPort(),
+            type,
+            platform));
+  }
 
-    // Render virtual controls if available (Android only)
+  /** Render virtual controls (called by GameScreen for Android). */
+  public void renderVirtualControls() {
     if (renderVirtualControls != null) {
       renderVirtualControls.run();
     }
-  }
-
-  private void handleInput() {
-    // Delegate to platform-specific input controller
-    if (inputController != null) {
-      inputController.handleInput(gameContext, gameScreen);
-    }
-  }
-
-  @Override
-  public void resize(int width, int height) {
-    // Update viewport when screen size changes (important for Android)
-    viewport.update(width, height);
   }
 
   @Override

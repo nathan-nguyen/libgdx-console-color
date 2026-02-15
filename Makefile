@@ -1,13 +1,7 @@
-# Load environment variables from .env file if it exists
--include .env
-
-# Export variables for sub-make calls
-export
-
 # Gradle command
 GRADLE = ./gradlew
 
-.PHONY: help build clean test run run-client run-server run-android format check-format
+.PHONY: help build clean test run run-android format check-format
 
 # Default target
 help:
@@ -17,17 +11,11 @@ help:
 	@echo "  make test          - Run tests"
 	@echo "  make format        - Format all Java source files"
 	@echo "  make check-format  - Check if code is formatted correctly"
-	@echo "  make run           - Run desktop version with current settings (TYPE=$(TYPE))"
-	@echo "  make run-client    - Run as client (desktop)"
-	@echo "  make run-server    - Run as server (desktop)"
+	@echo "  make run           - Run desktop version"
 	@echo "  make run-android   - Build and install Android APK"
 	@echo "  make clean         - Clean build artifacts"
 	@echo ""
-	@echo "Configuration variables:"
-	@echo "  PLATFORM=$(PLATFORM) USERNAME=$(USERNAME) TYPE=$(TYPE)"
-	@echo "  HOSTNAME=$(HOSTNAME) PORT=$(PORT)"
-	@echo ""
-	@echo "Example: make run USERNAME=alice HOSTNAME=192.168.1.100 PORT=9090"
+	@echo "Note: Username, hostname, and port are now configured via the in-game settings menu."
 
 build:
 	$(GRADLE) clean lwjgl3:build
@@ -42,13 +30,7 @@ clean:
 	$(GRADLE) clean
 
 run:
-	$(GRADLE) lwjgl3:run --args="$(PLATFORM) $(USERNAME) $(TYPE) $(HOSTNAME) $(PORT)"
-
-run-client:
-	$(MAKE) run TYPE=client
-
-run-server:
-	$(MAKE) run TYPE=server
+	$(GRADLE) lwjgl3:run
 
 run-android:
 	$(GRADLE) android:assembleDebug

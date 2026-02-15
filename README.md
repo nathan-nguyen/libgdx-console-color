@@ -5,9 +5,12 @@ A cross-platform UI implementation for the console-color game using libGDX. This
 ## Features
 
 - **Cross-platform**: Runs on Desktop (LWJGL3) and Android
+- **Main menu and settings**: Configure username, hostname, and port via in-game UI
+- **Settings persistence**: Configuration saved across sessions
 - **Color-coded rendering**: Supports the color mapping system from console-color
 - **HUD system**: Includes crafting, equipment, and inventory interaction HUDs
 - **Input handling**: Full keyboard support with arrow key navigation (Desktop)
+- **Touch controls**: Virtual joystick and buttons for Android
 
 ## Project Structure
 
@@ -50,31 +53,14 @@ make build
 
 ## Configuration
 
-Copy `.env.template` to `.env` and customize your defaults:
-
-```bash
-PLATFORM=pc
-USERNAME=noiprocs
-TYPE=client
-HOSTNAME=localhost
-PORT=8080
-```
-
-The Makefile will automatically load these values from `.env` if it exists.
+The game features an in-game settings menu accessible from the main menu. Configure your username, hostname, and port via the "Settings" button. Settings are automatically saved and persisted across sessions.
 
 ## Running
 
 ### Desktop
 
 ```bash
-# Run as client (default)
-make run-client
-
-# Run as server
-make run-server
-
-# Run with custom configuration
-make run USERNAME=alice HOSTNAME=192.168.1.100 PORT=9090
+make run
 ```
 
 ### Android
@@ -105,14 +91,18 @@ adb install -r android/build/outputs/apk/debug/android-debug.apk
 
 ### Core Module (`core/`)
 The core module contains platform-independent code:
-- **LibGDXApp**: Main application class that handles game lifecycle, input, and rendering
+- **LibGDXApp**: Main application class extending `Game`, manages screen lifecycle and shared resources
+- **MainMenuScreen**: Scene2D-based main menu with Play, Settings, and Exit options
+- **SettingsScreen**: Scene2D-based settings UI for configuring username, hostname, and port
+- **GameScreen**: Wrapper screen that integrates the game rendering
 - **LibGDXGameScreen**: Implements `GameScreenInterface` and renders the game using libGDX's SpriteBatch and BitmapFont
+- **SettingsManager**: Manages persistent settings using LibGDX Preferences
 
 ### Desktop Module (`lwjgl3/`)
-Desktop implementation using LWJGL3 backend. The launcher accepts command-line arguments and instantiates the core `LibGDXApp` class.
+Desktop implementation using LWJGL3 backend with keyboard input support.
 
 ### Android Module (`android/`)
-Android implementation using Android backend. The launcher receives configuration via Intent extras or uses defaults.
+Android implementation with touch controls, including virtual joystick and on-screen buttons.
 
 ## Building for Production
 
@@ -132,10 +122,12 @@ Android implementation using Android backend. The launcher receives configuratio
 
 Useful Gradle tasks:
 - `./gradlew lwjgl3:build`: Build desktop module
-- `./gradlew lwjgl3:run --args="pc noiprocs client localhost 8080"`: Run desktop version
+- `./gradlew lwjgl3:run`: Run desktop version
 - `./gradlew android:assembleDebug`: Build Android debug APK
 - `./gradlew clean`: Clean build artifacts
 - `./gradlew test`: Run tests
+- `./gradlew spotlessApply`: Format all Java code
+- `./gradlew spotlessCheck`: Check code formatting
 
 ## Troubleshooting
 

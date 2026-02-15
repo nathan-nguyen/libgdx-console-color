@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.noiprocs.LibGDXApp;
+import com.noiprocs.input.InputController;
 import com.noiprocs.resources.UIConfig;
 
 /** Launches the Android application with touch controls. */
@@ -18,13 +19,9 @@ public class AndroidLauncher extends AndroidApplication {
     AndroidApplicationConfiguration configuration = new AndroidApplicationConfiguration();
     configuration.useImmersiveMode = true;
 
-    // Get parameters from intent or use defaults
-    String username = "player";
-    String hostname = "192.168.1.3";
-    int port = 8080;
-
     // Create AndroidApp which extends LibGDXApp with touch controls
-    AndroidApp app = new AndroidApp(PLATFORM, username, TYPE, hostname, port);
+    // Settings will be loaded from SettingsManager when user clicks Play
+    AndroidApp app = new AndroidApp(PLATFORM, TYPE);
 
     initialize(app, configuration);
   }
@@ -37,8 +34,8 @@ class AndroidApp extends LibGDXApp {
   private TouchInputController touchInputController;
   private VirtualControlRenderer virtualControlRenderer;
 
-  public AndroidApp(String platform, String username, String type, String hostname, int port) {
-    super(platform, username, type, hostname, port, null);
+  public AndroidApp(String platform, String type) {
+    super(platform, type, null);
   }
 
   @Override
@@ -77,6 +74,12 @@ class AndroidApp extends LibGDXApp {
     setVirtualControlsRenderer(this::renderTouchControls);
   }
 
+  @Override
+  public InputController getInputController() {
+    // Return touch input controller for use by GameScreen
+    return touchInputController;
+  }
+
   private void renderTouchControls() {
     virtualControlRenderer.setProjectionMatrix(getCamera().combined);
     TouchState touchState = touchInputController.getTouchState();
@@ -93,15 +96,6 @@ class AndroidApp extends LibGDXApp {
       virtualControlRenderer.renderGameControls(
           touchState.getActiveZones(), getBatch(), getFont(), touchState);
     }
-  }
-
-  @Override
-  public void render() {
-    // Handle touch input before rendering
-    if (touchInputController != null) {
-      touchInputController.handleInput(getGameContext(), getGameScreen());
-    }
-    super.render();
   }
 
   @Override
