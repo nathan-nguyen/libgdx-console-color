@@ -12,10 +12,9 @@ import com.noiprocs.resources.FontGenerator;
 import com.noiprocs.resources.UIConfig;
 import com.noiprocs.settings.SettingsManager;
 import com.noiprocs.ui.console.ConsoleUIConfig;
-import com.noiprocs.ui.libgdx.LibGDXGameScreen;
-import com.noiprocs.ui.menu.GameScreen;
-import com.noiprocs.ui.menu.MainMenuScreen;
-import com.noiprocs.ui.menu.SettingsScreen;
+import com.noiprocs.ui.libgdx.screen.GameScreen;
+import com.noiprocs.ui.libgdx.screen.MainMenuScreen;
+import com.noiprocs.ui.libgdx.screen.SettingsScreen;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class LibGDXApp extends Game {
@@ -25,9 +24,7 @@ public class LibGDXApp extends Game {
 
   private SpriteBatch batch;
   private BitmapFont font;
-  private LibGDXGameScreen gameScreen;
   private GameContext gameContext;
-  private final InputController inputController;
   private OrthographicCamera camera;
   private Viewport viewport;
   private Runnable renderVirtualControls; // For Android touch controls
@@ -36,6 +33,7 @@ public class LibGDXApp extends Game {
   // Configuration
   private final String platform;
   private final String type;
+  private final InputController inputController;
 
   public LibGDXApp(String platform, String type, InputController inputController) {
     this.platform = platform;
@@ -61,16 +59,6 @@ public class LibGDXApp extends Game {
   /** Get the font for rendering text. */
   public BitmapFont getFont() {
     return font;
-  }
-
-  /** Get the game screen for HUD state access. */
-  public LibGDXGameScreen getGameScreen() {
-    return gameScreen;
-  }
-
-  /** Set the game screen (called by GameScreen wrapper). */
-  public void setGameScreen(LibGDXGameScreen gameScreen) {
-    this.gameScreen = gameScreen;
   }
 
   /** Get the game context. */

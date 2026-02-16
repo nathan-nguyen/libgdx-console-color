@@ -11,8 +11,4 @@ public class UIConfig {
   public static final float CHAR_HEIGHT = BASE_VIRTUAL_HEIGHT / 44;
   // Total columns: 62 (2 border + 60 map), window width: 440
   public static final float CHAR_WIDTH = BASE_VIRTUAL_WIDTH / 62;
-
-  private UIConfig() {
-    // Prevent instantiation
-  }
 }

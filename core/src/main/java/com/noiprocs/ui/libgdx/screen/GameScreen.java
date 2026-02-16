@@ -1,4 +1,4 @@
-package com.noiprocs.ui.menu;
+package com.noiprocs.ui.libgdx.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
@@ -16,6 +16,9 @@ import com.noiprocs.resources.UIConfig;
 import com.noiprocs.ui.console.hitbox.ConsoleHitboxManager;
 import com.noiprocs.ui.console.sprite.ConsoleSpriteManager;
 import com.noiprocs.ui.libgdx.LibGDXGameScreen;
+import com.noiprocs.ui.libgdx.hud.HUDManager;
+import com.noiprocs.ui.libgdx.util.UIStyleHelper;
+import com.noiprocs.ui.libgdx.widget.MenuOverlay;
 
 /**
  * Game screen wrapper that integrates the existing character-grid rendering into the Screen
@@ -36,6 +39,7 @@ public class GameScreen implements Screen {
   private Skin skin;
   private MenuOverlay menuOverlay;
   private Table buttonTable;
+  private HUDManager hudManager;
 
   public GameScreen(
       LibGDXApp app, String username, String hostname, int port, String type, String platform) {
@@ -58,9 +62,6 @@ public class GameScreen implements Screen {
     int screenWidth = Math.round(virtualWidth / UIConfig.CHAR_WIDTH) - 2; // 2: 2 borders
     gameScreen = new LibGDXGameScreen(screenHeight, screenWidth, 120);
 
-    // Register game screen with app for virtual controls (Android)
-    app.setGameScreen(gameScreen);
-
     // Initialize gameContext
     gameContext =
         GameContext.build(
@@ -81,6 +82,13 @@ public class GameScreen implements Screen {
     gameThread.start();
 
     setupUI();
+
+    // Create graphical HUD manager
+    hudManager = new HUDManager(gameContext, gameScreen, app.getViewport(), app.getFont());
+    gameScreen.setHudManager(hudManager);
+
+    // Setup input multiplexer with HUD stage priority
+    setupInputMultiplexer();
   }
 
   private void setupUI() {
@@ -96,9 +104,19 @@ public class GameScreen implements Screen {
           }
         });
 
+    TextButton equipmentButton = new TextButton("E", skin);
+    equipmentButton.addListener(
+        new ClickListener() {
+          @Override
+          public void clicked(InputEvent event, float x, float y) {
+            openEquipmentHUD();
+          }
+        });
+
     buttonTable = new Table();
     buttonTable.setFillParent(true);
     buttonTable.top().right().pad(10);
+    buttonTable.add(equipmentButton).size(50, 50).padRight(10);
     buttonTable.add(menuButton).size(50, 50);
     uiStage.addActor(buttonTable);
 
@@ -106,7 +124,23 @@ public class GameScreen implements Screen {
     menuOverlay.setOnClose(() -> buttonTable.setVisible(true));
     uiStage.addActor(menuOverlay);
 
+    // NOTE: InputMultiplexer will be updated after hudManager is created
+    // Moved to show() method after hudManager initialization
+  }
+
+  private void openEquipmentHUD() {
+    if (hudManager != null) {
+      hudManager.openEquipmentHUD();
+    }
+  }
+
+  private void setupInputMultiplexer() {
     InputMultiplexer multiplexer = new InputMultiplexer();
+    // Priority 1: Graphical HUD stage (if open, captures all input)
+    if (hudManager != null) {
+      multiplexer.addProcessor(hudManager.getHudStage());
+    }
+    // Priority 2: UI stage (menu overlay and buttons)
     multiplexer.addProcessor(uiStage);
     Gdx.input.setInputProcessor(multiplexer);
   }
@@ -145,6 +179,11 @@ public class GameScreen implements Screen {
     // Render virtual controls if available (Android only)
     app.renderVirtualControls();
 
+    // Render graphical HUD (if open)
+    if (hudManager != null && hudManager.isOpen()) {
+      hudManager.render(delta);
+    }
+
     // Render UI overlay
     uiStage.act(delta);
     uiStage.draw();
@@ -181,10 +220,13 @@ public class GameScreen implements Screen {
     }
 
     // Clear game screen and context references in app
-    app.setGameScreen(null);
     app.setGameContext(null);
 
     // Cleanup resources
+    if (hudManager != null) {
+      hudManager.dispose();
+      hudManager = null;
+    }
     if (uiStage != null) {
       uiStage.dispose();
     }

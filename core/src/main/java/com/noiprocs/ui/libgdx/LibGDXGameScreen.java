@@ -5,14 +5,19 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.noiprocs.core.GameContext;
 import com.noiprocs.core.graphic.GameScreenInterface;
+import com.noiprocs.core.model.InventoryContainerInterface;
 import com.noiprocs.core.model.Model;
+import com.noiprocs.core.model.action.Action;
+import com.noiprocs.core.model.action.InteractAction;
 import com.noiprocs.core.model.event.EventType;
 import com.noiprocs.core.model.manager.ClientModelManager;
+import com.noiprocs.core.model.mob.character.HumanoidModel;
 import com.noiprocs.core.model.mob.character.PlayerModel;
 import com.noiprocs.ui.console.hud.HUD;
 import com.noiprocs.ui.console.sprite.ConsoleSprite;
 import com.noiprocs.ui.console.sprite.ConsoleTexture;
 import com.noiprocs.ui.console.util.ColorMapper;
+import com.noiprocs.ui.libgdx.hud.HUDManager;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +36,8 @@ public class LibGDXGameScreen implements GameScreenInterface {
 
   protected GameContext gameContext;
   public HUD hud;
+
+  private HUDManager hudManager;
 
   public LibGDXGameScreen(int height, int width, int renderRange) {
     this.height = height;
@@ -67,6 +74,33 @@ public class LibGDXGameScreen implements GameScreenInterface {
   }
 
   /**
+   * Synchronizes the graphical HUD with the text-based HUD state. When a chest is opened in the
+   * text-based system, this automatically opens the graphical inventory HUD.
+   */
+  private void syncGraphicalHUD(PlayerModel playerModel) {
+    if (hudManager == null) {
+      return;
+    }
+
+    Action playerAction = playerModel.getAction();
+    if (playerAction instanceof InteractAction) {
+      InteractAction interactAction = (InteractAction) playerAction;
+      Model model = gameContext.modelManager.getModel(interactAction.targetId);
+      if (model instanceof InventoryContainerInterface || isHumanoidButNotPlayer(model)) {
+        if (!hudManager.isOpen()) {
+          hudManager.openInventoryHUD(interactAction.targetId);
+        }
+      }
+    }
+    // Note: Inventory HUD stays open until manually closed (clicking outside or ESC)
+    // This matches the Equipment HUD behavior
+  }
+
+  private boolean isHumanoidButNotPlayer(Model model) {
+    return model instanceof HumanoidModel && !(model instanceof PlayerModel);
+  }
+
+  /**
    * Renders the game screen using libGDX rendering API.
    *
    * @param batch SpriteBatch for rendering
@@ -80,6 +114,9 @@ public class LibGDXGameScreen implements GameScreenInterface {
     Model playerModel = gameContext.modelManager.getModel(gameContext.username);
     if (playerModel == null) return;
 
+    // Sync graphical HUD (runs on GL thread)
+    syncGraphicalHUD((PlayerModel) playerModel);
+
     float y = virtualHeight - 5; // Start from top (using virtual coordinates)
     float x = 0;
 
@@ -92,9 +129,6 @@ public class LibGDXGameScreen implements GameScreenInterface {
       y -= charHeight;
     }
 
-    // 2. Get overlay content
-    List<String> overlayLines = hud.getOverlayContent((PlayerModel) playerModel);
-
     // 3. Build border string
     StringBuilder borderSb = new StringBuilder();
     for (int j = 0; j < width + 2; j++) {
@@ -104,11 +138,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
     // 4. Render map with borders (matching Swing's approach)
     // Total lines: 1 top border + HEIGHT map rows + 1 bottom border
     for (int i = 0; i < height + 2; i++) {
-      // Check if we should render overlay line instead (like Swing)
-      if (overlayLines != null && i < overlayLines.size()) {
-        font.setColor(Color.WHITE);
-        renderMonospaceLine(batch, font, overlayLines.get(i), x, y, charWidth);
-      } else if (i == 0 || i == height + 1) {
+      if (i == 0 || i == height + 1) {
         // Top or bottom border
         font.setColor(Color.WHITE);
         renderMonospaceLine(batch, font, borderSb.toString(), x, y, charWidth);
@@ -214,7 +244,6 @@ public class LibGDXGameScreen implements GameScreenInterface {
       ConsoleTexture consoleTexture = consoleSprite.getTexture(model);
       char[][] texture = consoleTexture.texture;
 
-      if (model == null) continue;
       int posX = model.position.x - offsetX - consoleTexture.offsetX;
       int posY = model.position.y - offsetY - consoleTexture.offsetY;
 
@@ -233,6 +262,24 @@ public class LibGDXGameScreen implements GameScreenInterface {
       logger.debug("Rendering model {}", model);
       this.updateMap(posX, posY, texture, consoleTexture.colorMap, overrideColor);
     }
+  }
+
+  /**
+   * Sets the HUD manager for this game screen.
+   *
+   * @param hudManager HUDManager instance
+   */
+  public void setHudManager(HUDManager hudManager) {
+    this.hudManager = hudManager;
+  }
+
+  /**
+   * Gets the HUD manager.
+   *
+   * @return HUDManager instance or null
+   */
+  public HUDManager getHudManager() {
+    return hudManager;
   }
 
   private void clearMap() {

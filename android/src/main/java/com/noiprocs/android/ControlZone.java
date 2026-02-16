@@ -6,45 +6,23 @@ import com.badlogic.gdx.math.Vector2;
 import com.noiprocs.resources.UIConfig;
 
 /**
- * Defines all touch control zones and their screen positions.
- * Positions are scaled based on actual virtual screen dimensions.
- * LibGDX uses bottom-left origin: (0,0) is bottom-left.
+ * Defines all touch control zones and their screen positions. Positions are scaled based on actual
+ * virtual screen dimensions. LibGDX uses bottom-left origin: (0,0) is bottom-left.
  */
 public enum ControlZone {
-  // Joystick (bottom left - replaces D-pad)
+  // Joystick (bottom left)
   JOYSTICK('\0'),
-
-  // D-pad zones (kept for compatibility, but not used in game mode)
-  DPAD_UP('w'),
-  DPAD_DOWN('s'),
-  DPAD_LEFT('a'),
-  DPAD_RIGHT('d'),
 
   // Action buttons (bottom right, circular)
   ACTION_SPACE(' '),
   ACTION_FIRE('f'),
   ACTION_TOGGLE('t'),
 
-  // Quick actions (top right corner - E button, touching top map border)
-  QUICK_EQUIPMENT('e'),
-
   // Inventory slots (top left, horizontal row, touching top map border)
   QUICK_SLOT_1('1'),
   QUICK_SLOT_2('2'),
   QUICK_SLOT_3('3'),
-  QUICK_SLOT_4('4'),
-
-  // HUD navigation (context-aware, shown when HUD is active)
-  HUD_UP('w'),
-  HUD_DOWN('s'),
-  HUD_LEFT('a'),
-  HUD_RIGHT('d'),
-
-  // Action buttons positioned to match game controls
-  HUD_TAB('\t'),
-  HUD_CONFIRM('\n'),
-  HUD_CLOSE((char) 27),
-  HUD_EQUIPMENT_ACTION('e');
+  QUICK_SLOT_4('4');
 
   private Object shape; // Either Rectangle or Circle (calculated dynamically)
   private final char command;
@@ -54,8 +32,8 @@ public enum ControlZone {
   }
 
   /**
-   * Initialize all control zone positions based on actual virtual screen dimensions.
-   * Must be called before using any control zones.
+   * Initialize all control zone positions based on actual virtual screen dimensions. Must be called
+   * before using any control zones.
    *
    * @param virtualWidth Actual virtual screen width
    * @param virtualHeight Actual virtual screen height
@@ -68,12 +46,6 @@ public enum ControlZone {
     // Joystick (bottom left)
     JOYSTICK.shape = new Circle(100, 100, 80f * Math.min(scaleX, scaleY));
 
-    // D-pad zones
-    DPAD_UP.shape = new Rectangle(55 * scaleX, 115 * scaleY, 55 * scaleX, 55 * scaleY);
-    DPAD_DOWN.shape = new Rectangle(55 * scaleX, 5 * scaleY, 55 * scaleX, 55 * scaleY);
-    DPAD_LEFT.shape = new Rectangle(5 * scaleX, 60 * scaleY, 55 * scaleX, 55 * scaleY);
-    DPAD_RIGHT.shape = new Rectangle(105 * scaleX, 60 * scaleY, 55 * scaleX, 55 * scaleY);
-
     // Action buttons (bottom right, circular)
     float actionScale = Math.min(scaleX, scaleY);
     ACTION_SPACE.shape = new Circle(virtualWidth - 100, 75 * scaleY, 32 * actionScale);
@@ -82,28 +54,33 @@ public enum ControlZone {
 
     float touchTopBorderY = virtualHeight - 90;
     float squareButtonDimension = Math.min(45 * scaleX, 45 * scaleY);
-    // Quick actions (top right corner)
-    QUICK_EQUIPMENT.shape = new Rectangle(virtualWidth - 5 - squareButtonDimension, touchTopBorderY, squareButtonDimension, squareButtonDimension);
 
     // Inventory slots (top left, horizontal row)
     float quickSlotPaddingLeft = 5;
-    QUICK_SLOT_1.shape = new Rectangle(quickSlotPaddingLeft * 1 + squareButtonDimension * 0, touchTopBorderY, squareButtonDimension, squareButtonDimension);
-    QUICK_SLOT_2.shape = new Rectangle(quickSlotPaddingLeft * 2 + squareButtonDimension * 1, touchTopBorderY, squareButtonDimension, squareButtonDimension);
-    QUICK_SLOT_3.shape = new Rectangle(quickSlotPaddingLeft * 3 + squareButtonDimension * 2, touchTopBorderY, squareButtonDimension, squareButtonDimension);
-    QUICK_SLOT_4.shape = new Rectangle(quickSlotPaddingLeft * 4 + squareButtonDimension * 3, touchTopBorderY, squareButtonDimension, squareButtonDimension);
-
-    // HUD navigation (same as D-pad)
-    HUD_UP.shape = new Rectangle(55 * scaleX, 115 * scaleY, 55 * scaleX, 55 * scaleY);
-    HUD_DOWN.shape = new Rectangle(55 * scaleX, 5 * scaleY, 55 * scaleX, 55 * scaleY);
-    HUD_LEFT.shape = new Rectangle(5 * scaleX, 60 * scaleY, 55 * scaleX, 55 * scaleY);
-    HUD_RIGHT.shape = new Rectangle(105 * scaleX, 60 * scaleY, 55 * scaleX, 55 * scaleY);
-
-    // HUD action buttons
-    float equipButtonDimension = Math.min(50 * scaleX, 50 * scaleY);
-    HUD_TAB.shape = new Circle(virtualWidth - 100, 75 * scaleY, 32 * actionScale);
-    HUD_CONFIRM.shape = new Circle(virtualWidth - 45, 115 * scaleY, 28 * actionScale);
-    HUD_CLOSE.shape = new Rectangle(virtualWidth - 5 - squareButtonDimension, touchTopBorderY, squareButtonDimension, squareButtonDimension);
-    HUD_EQUIPMENT_ACTION.shape = new Rectangle(virtualWidth - 55, 350 * scaleY, equipButtonDimension, equipButtonDimension);
+    QUICK_SLOT_1.shape =
+        new Rectangle(
+            quickSlotPaddingLeft * 1 + squareButtonDimension * 0,
+            touchTopBorderY,
+            squareButtonDimension,
+            squareButtonDimension);
+    QUICK_SLOT_2.shape =
+        new Rectangle(
+            quickSlotPaddingLeft * 2 + squareButtonDimension * 1,
+            touchTopBorderY,
+            squareButtonDimension,
+            squareButtonDimension);
+    QUICK_SLOT_3.shape =
+        new Rectangle(
+            quickSlotPaddingLeft * 3 + squareButtonDimension * 2,
+            touchTopBorderY,
+            squareButtonDimension,
+            squareButtonDimension);
+    QUICK_SLOT_4.shape =
+        new Rectangle(
+            quickSlotPaddingLeft * 4 + squareButtonDimension * 3,
+            touchTopBorderY,
+            squareButtonDimension,
+            squareButtonDimension);
   }
 
   /**
@@ -125,37 +102,25 @@ public enum ControlZone {
     return false;
   }
 
-  /**
-   * Get the command character associated with this zone.
-   */
+  /** Get the command character associated with this zone. */
   public char getCommand() {
     return command;
   }
 
-  /**
-   * Get the shape for rendering purposes.
-   */
+  /** Get the shape for rendering purposes. */
   public Object getShape() {
     return shape;
   }
 
-  /**
-   * Check if this is the joystick zone.
-   */
+  /** Check if this is the joystick zone. */
   public boolean isJoystick() {
     return this == JOYSTICK;
   }
 
   /**
-   * Check if this is a D-pad zone.
-   */
-  public boolean isDpad() {
-    return this == DPAD_UP || this == DPAD_DOWN || this == DPAD_LEFT || this == DPAD_RIGHT;
-  }
-
-  /**
-   * Get joystick direction from touch position.
-   * Returns the primary direction command based on angle from center.
+   * Get joystick direction from touch position. Returns the primary direction command based on
+   * angle from center.
+   *
    * @param x Touch X coordinate
    * @param y Touch Y coordinate
    * @return Direction character ('w', 'a', 's', 'd') or '\0' if not in dead zone
@@ -193,6 +158,7 @@ public enum ControlZone {
 
   /**
    * Get joystick offset vector (normalized) from touch position.
+   *
    * @param x Touch X coordinate
    * @param y Touch Y coordinate
    * @return Vector2 with normalized offset, or zero vector if not applicable
@@ -220,25 +186,22 @@ public enum ControlZone {
     return new Vector2(normalizedX, normalizedY);
   }
 
-  /**
-   * Check if this is a HUD navigation zone.
-   */
+  /** Check if this is a HUD navigation zone. */
   public boolean isHudControl() {
     return name().startsWith("HUD_");
   }
 
-  /**
-   * Check if this is a game control zone (not HUD).
-   */
+  /** Check if this is a game control zone (not HUD). */
   public boolean isGameControl() {
     return !isHudControl();
   }
 
-  /**
-   * Check if this is a quick slot zone (1-4).
-   */
+  /** Check if this is a quick slot zone (1-4). */
   public boolean isQuickSlot() {
-    return this == QUICK_SLOT_1 || this == QUICK_SLOT_2 || this == QUICK_SLOT_3 || this == QUICK_SLOT_4;
+    return this == QUICK_SLOT_1
+        || this == QUICK_SLOT_2
+        || this == QUICK_SLOT_3
+        || this == QUICK_SLOT_4;
   }
 
   /**
@@ -265,9 +228,7 @@ public enum ControlZone {
     return null;
   }
 
-  /**
-   * Get the center position of this zone for rendering.
-   */
+  /** Get the center position of this zone for rendering. */
   public Vector2 getCenter() {
     if (shape instanceof Rectangle) {
       Rectangle rect = (Rectangle) shape;

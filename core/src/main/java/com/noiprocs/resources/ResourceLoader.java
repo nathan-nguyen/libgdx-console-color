@@ -9,10 +9,6 @@ import com.badlogic.gdx.utils.JsonValue;
 public class ResourceLoader {
   private static final String FONT_CHARACTERS_JSON = "font-characters.json";
 
-  private ResourceLoader() {
-    // Utility class - prevent instantiation
-  }
-
   /**
    * Loads the font characters from the font-characters.json file.
    *

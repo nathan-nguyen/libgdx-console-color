@@ -1,4 +1,4 @@
-package com.noiprocs.ui.menu;
+package com.noiprocs.ui.libgdx.util;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;

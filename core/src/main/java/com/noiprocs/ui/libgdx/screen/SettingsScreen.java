@@ -1,4 +1,4 @@
-package com.noiprocs.ui.menu;
+package com.noiprocs.ui.libgdx.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldFilter;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.noiprocs.LibGDXApp;
 import com.noiprocs.settings.SettingsManager;
+import com.noiprocs.ui.libgdx.util.UIStyleHelper;
 
 /**
  * Settings screen for configuring username, hostname, and port. Validates input and persists

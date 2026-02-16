@@ -1,4 +1,4 @@
-package com.noiprocs.ui.menu;
+package com.noiprocs.ui.libgdx.widget;
 
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -32,6 +32,7 @@ public class MenuOverlay extends Table {
     setBackground(new TextureRegionDrawable(overlayBgTexture));
 
     menuBox = new Table();
+    menuBox.setTouchable(Touchable.enabled);
 
     Pixmap menuBgPixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
     menuBgPixmap.setColor(0.2f, 0.2f, 0.2f, 0.95f);
@@ -50,6 +51,7 @@ public class MenuOverlay extends Table {
           }
         });
     menuBox.add(mainMenuButton).width(300).height(60);
+    menuBox.row();
 
     add(menuBox).width(400).height(300);
 
@@ -106,7 +108,7 @@ public class MenuOverlay extends Table {
             menuBox.hit(
                 menuBox.parentToLocalCoordinates(new Vector2(x, y)).x,
                 menuBox.parentToLocalCoordinates(new Vector2(x, y)).y,
-                touchable);
+                true);
         if (hit != null) {
           return hit;
         }

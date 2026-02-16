@@ -27,9 +27,7 @@ public class AndroidLauncher extends AndroidApplication {
   }
 }
 
-/**
- * Android-specific extension of LibGDXApp that adds touch controls.
- */
+/** Android-specific extension of LibGDXApp that adds touch controls. */
 class AndroidApp extends LibGDXApp {
   private TouchInputController touchInputController;
   private VirtualControlRenderer virtualControlRenderer;
@@ -84,18 +82,9 @@ class AndroidApp extends LibGDXApp {
     virtualControlRenderer.setProjectionMatrix(getCamera().combined);
     TouchState touchState = touchInputController.getTouchState();
 
-    if (touchState.isHudMode()) {
-      // Render HUD navigation controls
-      TouchState.HudType hudType = touchState.getHudType(getGameScreen());
-      boolean showEquipmentAction = hudType == TouchState.HudType.CHEST;
-      boolean showQuickSlots = hudType == TouchState.HudType.EQUIPMENT;
-      virtualControlRenderer.renderHudControls(
-          touchState.getActiveZones(), getBatch(), getFont(), showEquipmentAction, showQuickSlots);
-    } else {
-      // Render game controls
-      virtualControlRenderer.renderGameControls(
-          touchState.getActiveZones(), getBatch(), getFont(), touchState);
-    }
+    // Render game controls (graphical HUD handles its own input via Scene2D)
+    virtualControlRenderer.renderGameControls(
+        touchState.getActiveZones(), getBatch(), getFont(), touchState);
   }
 
   @Override
