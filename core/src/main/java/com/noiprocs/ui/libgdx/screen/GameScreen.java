@@ -87,6 +87,9 @@ public class GameScreen implements Screen {
     hudManager = new HUDManager(gameContext, gameScreen, app.getViewport(), app.getFont());
     gameScreen.setHudManager(hudManager);
 
+    // Pass settings manager to game screen for debug mode
+    gameScreen.setSettingsManager(app.getSettingsManager());
+
     // Setup input multiplexer with HUD stage priority
     setupInputMultiplexer();
   }

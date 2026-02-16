@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -49,6 +50,21 @@ public class MenuOverlay extends Table {
     menuBox.add(titleLabel).expandX().center().padBottom(20);
     menuBox.row();
 
+    // Debug mode checkbox
+    CheckBox debugModeCheckbox = new CheckBox(" Debug Mode", skin);
+    debugModeCheckbox.setChecked(app.getSettingsManager().isDebugMode());
+    debugModeCheckbox.addListener(
+        new ClickListener() {
+          @Override
+          public void clicked(InputEvent event, float x, float y) {
+            boolean isChecked = debugModeCheckbox.isChecked();
+            app.getSettingsManager().setDebugMode(isChecked);
+            app.getSettingsManager().save();
+          }
+        });
+    menuBox.add(debugModeCheckbox).left().padBottom(20);
+    menuBox.row();
+
     TextButton mainMenuButton = new TextButton("Main Menu", skin);
     mainMenuButton.addListener(
         new ClickListener() {
@@ -65,7 +81,7 @@ public class MenuOverlay extends Table {
     menuBox.add(mainMenuButton).width(300).height(60);
     menuBox.row();
 
-    add(menuBox).width(400).height(300);
+    add(menuBox).width(400).height(350);
 
     // Close overlay when clicking outside the menu box - use capture listener
     addCaptureListener(

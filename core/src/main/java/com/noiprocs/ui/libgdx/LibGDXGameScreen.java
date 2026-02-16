@@ -1,5 +1,6 @@
 package com.noiprocs.ui.libgdx;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -10,10 +11,11 @@ import com.noiprocs.core.model.Model;
 import com.noiprocs.core.model.action.Action;
 import com.noiprocs.core.model.action.InteractAction;
 import com.noiprocs.core.model.event.EventType;
+import com.noiprocs.core.model.item.Item;
 import com.noiprocs.core.model.manager.ClientModelManager;
 import com.noiprocs.core.model.mob.character.HumanoidModel;
 import com.noiprocs.core.model.mob.character.PlayerModel;
-import com.noiprocs.ui.console.hud.HUD;
+import com.noiprocs.settings.SettingsManager;
 import com.noiprocs.ui.console.sprite.ConsoleSprite;
 import com.noiprocs.ui.console.sprite.ConsoleTexture;
 import com.noiprocs.ui.console.util.ColorMapper;
@@ -35,8 +37,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
   protected final char[][] colorMap;
 
   protected GameContext gameContext;
-  public HUD hud;
-
+  private SettingsManager settingsManager;
   private HUDManager hudManager;
 
   public LibGDXGameScreen(int height, int width, int renderRange) {
@@ -60,7 +61,6 @@ public class LibGDXGameScreen implements GameScreenInterface {
   @Override
   public void setGameContext(GameContext gameContext) {
     this.gameContext = gameContext;
-    this.hud = new HUD(gameContext, this.width);
   }
 
   @Override
@@ -120,10 +120,9 @@ public class LibGDXGameScreen implements GameScreenInterface {
     float y = virtualHeight - 5; // Start from top (using virtual coordinates)
     float x = 0;
 
-    // 1. Render player info HUD (may contain multiple lines separated by \n)
-    String playerInfo = hud.getPlayerInfo((PlayerModel) playerModel);
+    // 1. Render player info HUD (2 lines: player/health, inventory/FPS)
+    String[] playerInfoLines = buildPlayerInfo((PlayerModel) playerModel);
     font.setColor(Color.WHITE);
-    String[] playerInfoLines = playerInfo.split("\n");
     for (String line : playerInfoLines) {
       renderMonospaceLine(batch, font, line, 10, y, charWidth);
       y -= charHeight;
@@ -265,6 +264,15 @@ public class LibGDXGameScreen implements GameScreenInterface {
   }
 
   /**
+   * Sets the settings manager for this game screen.
+   *
+   * @param settingsManager SettingsManager instance
+   */
+  public void setSettingsManager(SettingsManager settingsManager) {
+    this.settingsManager = settingsManager;
+  }
+
+  /**
    * Sets the HUD manager for this game screen.
    *
    * @param hudManager HUDManager instance
@@ -280,6 +288,38 @@ public class LibGDXGameScreen implements GameScreenInterface {
    */
   public HUDManager getHudManager() {
     return hudManager;
+  }
+
+  /**
+   * Builds the player info HUD lines.
+   *
+   * @param playerModel The player
+   * @return Array of player info lines (2 lines: player name/position/health, inventory/FPS)
+   */
+  private String[] buildPlayerInfo(PlayerModel playerModel) {
+    boolean debugMode = settingsManager != null && settingsManager.isDebugMode();
+
+    // Line 1: Player name, position (if debug), and health
+    StringBuilder line1 = new StringBuilder();
+    line1.append(playerModel.id);
+    if (debugMode) {
+      line1.append(" - [").append(playerModel.position).append("]");
+    }
+    line1.append(" - Health: ").append(playerModel.getHealth());
+
+    // Line 2: Inventory and FPS (if debug)
+    StringBuilder line2 = new StringBuilder();
+    line2.append("Inventory: [");
+    Item item = playerModel.getHoldingItem();
+    if (item != null) {
+      line2.append(item.name).append(": ").append(item.amount);
+    }
+    line2.append("]");
+    if (debugMode) {
+      line2.append(" - FPS: ").append(Gdx.graphics.getFramesPerSecond());
+    }
+
+    return new String[] {line1.toString(), line2.toString()};
   }
 
   private void clearMap() {

@@ -14,11 +14,13 @@ public class SettingsManager {
   private static final String KEY_USERNAME = "username";
   private static final String KEY_HOSTNAME = "hostname";
   private static final String KEY_PORT = "port";
+  private static final String KEY_DEBUG_MODE = "debugMode";
 
   // Default values
   private static final String DEFAULT_USERNAME = "player";
   private static final String DEFAULT_HOSTNAME = "localhost";
   private static final int DEFAULT_PORT = 8080;
+  private static final boolean DEFAULT_DEBUG_MODE = false;
 
   private final Preferences prefs;
 
@@ -78,6 +80,24 @@ public class SettingsManager {
    */
   public void setPort(int port) {
     prefs.putInteger(KEY_PORT, port);
+  }
+
+  /**
+   * Get the debug mode setting.
+   *
+   * @return True if debug mode is enabled (default: false)
+   */
+  public boolean isDebugMode() {
+    return prefs.getBoolean(KEY_DEBUG_MODE, DEFAULT_DEBUG_MODE);
+  }
+
+  /**
+   * Set the debug mode setting.
+   *
+   * @param debugMode True to enable debug mode
+   */
+  public void setDebugMode(boolean debugMode) {
+    prefs.putBoolean(KEY_DEBUG_MODE, debugMode);
   }
 
   /**

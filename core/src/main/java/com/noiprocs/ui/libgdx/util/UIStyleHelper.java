@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox.CheckBoxStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
@@ -63,6 +64,29 @@ public class UIStyleHelper {
     pixmap.fill();
     Texture selectionTexture = new Texture(pixmap);
 
+    // Create checkbox textures (simple colored boxes)
+    pixmap = new Pixmap(20, 20, Format.RGBA8888);
+
+    // Checkbox unchecked (empty gray box with border)
+    pixmap.setColor(0.25f, 0.25f, 0.25f, 1f);
+    pixmap.fill();
+    pixmap.setColor(0.5f, 0.5f, 0.5f, 1f);
+    pixmap.drawRectangle(0, 0, 20, 20);
+    Texture checkboxOffTexture = new Texture(pixmap);
+
+    // Checkbox checked (gray box with white checkmark)
+    pixmap.setColor(0.25f, 0.25f, 0.25f, 1f);
+    pixmap.fill();
+    pixmap.setColor(0.5f, 0.5f, 0.5f, 1f);
+    pixmap.drawRectangle(0, 0, 20, 20);
+    pixmap.setColor(Color.WHITE);
+    // Draw a simple checkmark
+    pixmap.drawLine(4, 10, 8, 14);
+    pixmap.drawLine(8, 14, 16, 6);
+    pixmap.drawLine(5, 10, 9, 14);
+    pixmap.drawLine(9, 14, 17, 6);
+    Texture checkboxOnTexture = new Texture(pixmap);
+
     pixmap.dispose();
 
     // Add textures to skin so they get disposed properly
@@ -73,6 +97,8 @@ public class UIStyleHelper {
     skin.add("textfield-bg", textFieldBgTexture);
     skin.add("textfield-focused-bg", textFieldFocusedBgTexture);
     skin.add("selection", selectionTexture);
+    skin.add("checkbox-on", checkboxOnTexture);
+    skin.add("checkbox-off", checkboxOffTexture);
 
     // Ensure font color is white
     font.setColor(Color.WHITE);
@@ -105,6 +131,14 @@ public class UIStyleHelper {
     textFieldStyle.cursor = new TextureRegionDrawable(whiteTexture);
     textFieldStyle.selection = new TextureRegionDrawable(selectionTexture);
     skin.add("default", textFieldStyle);
+
+    // CheckBox style
+    CheckBoxStyle checkBoxStyle = new CheckBoxStyle();
+    checkBoxStyle.font = font;
+    checkBoxStyle.fontColor = new Color(1f, 1f, 1f, 1f); // Explicit white color
+    checkBoxStyle.checkboxOn = new TextureRegionDrawable(checkboxOnTexture);
+    checkBoxStyle.checkboxOff = new TextureRegionDrawable(checkboxOffTexture);
+    skin.add("default", checkBoxStyle);
 
     return skin;
   }
