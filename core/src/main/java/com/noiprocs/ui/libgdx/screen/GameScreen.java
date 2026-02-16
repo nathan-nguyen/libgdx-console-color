@@ -57,9 +57,8 @@ public class GameScreen implements Screen {
     float virtualHeight = app.getViewport().getWorldHeight();
     float virtualWidth = app.getViewport().getWorldWidth();
 
-    int screenHeight =
-        Math.round(virtualHeight / UIConfig.CHAR_HEIGHT) - 4; // 4: 2 border + 2 player info
-    int screenWidth = Math.round(virtualWidth / UIConfig.CHAR_WIDTH) - 2; // 2: 2 borders
+    int screenHeight = Math.round(virtualHeight / UIConfig.CHAR_HEIGHT);
+    int screenWidth = Math.round(virtualWidth / UIConfig.CHAR_WIDTH);
     gameScreen = new LibGDXGameScreen(screenHeight, screenWidth, 120);
 
     // Initialize gameContext

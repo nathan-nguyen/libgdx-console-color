@@ -117,34 +117,21 @@ public class LibGDXGameScreen implements GameScreenInterface {
     // Sync graphical HUD (runs on GL thread)
     syncGraphicalHUD((PlayerModel) playerModel);
 
-    float y = virtualHeight - 5; // Start from top (using virtual coordinates)
     float x = 0;
+    float y = virtualHeight;
 
-    // 1. Render player info HUD (2 lines: player/health, inventory/FPS)
-    String[] playerInfoLines = buildPlayerInfo((PlayerModel) playerModel);
-    font.setColor(Color.WHITE);
-    for (String line : playerInfoLines) {
-      renderMonospaceLine(batch, font, line, 10, y, charWidth);
+    // 1. Render map without borders (full height)
+    for (int i = 0; i < height; i++) {
+      renderMapLineWithColors(batch, font, i, x, y, charWidth);
       y -= charHeight;
     }
 
-    // 3. Build border string
-    StringBuilder borderSb = new StringBuilder();
-    for (int j = 0; j < width + 2; j++) {
-      borderSb.append('-');
-    }
-
-    // 4. Render map with borders (matching Swing's approach)
-    // Total lines: 1 top border + HEIGHT map rows + 1 bottom border
-    for (int i = 0; i < height + 2; i++) {
-      if (i == 0 || i == height + 1) {
-        // Top or bottom border
-        font.setColor(Color.WHITE);
-        renderMonospaceLine(batch, font, borderSb.toString(), x, y, charWidth);
-      } else {
-        // Map content line with colors (i-1 because i=0 is border)
-        renderMapLineWithColors(batch, font, i - 1, x, y, charWidth);
-      }
+    // 2. Render player info HUD on top (overlaying the map)
+    String[] playerInfoLines = buildPlayerInfo((PlayerModel) playerModel);
+    font.setColor(Color.WHITE);
+    y = virtualHeight - 5; // Small padding from top edge
+    for (String line : playerInfoLines) {
+      renderMonospaceLine(batch, font, line, 10, y, charWidth);
       y -= charHeight;
     }
   }
@@ -170,11 +157,6 @@ public class LibGDXGameScreen implements GameScreenInterface {
     float currentX = x;
     Color originalColor = batch.getColor().cpy();
 
-    // Left border
-    batch.setColor(Color.WHITE);
-    renderCharAtPosition(batch, font, '|', currentX, y);
-    currentX += charWidth;
-
     // Map content with colors - render each character individually for monospace
     for (int j = 0; j < width; j++) {
       char ch = map[mapRow][j] == 0 ? ' ' : map[mapRow][j];
@@ -187,10 +169,6 @@ public class LibGDXGameScreen implements GameScreenInterface {
       renderCharAtPosition(batch, font, ch, currentX, y);
       currentX += charWidth;
     }
-
-    // Right border
-    batch.setColor(Color.WHITE);
-    renderCharAtPosition(batch, font, '|', currentX, y);
 
     // Restore original color
     batch.setColor(originalColor);
