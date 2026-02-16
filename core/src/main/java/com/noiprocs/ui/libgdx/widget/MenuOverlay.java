@@ -7,12 +7,14 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.noiprocs.LibGDXApp;
+import com.noiprocs.core.control.command.DisconnectCommand;
 
 public class MenuOverlay extends Table {
   private final Table menuBox;
@@ -42,11 +44,21 @@ public class MenuOverlay extends Table {
     menuBox.setBackground(new TextureRegionDrawable(menuBgTexture));
     menuBox.pad(40);
 
+    Label titleLabel = new Label("Menu", skin);
+    titleLabel.setFontScale(1.5f);
+    menuBox.add(titleLabel).expandX().center().padBottom(20);
+    menuBox.row();
+
     TextButton mainMenuButton = new TextButton("Main Menu", skin);
     mainMenuButton.addListener(
         new ClickListener() {
           @Override
           public void clicked(InputEvent event, float x, float y) {
+            if (app.getGameContext() != null && !app.getGameContext().isServer) {
+              DisconnectCommand disconnectCommand =
+                  new DisconnectCommand(app.getGameContext().username);
+              app.getGameContext().controlManager.processInput(disconnectCommand);
+            }
             app.showMainMenu();
           }
         });
