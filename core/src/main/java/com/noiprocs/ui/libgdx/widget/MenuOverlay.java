@@ -14,19 +14,20 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.noiprocs.LibGDXApp;
+import com.noiprocs.core.GameContext;
 import com.noiprocs.core.control.command.DisconnectCommand;
+import com.noiprocs.settings.SettingsManager;
 
 public class MenuOverlay extends Table {
   private final Table menuBox;
   private Runnable onClose;
 
-  public MenuOverlay(LibGDXApp app, Skin skin) {
+  public MenuOverlay(
+      SettingsManager settingsManager, GameContext gameContext, Runnable onMainMenu, Skin skin) {
     setFillParent(true);
     setVisible(false);
     setTouchable(Touchable.enabled);
 
-    // Add semi-transparent background to make the entire overlay touchable
     Pixmap overlayBgPixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
     overlayBgPixmap.setColor(0f, 0f, 0f, 0.5f);
     overlayBgPixmap.fill();
@@ -50,16 +51,15 @@ public class MenuOverlay extends Table {
     menuBox.add(titleLabel).expandX().center().padBottom(20);
     menuBox.row();
 
-    // Debug mode checkbox
     CheckBox debugModeCheckbox = new CheckBox(" Debug Mode", skin);
-    debugModeCheckbox.setChecked(app.getSettingsManager().isDebugMode());
+    debugModeCheckbox.setChecked(settingsManager.isDebugMode());
     debugModeCheckbox.addListener(
         new ClickListener() {
           @Override
           public void clicked(InputEvent event, float x, float y) {
             boolean isChecked = debugModeCheckbox.isChecked();
-            app.getSettingsManager().setDebugMode(isChecked);
-            app.getSettingsManager().save();
+            settingsManager.setDebugMode(isChecked);
+            settingsManager.save();
           }
         });
     menuBox.add(debugModeCheckbox).left().padBottom(20);
@@ -70,12 +70,11 @@ public class MenuOverlay extends Table {
         new ClickListener() {
           @Override
           public void clicked(InputEvent event, float x, float y) {
-            if (app.getGameContext() != null && !app.getGameContext().isServer) {
-              DisconnectCommand disconnectCommand =
-                  new DisconnectCommand(app.getGameContext().username);
-              app.getGameContext().controlManager.processInput(disconnectCommand);
+            if (gameContext != null && !gameContext.isServer) {
+              DisconnectCommand disconnectCommand = new DisconnectCommand(gameContext.username);
+              gameContext.controlManager.processInput(disconnectCommand);
             }
-            app.showMainMenu();
+            onMainMenu.run();
           }
         });
     menuBox.add(mainMenuButton).width(300).height(60);
@@ -83,16 +82,14 @@ public class MenuOverlay extends Table {
 
     add(menuBox).width(400).height(350);
 
-    // Close overlay when clicking outside the menu box - use capture listener
     addCaptureListener(
         new InputListener() {
           @Override
           public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-            // If click target is not menuBox or its descendant, close the overlay
             Actor target = event.getTarget();
             if (target != menuBox && !isDescendantOf(target, menuBox)) {
               close();
-              event.stop(); // Stop the event from propagating
+              event.stop();
               return true;
             }
             return false;
@@ -123,15 +120,12 @@ public class MenuOverlay extends Table {
 
   @Override
   public Actor hit(float x, float y, boolean touchable) {
-    // Don't capture hits if overlay is not visible
     if (!isVisible()) {
       return null;
     }
 
-    // Always return self for hits within bounds to ensure we capture all touch events
     if (touchable && getTouchable() == Touchable.enabled) {
       if (x >= 0 && x < getWidth() && y >= 0 && y < getHeight()) {
-        // Check if hit is on menuBox first
         Actor hit =
             menuBox.hit(
                 menuBox.parentToLocalCoordinates(new Vector2(x, y)).x,
@@ -140,7 +134,6 @@ public class MenuOverlay extends Table {
         if (hit != null) {
           return hit;
         }
-        // If not on menuBox, return self to capture the event
         return this;
       }
     }

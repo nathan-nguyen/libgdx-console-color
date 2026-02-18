@@ -2,13 +2,11 @@ package com.noiprocs;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.noiprocs.core.GameContext;
 import com.noiprocs.input.InputController;
-import com.noiprocs.resources.FontGenerator;
+import com.noiprocs.resources.RenderResources;
 import com.noiprocs.resources.UIConfig;
 import com.noiprocs.settings.SettingsManager;
 import com.noiprocs.ui.console.ConsoleUIConfig;
@@ -22,8 +20,7 @@ public class LibGDXApp extends Game {
   protected float virtualWidth;
   protected float virtualHeight;
 
-  private SpriteBatch batch;
-  private BitmapFont font;
+  protected RenderResources renderResources;
   private GameContext gameContext;
   private OrthographicCamera camera;
   private Viewport viewport;
@@ -51,14 +48,9 @@ public class LibGDXApp extends Game {
     return camera;
   }
 
-  /** Get the sprite batch for rendering. */
-  public SpriteBatch getBatch() {
-    return batch;
-  }
-
-  /** Get the font for rendering text. */
-  public BitmapFont getFont() {
-    return font;
+  /** Get the shared rendering resources (batch, fonts). */
+  public RenderResources getRenderResources() {
+    return renderResources;
   }
 
   /** Get the game context. */
@@ -101,11 +93,7 @@ public class LibGDXApp extends Game {
     viewport = new FitViewport(virtualWidth, virtualHeight, camera);
     viewport.apply();
 
-    batch = new SpriteBatch();
-
-    // Generate a monospace font using FreeType
-    FontGenerator fontGenerator = new FontGenerator();
-    font = fontGenerator.generateMonospaceFont();
+    renderResources = new RenderResources();
     ConsoleUIConfig.CLEAR_SCREEN = false;
 
     // Initialize settings manager
@@ -134,7 +122,14 @@ public class LibGDXApp extends Game {
   public void showGame() {
     setScreen(
         new GameScreen(
-            this,
+            viewport,
+            camera,
+            renderResources,
+            getInputController(),
+            settingsManager,
+            this::renderVirtualControls,
+            this::setGameContext,
+            this::showMainMenu,
             settingsManager.getUsername(),
             settingsManager.getHostname(),
             settingsManager.getPort(),
@@ -151,8 +146,6 @@ public class LibGDXApp extends Game {
 
   @Override
   public void dispose() {
-    batch.dispose();
-    font.dispose();
-    // Game thread will be terminated when application exits
+    renderResources.dispose();
   }
 }

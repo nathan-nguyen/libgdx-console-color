@@ -39,10 +39,10 @@ public class SettingsScreen implements Screen {
   @Override
   public void show() {
     // Create stage for UI
-    stage = new Stage(app.getViewport(), app.getBatch());
+    stage = new Stage(app.getViewport(), app.getRenderResources().getBatch());
 
     // Create skin for UI elements
-    skin = UIStyleHelper.createSkin(app.getFont());
+    skin = UIStyleHelper.createSkin(app.getRenderResources().getFont());
 
     // Get current settings
     SettingsManager settings = app.getSettingsManager();

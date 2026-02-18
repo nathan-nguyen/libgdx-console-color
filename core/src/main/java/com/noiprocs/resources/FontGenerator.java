@@ -9,8 +9,33 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFont
 /** Utility class for generating fonts. */
 public class FontGenerator {
   private static final int FONT_SIZE = 12;
+  private static final int HUD_FONT_SIZE = 12;
 
   private BitmapFont font;
+
+  /**
+   * Generates a high-resolution font for HUD labels. The font is rasterized at the physical screen
+   * pixel size and scaled down to virtual coordinates, so it stays sharp at any display resolution.
+   *
+   * @return A BitmapFont sized for HUD use
+   */
+  public BitmapFont generateHUDFont() {
+    FreeTypeFontGenerator generator =
+        new FreeTypeFontGenerator(Gdx.files.internal("DejaVuSansMono.ttf"));
+
+    float screenScale = Gdx.graphics.getHeight() / UIConfig.BASE_VIRTUAL_HEIGHT;
+
+    FreeTypeFontParameter parameter = new FreeTypeFontParameter();
+    parameter.size = Math.round(HUD_FONT_SIZE * screenScale);
+    parameter.characters = ResourceLoader.loadFontCharacters();
+    parameter.color = Color.WHITE;
+
+    BitmapFont hudFont = generator.generateFont(parameter);
+    generator.dispose();
+    hudFont.setUseIntegerPositions(false);
+    hudFont.getData().setScale(1f / screenScale);
+    return hudFont;
+  }
 
   /**
    * Generates a monospace bitmap font using the bundled DejaVu Sans Mono font.
