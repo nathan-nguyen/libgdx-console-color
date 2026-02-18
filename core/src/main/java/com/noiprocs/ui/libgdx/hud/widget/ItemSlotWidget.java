@@ -59,6 +59,9 @@ public class ItemSlotWidget extends Table {
     iconStyle.fontColor = Color.WHITE;
     iconLabel = new Label("", iconStyle);
     iconLabel.setFontScale(showItemName ? 0.5f : 1.5f); // Smaller for names, larger for icons
+    if (showItemName) {
+      iconLabel.setWrap(true);
+    }
 
     // Create quantity label (bottom-right corner)
     Label.LabelStyle qtyStyle = new Label.LabelStyle();
@@ -71,7 +74,7 @@ public class ItemSlotWidget extends Table {
     Table contentTable = new Table();
     contentTable.setFillParent(true); // Fill entire slot area
     contentTable.setTouchable(Touchable.enabled); // Make content table touchable
-    contentTable.add(iconLabel).expand().center();
+    contentTable.add(iconLabel).expand().fillX().center();
     contentTable.row();
     contentTable.add(quantityLabel).right().bottom();
 
