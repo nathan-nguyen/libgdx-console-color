@@ -42,7 +42,7 @@ public class SettingsScreen implements Screen {
     stage = new Stage(app.getViewport(), app.getRenderResources().getBatch());
 
     // Create skin for UI elements
-    skin = UIStyleHelper.createSkin(app.getRenderResources().getFont());
+    skin = UIStyleHelper.createSkin(app.getRenderResources().getHudFont());
 
     // Get current settings
     SettingsManager settings = app.getSettingsManager();

@@ -32,7 +32,7 @@ public class MainMenuScreen implements Screen {
     stage = new Stage(app.getViewport(), app.getRenderResources().getBatch());
 
     // Create skin for UI elements
-    skin = UIStyleHelper.createSkin(app.getRenderResources().getFont());
+    skin = UIStyleHelper.createSkin(app.getRenderResources().getHudFont());
 
     // Create UI table
     Table table = new Table();

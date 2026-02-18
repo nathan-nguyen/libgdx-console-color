@@ -18,20 +18,20 @@ public class PlayerInfoHUD extends Table {
 
   private final Label nameLabel;
   private final HealthBarActor healthBar;
-  private final Label inventoryLabel;
+  private final Label itemLabel;
 
   public PlayerInfoHUD(BitmapFont font) {
     Label.LabelStyle style = new Label.LabelStyle(font, Color.WHITE);
     this.nameLabel = new Label("", style);
     this.healthBar = new HealthBarActor(font);
-    this.inventoryLabel = new Label("", style);
+    this.itemLabel = new Label("", style);
 
     setFillParent(true);
     top().left().pad(5);
     add(nameLabel).left();
     add(healthBar).size(HealthBarActor.BAR_WIDTH, HealthBarActor.BAR_HEIGHT).padLeft(6).left();
     row();
-    add(inventoryLabel).left().colspan(2);
+    add(itemLabel).left().colspan(2);
   }
 
   public void update(PlayerModel playerModel, SettingsManager settingsManager) {
@@ -45,7 +45,7 @@ public class PlayerInfoHUD extends Table {
 
     healthBar.setHealth(playerModel.getHealth(), playerModel.getMaxHealth());
 
-    StringBuilder inv = new StringBuilder("Inventory: [");
+    StringBuilder inv = new StringBuilder("Item: [");
     Item item = playerModel.getHoldingItem();
     if (item != null) {
       inv.append(item.name).append(": ").append(item.amount);
@@ -54,7 +54,7 @@ public class PlayerInfoHUD extends Table {
     if (debug) {
       inv.append("  FPS: ").append(Gdx.graphics.getFramesPerSecond());
     }
-    inventoryLabel.setText(inv.toString());
+    itemLabel.setText(inv.toString());
   }
 
   public void dispose() {

@@ -92,7 +92,7 @@ public class VirtualControlRenderer {
     batch.begin();
     renderLabel(batch, font, "Interact", ControlZone.ACTION_SPACE);
     renderLabel(batch, font, "Attack", ControlZone.ACTION_FIRE);
-    renderLabel(batch, font, "Use Item", ControlZone.ACTION_TOGGLE);
+    renderLabel(batch, font, "Item", ControlZone.ACTION_TOGGLE);
     renderLabel(batch, font, "1", ControlZone.QUICK_SLOT_1);
     renderLabel(batch, font, "2", ControlZone.QUICK_SLOT_2);
     renderLabel(batch, font, "3", ControlZone.QUICK_SLOT_3);
