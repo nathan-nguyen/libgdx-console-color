@@ -152,15 +152,16 @@ public class LibGDXGameScreen implements GameScreenInterface {
 
     BitmapFont.Glyph glyph = font.getData().getGlyph(ch);
     if (glyph != null && glyph.page < font.getRegions().size) {
-      float glyphX = x + glyph.xoffset;
-      float glyphY = y + glyph.yoffset;
+      float scale = font.getData().scaleX;
+      float glyphX = x + glyph.xoffset * scale;
+      float glyphY = y + glyph.yoffset * scale;
 
       batch.draw(
           font.getRegions().get(glyph.page).getTexture(),
           Math.round(glyphX),
           Math.round(glyphY),
-          glyph.width,
-          glyph.height,
+          glyph.width * scale,
+          glyph.height * scale,
           glyph.u,
           glyph.v,
           glyph.u2,

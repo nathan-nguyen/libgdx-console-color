@@ -113,7 +113,7 @@ public class GameScreen implements Screen {
 
     setupUI();
 
-    hudManager = new HUDManager(gameContext, gameScreen, viewport, renderResources.getFont());
+    hudManager = new HUDManager(gameContext, gameScreen, viewport, renderResources.getPanelFont());
     gameScreen.setHudManager(hudManager);
 
     setupInputMultiplexer();

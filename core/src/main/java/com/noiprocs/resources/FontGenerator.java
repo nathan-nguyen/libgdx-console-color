@@ -43,31 +43,49 @@ public class FontGenerator {
    * @return A configured BitmapFont suitable for monospace text rendering with full Unicode support
    */
   public BitmapFont generateMonospaceFont() {
-    // Load bundled DejaVu Sans Mono font from assets
     FreeTypeFontGenerator generator =
         new FreeTypeFontGenerator(Gdx.files.internal("DejaVuSansMono.ttf"));
 
+    float screenScale = Gdx.graphics.getHeight() / UIConfig.BASE_VIRTUAL_HEIGHT;
+
     FreeTypeFontParameter parameter = new FreeTypeFontParameter();
-    parameter.size = FONT_SIZE;
+    parameter.size = Math.round(FONT_SIZE * screenScale);
     parameter.mono = true;
     parameter.characters = ResourceLoader.loadFontCharacters();
     parameter.color = Color.WHITE;
 
     font = generator.generateFont(parameter);
     generator.dispose();
-    font.setUseIntegerPositions(true);
-    // Disable markup to prevent any text formatting interference
+    font.setUseIntegerPositions(false);
     font.getData().markupEnabled = false;
+    font.getData().setScale(1f / screenScale);
 
-    forceMonospacing();
+    forceMonospacing(screenScale);
     return font;
   }
 
   /**
-   * Forces all glyphs to use the same advance width for true monospacing. This ensures consistent
-   * character spacing across all glyphs.
+   * Generates a font for HUD panel labels. Rasterized at virtual size so that Label.setFontScale()
+   * values work as expected in virtual coordinate units.
+   *
+   * @return A BitmapFont sized for HUD panel use
    */
-  private void forceMonospacing() {
+  public BitmapFont generatePanelFont() {
+    FreeTypeFontGenerator generator =
+        new FreeTypeFontGenerator(Gdx.files.internal("DejaVuSansMono.ttf"));
+
+    FreeTypeFontParameter parameter = new FreeTypeFontParameter();
+    parameter.size = HUD_FONT_SIZE;
+    parameter.characters = ResourceLoader.loadFontCharacters();
+    parameter.color = Color.WHITE;
+
+    BitmapFont panelFont = generator.generateFont(parameter);
+    generator.dispose();
+    panelFont.setUseIntegerPositions(false);
+    return panelFont;
+  }
+
+  private void forceMonospacing(float screenScale) {
     BitmapFont.BitmapFontData fontData = font.getData();
     for (int i = 0; i < fontData.glyphs.length; i++) {
       BitmapFont.Glyph[] page = fontData.glyphs[i];
@@ -76,10 +94,10 @@ public class FontGenerator {
       }
       for (BitmapFont.Glyph glyph : page) {
         if (glyph != null) {
-          glyph.xadvance = (int) UIConfig.CHAR_WIDTH;
+          glyph.xadvance = Math.round(UIConfig.CHAR_WIDTH * screenScale);
         }
       }
     }
-    fontData.spaceXadvance = UIConfig.CHAR_HEIGHT;
+    fontData.spaceXadvance = Math.round(UIConfig.CHAR_HEIGHT * screenScale);
   }
 }
