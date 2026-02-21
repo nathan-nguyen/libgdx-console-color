@@ -18,21 +18,40 @@ public class ItemTextureManager implements Disposable {
 
   private static final String ITEM_ICONS_JSON = "item-icons.json";
 
+  private static final Map<String, String> EQUIPMENT_SLOT_ICON_PATHS = new HashMap<>();
+
+  static {
+    EQUIPMENT_SLOT_ICON_PATHS.put("HELMET", "icons/helmet_slot.png");
+    EQUIPMENT_SLOT_ICON_PATHS.put("CHEST PLATE", "icons/chest_plate_slot.png");
+    EQUIPMENT_SLOT_ICON_PATHS.put("LEGGING", "icons/legging_slot.png");
+    EQUIPMENT_SLOT_ICON_PATHS.put("BOOT", "icons/boots_slot.png");
+  }
+
   private final Map<String, TextureRegion> textures = new HashMap<>();
+  private final Map<String, TextureRegion> slotTextures = new HashMap<>();
 
   public ItemTextureManager() {
     FileHandle jsonFile = Gdx.files.internal(ITEM_ICONS_JSON);
-    if (!jsonFile.exists()) return;
+    if (jsonFile.exists()) {
+      JsonValue root = new JsonReader().parse(jsonFile);
+      for (JsonValue entry = root.child; entry != null; entry = entry.next) {
+        String className = entry.name;
+        String iconPath = entry.asString();
+        FileHandle iconFile = Gdx.files.internal(iconPath);
+        if (iconFile.exists()) {
+          Texture tex = new Texture(iconFile);
+          tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+          textures.put(className, new TextureRegion(tex));
+        }
+      }
+    }
 
-    JsonValue root = new JsonReader().parse(jsonFile);
-    for (JsonValue entry = root.child; entry != null; entry = entry.next) {
-      String className = entry.name;
-      String iconPath = entry.asString();
-      FileHandle iconFile = Gdx.files.internal(iconPath);
-      if (iconFile.exists()) {
-        Texture tex = new Texture(iconFile);
+    for (Map.Entry<String, String> entry : EQUIPMENT_SLOT_ICON_PATHS.entrySet()) {
+      FileHandle file = Gdx.files.internal(entry.getValue());
+      if (file.exists()) {
+        Texture tex = new Texture(file);
         tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        textures.put(className, new TextureRegion(tex));
+        slotTextures.put(entry.getKey(), new TextureRegion(tex));
       }
     }
   }
@@ -43,11 +62,26 @@ public class ItemTextureManager implements Disposable {
     return textures.get(item.getClass().getName());
   }
 
+  /** Returns the icon texture for the given item class, or null if no icon is mapped. */
+  public TextureRegion getTextureByClass(Class<?> itemClass) {
+    if (itemClass == null) return null;
+    return textures.get(itemClass.getName());
+  }
+
+  /** Returns the placeholder texture for an equipment slot type (e.g. "HELMET"), or null. */
+  public TextureRegion getEquipmentSlotTexture(String slotType) {
+    return slotTextures.get(slotType);
+  }
+
   @Override
   public void dispose() {
     for (TextureRegion region : textures.values()) {
       region.getTexture().dispose();
     }
     textures.clear();
+    for (TextureRegion region : slotTextures.values()) {
+      region.getTexture().dispose();
+    }
+    slotTextures.clear();
   }
 }

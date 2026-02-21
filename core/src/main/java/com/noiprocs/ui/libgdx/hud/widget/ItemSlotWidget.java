@@ -26,6 +26,7 @@ public class ItemSlotWidget extends Table {
   private final ItemTextureManager itemTextureManager;
 
   private Object item; // Item object (from console-color-core dependency)
+  private Class<?> itemClass; // Explicit item class for texture lookup (used when item is a String)
   private int quantity;
   private final boolean showItemName; // Whether to show full item name instead of icon character
   private boolean isHotbarSlot; // Whether this is a hotbar slot (first 4 inventory slots)
@@ -116,6 +117,21 @@ public class ItemSlotWidget extends Table {
    */
   public void setItem(Object item, int quantity) {
     this.item = item;
+    this.itemClass = null;
+    this.quantity = quantity;
+    updateDisplay();
+  }
+
+  /**
+   * Sets the item displayed in this slot using an explicit class for texture lookup.
+   *
+   * @param itemClass The item's class (used for texture lookup)
+   * @param displayName The name to display in the slot
+   * @param quantity Item quantity
+   */
+  public void setItem(Class<?> itemClass, String displayName, int quantity) {
+    this.item = displayName;
+    this.itemClass = itemClass;
     this.quantity = quantity;
     updateDisplay();
   }
@@ -207,7 +223,10 @@ public class ItemSlotWidget extends Table {
     } else {
       ItemIconRenderer.ItemIcon icon = ItemIconRenderer.renderIcon(item);
       if (icon != null) {
-        TextureRegion region = itemTextureManager.getTexture(item);
+        TextureRegion region =
+            itemClass != null
+                ? itemTextureManager.getTextureByClass(itemClass)
+                : itemTextureManager.getTexture(item);
         if (region != null) {
           iconImage.setDrawable(new TextureRegionDrawable(region));
           iconImage.setColor(1, 1, 1, 1f);

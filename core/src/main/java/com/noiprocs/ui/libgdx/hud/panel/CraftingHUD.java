@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.noiprocs.core.GameContext;
 import com.noiprocs.core.model.item.Inventory;
@@ -53,7 +54,7 @@ public class CraftingHUD {
 
   // Recipe data
   private final List<Class<?>> recipeList;
-  private final List<TextButton> recipeButtons;
+  private final List<ItemSlotWidget> recipeButtons;
   private int selectedRecipeIndex = -1;
 
   public CraftingHUD(
@@ -290,23 +291,26 @@ public class CraftingHUD {
       final int recipeIndex = i;
       Class<?> itemClass = recipeList.get(i);
 
-      // Get recipe name (remove "Item" suffix if present)
-      String recipeName = itemClass.getSimpleName();
-      if (recipeName.endsWith("Item")) {
-        recipeName = recipeName.substring(0, recipeName.length() - 4);
-      }
+      String recipeName = toDisplayName(itemClass);
 
-      // Recipe button - use selected style if this is the selected recipe
-      TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
-      buttonStyle.font = font;
-      buttonStyle.fontColor = Color.WHITE;
-      buttonStyle.up =
-          (i == selectedRecipeIndex) ? slotStyle.selectedBackground : slotStyle.emptyBackground;
-      buttonStyle.over = slotStyle.hoverBackground;
-      buttonStyle.down = slotStyle.filledBackground;
+      // Icon slot showing the recipe output item
+      ItemSlotWidget recipeSlot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+      recipeSlot.setItem(itemClass, recipeName, 1);
+      recipeSlot.setSelected(i == selectedRecipeIndex);
 
-      TextButton recipeButton = new TextButton(recipeName, buttonStyle);
-      recipeButton.addListener(
+      // Name label below the icon
+      Label nameLabel = new Label(recipeName, labelStyle);
+      nameLabel.setFontScale(0.6f);
+      nameLabel.setAlignment(Align.center);
+      nameLabel.setWrap(true);
+
+      // Container: icon on top, name below
+      Table recipeEntry = new Table();
+      recipeEntry.add(recipeSlot).size(52, 52);
+      recipeEntry.row();
+      recipeEntry.add(nameLabel).width(52).height(28).padTop(2);
+
+      recipeEntry.addListener(
           new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -314,8 +318,8 @@ public class CraftingHUD {
             }
           });
 
-      recipeButtons.add(recipeButton);
-      recipeListTable.add(recipeButton).expandX().fillX().height(35).padBottom(5);
+      recipeButtons.add(recipeSlot);
+      recipeListTable.add(recipeEntry).padBottom(10);
       recipeListTable.row();
     }
   }
@@ -325,21 +329,15 @@ public class CraftingHUD {
       return;
     }
 
-    // Update selected index
     int previousIndex = selectedRecipeIndex;
     selectedRecipeIndex = index;
 
-    // Update button styles without rebuilding entire list
     if (previousIndex >= 0 && previousIndex < recipeButtons.size()) {
-      TextButton previousButton = recipeButtons.get(previousIndex);
-      TextButton.TextButtonStyle style = previousButton.getStyle();
-      style.up = slotStyle.emptyBackground;
+      recipeButtons.get(previousIndex).setSelected(false);
     }
 
     if (selectedRecipeIndex >= 0 && selectedRecipeIndex < recipeButtons.size()) {
-      TextButton selectedButton = recipeButtons.get(selectedRecipeIndex);
-      TextButton.TextButtonStyle style = selectedButton.getStyle();
-      style.up = slotStyle.selectedBackground;
+      recipeButtons.get(selectedRecipeIndex).setSelected(true);
     }
 
     refreshMaterialsPanel();
@@ -394,15 +392,17 @@ public class CraftingHUD {
         canCraft = false;
       }
 
-      // Get material name (remove "Item" suffix if present)
-      String materialName = material.itemClass.getSimpleName();
-      if (materialName.endsWith("Item")) {
-        materialName = materialName.substring(0, materialName.length() - 4);
-      }
+      String materialName = toDisplayName(material.itemClass);
 
       // Create a slot showing the required material
-      ItemSlotWidget materialSlot = new ItemSlotWidget(slotStyle, font, true, itemTextureManager);
-      materialSlot.setItem(materialName, needed);
+      ItemSlotWidget materialSlot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+      materialSlot.setItem(material.itemClass, materialName, needed);
+
+      // Name label below the icon
+      Label nameLabel = new Label(materialName, labelStyle);
+      nameLabel.setFontScale(0.6f);
+      nameLabel.setAlignment(Align.center);
+      nameLabel.setWrap(true);
 
       // Create label showing available/needed amounts
       String amountText = String.format("%d/%d", available, needed);
@@ -410,9 +410,11 @@ public class CraftingHUD {
       amountLabel.setFontScale(0.7f);
       amountLabel.setColor(available >= needed ? Color.GREEN : Color.RED);
 
-      // Add material slot and amount label vertically
+      // Add material slot, name label, and amount label vertically
       Table materialEntry = new Table();
       materialEntry.add(materialSlot).size(52, 52);
+      materialEntry.row();
+      materialEntry.add(nameLabel).width(52).height(28).padTop(2);
       materialEntry.row();
       materialEntry.add(amountLabel).padTop(2);
 
@@ -459,6 +461,13 @@ public class CraftingHUD {
               refresh();
             })
         .start();
+  }
+
+  private static String toDisplayName(Class<?> itemClass) {
+    String name = itemClass.getSimpleName();
+    if (name.endsWith("Item")) name = name.substring(0, name.length() - 4);
+    else if (name.endsWith("Recipe")) name = name.substring(0, name.length() - 6);
+    return name.replaceAll("(?<=[a-z])(?=[A-Z])", " ");
   }
 
   private void close() {

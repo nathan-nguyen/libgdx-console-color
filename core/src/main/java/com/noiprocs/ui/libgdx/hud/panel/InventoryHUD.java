@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -18,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Source;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Target;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.noiprocs.core.GameContext;
 import com.noiprocs.core.model.InventoryContainerInterface;
@@ -32,6 +34,7 @@ import com.noiprocs.resources.ItemTextureManager;
 import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
 import com.noiprocs.ui.libgdx.hud.ItemDragDropHandler;
+import com.noiprocs.ui.libgdx.hud.widget.ItemIconRenderer;
 import com.noiprocs.ui.libgdx.hud.widget.ItemSlotStyle;
 import com.noiprocs.ui.libgdx.hud.widget.ItemSlotWidget;
 
@@ -57,10 +60,12 @@ public class InventoryHUD {
 
   // Player inventory slots
   private ItemSlotWidget[] playerInventorySlots;
+  private Label[] playerInventoryNameLabels;
   private static final int PLAYER_INVENTORY_SIZE = 9; // 3x3 grid (9 slots)
 
   // Container slots
   private ItemSlotWidget[] containerSlots;
+  private Label[] containerNameLabels;
   private static final int CONTAINER_SIZE = 9; // 3x3 grid (9 slots)
 
   // Equipment slots (for HumanoidModel)
@@ -68,6 +73,10 @@ public class InventoryHUD {
   private ItemSlotWidget chestPlateSlot;
   private ItemSlotWidget leggingSlot;
   private ItemSlotWidget bootSlot;
+  private Label helmetNameLabel;
+  private Label chestPlateNameLabel;
+  private Label leggingNameLabel;
+  private Label bootNameLabel;
 
   private Table equipmentPanel;
   private Label healthValueLabel;
@@ -258,13 +267,28 @@ public class InventoryHUD {
     panel.add(label).colspan(3).padBottom(5);
     panel.row();
 
+    Label.LabelStyle nameLabelStyle = new Label.LabelStyle();
+    nameLabelStyle.font = font;
+    nameLabelStyle.fontColor = Color.WHITE;
+
     // Create inventory slots in a 3x3 grid (9 slots total)
     playerInventorySlots = new ItemSlotWidget[PLAYER_INVENTORY_SIZE];
+    playerInventoryNameLabels = new Label[PLAYER_INVENTORY_SIZE];
     for (int i = 0; i < PLAYER_INVENTORY_SIZE; i++) {
-      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, true, itemTextureManager);
+      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
       playerInventorySlots[i] = slot;
 
-      panel.add(slot).size(48, 48).pad(1);
+      Label nameLabel = new Label("", nameLabelStyle);
+      nameLabel.setFontScale(0.6f);
+      nameLabel.setAlignment(Align.center);
+      nameLabel.setWrap(true);
+      playerInventoryNameLabels[i] = nameLabel;
+
+      Table slotEntry = new Table();
+      slotEntry.add(slot).size(48, 48);
+      slotEntry.row();
+      slotEntry.add(nameLabel).width(48).height(28).padTop(2);
+      panel.add(slotEntry).pad(1);
 
       // New row every 3 slots
       if ((i + 1) % 3 == 0) {
@@ -278,13 +302,28 @@ public class InventoryHUD {
   private Table createContainerPanel() {
     Table panel = new Table();
 
+    Label.LabelStyle nameLabelStyle = new Label.LabelStyle();
+    nameLabelStyle.font = font;
+    nameLabelStyle.fontColor = Color.WHITE;
+
     // Create container slots in a 3x3 grid (9 slots total)
     containerSlots = new ItemSlotWidget[CONTAINER_SIZE];
+    containerNameLabels = new Label[CONTAINER_SIZE];
     for (int i = 0; i < CONTAINER_SIZE; i++) {
-      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, true, itemTextureManager);
+      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
       containerSlots[i] = slot;
 
-      panel.add(slot).size(48, 48).pad(1);
+      Label nameLabel = new Label("", nameLabelStyle);
+      nameLabel.setFontScale(0.6f);
+      nameLabel.setAlignment(Align.center);
+      nameLabel.setWrap(true);
+      containerNameLabels[i] = nameLabel;
+
+      Table slotEntry = new Table();
+      slotEntry.add(slot).size(48, 48);
+      slotEntry.row();
+      slotEntry.add(nameLabel).width(48).height(28).padTop(2);
+      panel.add(slotEntry).pad(1);
 
       // New row every 3 slots
       if ((i + 1) % 3 == 0) {
@@ -304,43 +343,73 @@ public class InventoryHUD {
     labelStyle.fontColor = Color.WHITE;
     Label label = new Label("Equipment", labelStyle);
     label.setFontScale(0.9f);
-    panel.add(label).colspan(2).padBottom(5);
+    panel.add(label).colspan(4).padBottom(5);
     panel.row();
 
     // Create equipment slots
-    helmetSlot = new ItemSlotWidget(slotStyle, font, true, itemTextureManager);
-    chestPlateSlot = new ItemSlotWidget(slotStyle, font, true, itemTextureManager);
-    leggingSlot = new ItemSlotWidget(slotStyle, font, true, itemTextureManager);
-    bootSlot = new ItemSlotWidget(slotStyle, font, true, itemTextureManager);
+    helmetSlot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+    chestPlateSlot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+    leggingSlot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+    bootSlot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
 
-    // Layout equipment slots vertically with labels
-    Label.LabelStyle slotLabelStyle = new Label.LabelStyle();
-    slotLabelStyle.font = font;
-    slotLabelStyle.fontColor = Color.LIGHT_GRAY;
+    // Set slot icons as placeholders
+    TextureRegion helmetRegion = itemTextureManager.getEquipmentSlotTexture("HELMET");
+    if (helmetRegion != null) helmetSlot.setEmptySlotTexture(helmetRegion);
+    TextureRegion chestRegion = itemTextureManager.getEquipmentSlotTexture("CHEST PLATE");
+    if (chestRegion != null) chestPlateSlot.setEmptySlotTexture(chestRegion);
+    TextureRegion leggingRegion = itemTextureManager.getEquipmentSlotTexture("LEGGING");
+    if (leggingRegion != null) leggingSlot.setEmptySlotTexture(leggingRegion);
+    TextureRegion bootRegion = itemTextureManager.getEquipmentSlotTexture("BOOT");
+    if (bootRegion != null) bootSlot.setEmptySlotTexture(bootRegion);
 
-    Label helmetLabel = new Label("Helmet", slotLabelStyle);
-    helmetLabel.setFontScale(0.8f);
-    panel.add(helmetLabel).left().padRight(5);
-    panel.add(helmetSlot).size(48, 48).pad(1);
-    panel.row();
+    Label.LabelStyle nameLabelStyle = new Label.LabelStyle();
+    nameLabelStyle.font = font;
+    nameLabelStyle.fontColor = Color.WHITE;
 
-    Label chestLabel = new Label("Chest", slotLabelStyle);
-    chestLabel.setFontScale(0.8f);
-    panel.add(chestLabel).left().padRight(5);
-    panel.add(chestPlateSlot).size(48, 48).pad(1);
-    panel.row();
+    helmetNameLabel = new Label("", nameLabelStyle);
+    helmetNameLabel.setFontScale(0.6f);
+    helmetNameLabel.setAlignment(Align.center);
+    helmetNameLabel.setWrap(true);
 
-    Label leggingLabel = new Label("Legging", slotLabelStyle);
-    leggingLabel.setFontScale(0.8f);
-    panel.add(leggingLabel).left().padRight(5);
-    panel.add(leggingSlot).size(48, 48).pad(1);
-    panel.row();
+    chestPlateNameLabel = new Label("", nameLabelStyle);
+    chestPlateNameLabel.setFontScale(0.6f);
+    chestPlateNameLabel.setAlignment(Align.center);
+    chestPlateNameLabel.setWrap(true);
 
-    Label bootLabel = new Label("Boot", slotLabelStyle);
-    bootLabel.setFontScale(0.8f);
-    panel.add(bootLabel).left().padRight(5);
-    panel.add(bootSlot).size(48, 48).pad(1);
-    panel.row();
+    leggingNameLabel = new Label("", nameLabelStyle);
+    leggingNameLabel.setFontScale(0.6f);
+    leggingNameLabel.setAlignment(Align.center);
+    leggingNameLabel.setWrap(true);
+
+    bootNameLabel = new Label("", nameLabelStyle);
+    bootNameLabel.setFontScale(0.6f);
+    bootNameLabel.setAlignment(Align.center);
+    bootNameLabel.setWrap(true);
+
+    // Horizontal layout: all 4 slots in a row with icons as placeholders
+    Table helmetEntry = new Table();
+    helmetEntry.add(helmetSlot).size(48, 48);
+    helmetEntry.row();
+    helmetEntry.add(helmetNameLabel).width(48).height(28).padTop(2);
+    panel.add(helmetEntry).pad(1);
+
+    Table chestEntry = new Table();
+    chestEntry.add(chestPlateSlot).size(48, 48);
+    chestEntry.row();
+    chestEntry.add(chestPlateNameLabel).width(48).height(28).padTop(2);
+    panel.add(chestEntry).pad(1);
+
+    Table leggingEntry = new Table();
+    leggingEntry.add(leggingSlot).size(48, 48);
+    leggingEntry.row();
+    leggingEntry.add(leggingNameLabel).width(48).height(28).padTop(2);
+    panel.add(leggingEntry).pad(1);
+
+    Table bootEntry = new Table();
+    bootEntry.add(bootSlot).size(48, 48);
+    bootEntry.row();
+    bootEntry.add(bootNameLabel).width(48).height(28).padTop(2);
+    panel.add(bootEntry).pad(1);
 
     return panel;
   }
@@ -647,8 +716,10 @@ public class InventoryHUD {
       Item item = playerInventory.getItem(i);
       if (item != null) {
         playerInventorySlots[i].setItem(item, item.amount);
+        playerInventoryNameLabels[i].setText(getItemDisplayName(item));
       } else {
         playerInventorySlots[i].clear();
+        playerInventoryNameLabels[i].setText("");
       }
     }
 
@@ -674,8 +745,10 @@ public class InventoryHUD {
           Item helmetItem = equipment.getItem(ItemCategory.HELMET);
           if (helmetItem != null) {
             helmetSlot.setItem(helmetItem, helmetItem.amount);
+            helmetNameLabel.setText(getItemDisplayName(helmetItem));
           } else {
             helmetSlot.clear();
+            helmetNameLabel.setText("");
           }
         }
 
@@ -683,8 +756,10 @@ public class InventoryHUD {
           Item chestItem = equipment.getItem(ItemCategory.CHEST_PLATE);
           if (chestItem != null) {
             chestPlateSlot.setItem(chestItem, chestItem.amount);
+            chestPlateNameLabel.setText(getItemDisplayName(chestItem));
           } else {
             chestPlateSlot.clear();
+            chestPlateNameLabel.setText("");
           }
         }
 
@@ -692,8 +767,10 @@ public class InventoryHUD {
           Item leggingItem = equipment.getItem(ItemCategory.LEGGING);
           if (leggingItem != null) {
             leggingSlot.setItem(leggingItem, leggingItem.amount);
+            leggingNameLabel.setText(getItemDisplayName(leggingItem));
           } else {
             leggingSlot.clear();
+            leggingNameLabel.setText("");
           }
         }
 
@@ -701,8 +778,10 @@ public class InventoryHUD {
           Item bootItem = equipment.getItem(ItemCategory.BOOT);
           if (bootItem != null) {
             bootSlot.setItem(bootItem, bootItem.amount);
+            bootNameLabel.setText(getItemDisplayName(bootItem));
           } else {
             bootSlot.clear();
+            bootNameLabel.setText("");
           }
         }
 
@@ -712,8 +791,10 @@ public class InventoryHUD {
           Item item = humanoidInventory.getItem(i);
           if (item != null) {
             containerSlots[i].setItem(item, item.amount);
+            containerNameLabels[i].setText(getItemDisplayName(item));
           } else {
             containerSlots[i].clear();
+            containerNameLabels[i].setText("");
           }
         }
       } else if (containerModel instanceof InventoryContainerInterface) {
@@ -724,12 +805,23 @@ public class InventoryHUD {
           Item item = containerInventory.getItem(i);
           if (item != null) {
             containerSlots[i].setItem(item, item.amount);
+            containerNameLabels[i].setText(getItemDisplayName(item));
           } else {
             containerSlots[i].clear();
+            containerNameLabels[i].setText("");
           }
         }
       }
     }
+  }
+
+  private static String getItemDisplayName(Object item) {
+    if (item == null) return "";
+    ItemIconRenderer.ItemIcon icon = ItemIconRenderer.renderIcon(item);
+    if (icon != null) return icon.displayName;
+    String name = item.getClass().getSimpleName();
+    if (name.endsWith("Item")) name = name.substring(0, name.length() - 4);
+    return name.replaceAll("(?<=[a-z])(?=[A-Z])", " ");
   }
 
   private void close() {
@@ -760,7 +852,6 @@ public class InventoryHUD {
 
   public void dispose() {
     // Don't dispose slotStyle - it's shared across all HUDs
-    // Dispose background texture
     if (backgroundTexture != null) {
       backgroundTexture.dispose();
     }
