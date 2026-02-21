@@ -2,10 +2,18 @@ package com.noiprocs.ui.libgdx.hud.widget;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Scaling;
+import com.noiprocs.resources.ItemTextureManager;
 
 /**
  * Reusable draggable slot widget for inventory items, equipment slots, and crafting materials.
@@ -15,6 +23,7 @@ public class ItemSlotWidget extends Table {
 
   private final ItemSlotStyle style;
   private final BitmapFont font;
+  private final ItemTextureManager itemTextureManager;
 
   private Object item; // Item object (from console-color-core dependency)
   private int quantity;
@@ -22,6 +31,8 @@ public class ItemSlotWidget extends Table {
   private boolean isHotbarSlot; // Whether this is a hotbar slot (first 4 inventory slots)
   private boolean isSelected; // Whether this is the currently selected slot
 
+  private TextureRegion emptySlotTexture; // Shown blurry when slot is empty
+  private Image iconImage;
   private Label iconLabel;
   private Label quantityLabel;
   private boolean isHovered;
@@ -34,10 +45,14 @@ public class ItemSlotWidget extends Table {
    * @param font Font for rendering text
    * @param showItemName Whether to show full item name below the slot
    */
-  public ItemSlotWidget(ItemSlotStyle style, BitmapFont font, boolean showItemName) {
+  public ItemSlotWidget(
+      ItemSlotStyle style,
+      BitmapFont font,
+      boolean showItemName,
+      ItemTextureManager itemTextureManager) {
     this.style = style;
     this.font = font;
-    // Equipment slot type (e.g., "HELMET", "CHEST") or null for inventory
+    this.itemTextureManager = itemTextureManager;
     this.showItemName = showItemName;
     this.item = null;
     this.quantity = 0;
@@ -53,12 +68,18 @@ public class ItemSlotWidget extends Table {
     this.pad(2);
     this.setTouchable(Touchable.enabled); // Enable touch for entire slot
 
-    // Create icon/name label (center)
+    // Create icon image (shown when a texture is available for the item)
+    iconImage = new Image();
+    iconImage.setScaling(Scaling.fit);
+    iconImage.setVisible(false);
+
+    // Create icon/name label (shown when no texture or in name mode)
     Label.LabelStyle iconStyle = new Label.LabelStyle();
     iconStyle.font = font;
     iconStyle.fontColor = Color.WHITE;
     iconLabel = new Label("", iconStyle);
-    iconLabel.setFontScale(showItemName ? 0.5f : 1.5f); // Smaller for names, larger for icons
+    iconLabel.setAlignment(Align.center);
+    iconLabel.setFontScale(showItemName ? 0.5f : 1.5f);
     if (showItemName) {
       iconLabel.setWrap(true);
     }
@@ -68,17 +89,20 @@ public class ItemSlotWidget extends Table {
     qtyStyle.font = font;
     qtyStyle.fontColor = Color.WHITE;
     quantityLabel = new Label("", qtyStyle);
-    quantityLabel.setFontScale(0.7f); // Smaller quantity text
+    quantityLabel.setFontScale(0.7f);
 
-    // Layout: Stack icon/name in center, quantity in bottom-right
-    Table contentTable = new Table();
-    contentTable.setFillParent(true); // Fill entire slot area
-    contentTable.setTouchable(Touchable.enabled); // Make content table touchable
-    contentTable.add(iconLabel).expand().fillX().center();
-    contentTable.row();
-    contentTable.add(quantityLabel).right().bottom();
+    // Quantity overlaid in bottom-right corner
+    Table quantityOverlay = new Table();
+    quantityOverlay.add(quantityLabel).expand().right().bottom().pad(1);
 
-    this.add(contentTable).expand().fill();
+    // Single Stack: icon fills the whole slot, quantity overlays on top
+    Stack contentStack = new Stack();
+    contentStack.setTouchable(Touchable.enabled);
+    contentStack.add(iconImage);
+    contentStack.add(iconLabel);
+    contentStack.add(quantityOverlay);
+
+    this.add(contentStack).expand().fill();
 
     // Set initial background
     updateBackground();
@@ -140,6 +164,16 @@ public class ItemSlotWidget extends Table {
   }
 
   /**
+   * Sets a placeholder texture displayed blurrily when the slot is empty.
+   *
+   * @param texture Texture region to show, or null to show nothing when empty
+   */
+  public void setEmptySlotTexture(TextureRegion texture) {
+    this.emptySlotTexture = texture;
+    if (item == null) updateDisplay();
+  }
+
+  /**
    * Sets the hover state for visual feedback.
    *
    * @param hovered true if mouse/touch is hovering over slot
@@ -161,34 +195,46 @@ public class ItemSlotWidget extends Table {
 
   private void updateDisplay() {
     if (item == null) {
+      if (emptySlotTexture != null) {
+        iconImage.setDrawable(new TextureRegionDrawable(emptySlotTexture));
+        iconImage.setColor(1, 1, 1, 0.35f);
+        iconImage.setVisible(true);
+      } else {
+        iconImage.setVisible(false);
+      }
       iconLabel.setText("");
       quantityLabel.setText("");
     } else {
-      // Render item using full name or icon based on showItemName setting
       ItemIconRenderer.ItemIcon icon = ItemIconRenderer.renderIcon(item);
       if (icon != null) {
-        if (showItemName) {
-          // Show full item name instead of single character
+        TextureRegion region = itemTextureManager.getTexture(item);
+        if (region != null) {
+          iconImage.setDrawable(new TextureRegionDrawable(region));
+          iconImage.setColor(1, 1, 1, 1f);
+          iconImage.setVisible(true);
+          iconLabel.setVisible(false);
+        } else if (showItemName) {
+          iconImage.setVisible(false);
+          iconLabel.setVisible(true);
           iconLabel.setText(icon.displayName);
-          iconLabel.setFontScale(0.5f); // Smaller font for full name
+          iconLabel.setFontScale(0.5f);
+          iconLabel.setColor(icon.color);
         } else {
-          // Show single character icon
+          iconImage.setVisible(false);
+          iconLabel.setVisible(true);
           iconLabel.setText(String.valueOf(icon.character));
-          iconLabel.setFontScale(1.5f); // Larger icon
+          iconLabel.setFontScale(1.5f);
+          iconLabel.setColor(icon.color);
         }
-        iconLabel.setColor(icon.color);
       } else {
+        iconImage.setVisible(false);
+        iconLabel.setVisible(true);
         iconLabel.setText(showItemName ? item.toString() : "?");
         iconLabel.setFontScale(showItemName ? 0.5f : 1.5f);
         iconLabel.setColor(Color.WHITE);
       }
 
-      // Show quantity if > 1
-      if (quantity > 1) {
-        quantityLabel.setText(String.valueOf(quantity));
-      } else {
-        quantityLabel.setText("");
-      }
+      quantityLabel.setText(quantity > 1 ? String.valueOf(quantity) : "");
     }
 
     updateBackground();
@@ -214,5 +260,28 @@ public class ItemSlotWidget extends Table {
     }
 
     this.setBackground(background);
+  }
+
+  /**
+   * Creates a drag actor for the given item: an Image if a texture is loaded, otherwise a Label.
+   */
+  public static Actor createDragActor(
+      Object item, BitmapFont font, ItemTextureManager itemTextureManager) {
+    ItemIconRenderer.ItemIcon icon = ItemIconRenderer.renderIcon(item);
+    if (icon != null) {
+      TextureRegion region = itemTextureManager.getTexture(item);
+      if (region != null) {
+        Image dragImage = new Image(new TextureRegionDrawable(region));
+        dragImage.setScaling(Scaling.fit);
+        dragImage.setSize(52, 52);
+        return dragImage;
+      }
+    }
+    Label.LabelStyle dragStyle = new Label.LabelStyle();
+    dragStyle.font = font;
+    dragStyle.fontColor = Color.WHITE;
+    Label dragLabel = new Label(String.valueOf(item), dragStyle);
+    dragLabel.setFontScale(1.5f);
+    return dragLabel;
   }
 }

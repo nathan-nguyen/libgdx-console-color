@@ -8,6 +8,7 @@ public class RenderResources {
   private final BitmapFont font;
   private final BitmapFont hudFont;
   private final BitmapFont panelFont;
+  private final ItemTextureManager itemTextureManager;
 
   public RenderResources() {
     batch = new SpriteBatch();
@@ -15,6 +16,7 @@ public class RenderResources {
     font = fontGenerator.generateMonospaceFont();
     hudFont = fontGenerator.generateHUDFont();
     panelFont = fontGenerator.generatePanelFont();
+    itemTextureManager = new ItemTextureManager();
   }
 
   public SpriteBatch getBatch() {
@@ -33,10 +35,15 @@ public class RenderResources {
     return panelFont;
   }
 
+  public ItemTextureManager getItemTextureManager() {
+    return itemTextureManager;
+  }
+
   public void dispose() {
     batch.dispose();
     font.dispose();
     hudFont.dispose();
     panelFont.dispose();
+    itemTextureManager.dispose();
   }
 }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.noiprocs.core.GameContext;
+import com.noiprocs.resources.ItemTextureManager;
 import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 import com.noiprocs.ui.libgdx.hud.panel.CraftingHUD;
 import com.noiprocs.ui.libgdx.hud.panel.EquipmentHUD;
@@ -18,6 +19,7 @@ public class HUDManager {
   private final Stage hudStage;
   private final BitmapFont font;
   private final ItemSlotStyle sharedSlotStyle;
+  private final ItemTextureManager itemTextureManager;
 
   private HUDMode currentMode;
 
@@ -35,14 +37,18 @@ public class HUDManager {
    * @param font Font for rendering text
    */
   public HUDManager(
-      GameContext gameContext, LibGDXGameScreen gameScreen, Viewport viewport, BitmapFont font) {
+      GameContext gameContext,
+      LibGDXGameScreen gameScreen,
+      Viewport viewport,
+      BitmapFont font,
+      ItemTextureManager itemTextureManager) {
     this.gameContext = gameContext;
     this.gameScreen = gameScreen;
     this.font = font;
     this.hudStage = new Stage(viewport);
     this.currentMode = HUDMode.NONE;
-    // Create shared slot style to avoid creating duplicate textures
     this.sharedSlotStyle = ItemSlotStyle.createDefault();
+    this.itemTextureManager = itemTextureManager;
   }
 
   /** Opens the equipment management HUD. */
@@ -52,7 +58,13 @@ public class HUDManager {
     // Lazy initialization
     if (equipmentHUD == null) {
       equipmentHUD =
-          new EquipmentHUD(gameContext, gameScreen, hudStage.getViewport(), font, sharedSlotStyle);
+          new EquipmentHUD(
+              gameContext,
+              gameScreen,
+              hudStage.getViewport(),
+              font,
+              sharedSlotStyle,
+              itemTextureManager);
     }
 
     equipmentHUD.refresh();
@@ -68,7 +80,13 @@ public class HUDManager {
     // Lazy initialization
     if (craftingHUD == null) {
       craftingHUD =
-          new CraftingHUD(gameContext, gameScreen, hudStage.getViewport(), font, sharedSlotStyle);
+          new CraftingHUD(
+              gameContext,
+              gameScreen,
+              hudStage.getViewport(),
+              font,
+              sharedSlotStyle,
+              itemTextureManager);
     }
 
     craftingHUD.refresh();
@@ -88,7 +106,13 @@ public class HUDManager {
     // Lazy initialization
     if (inventoryHUD == null) {
       inventoryHUD =
-          new InventoryHUD(gameContext, gameScreen, hudStage.getViewport(), font, sharedSlotStyle);
+          new InventoryHUD(
+              gameContext,
+              gameScreen,
+              hudStage.getViewport(),
+              font,
+              sharedSlotStyle,
+              itemTextureManager);
     }
 
     inventoryHUD.setContainer(containerModelId);

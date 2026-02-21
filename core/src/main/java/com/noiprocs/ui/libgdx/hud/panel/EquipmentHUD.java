@@ -1,9 +1,12 @@
 package com.noiprocs.ui.libgdx.hud.panel;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -25,6 +28,7 @@ import com.noiprocs.core.model.item.Inventory;
 import com.noiprocs.core.model.item.Item;
 import com.noiprocs.core.model.item.ItemCategory;
 import com.noiprocs.core.model.mob.character.PlayerModel;
+import com.noiprocs.resources.ItemTextureManager;
 import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
 import com.noiprocs.ui.libgdx.hud.ItemDragDropHandler;
@@ -50,7 +54,9 @@ public class EquipmentHUD {
   private final Viewport viewport;
   private final ItemDragDropHandler dragDropManager;
   private final DragAndDrop dragAndDrop;
+  private final ItemTextureManager itemTextureManager;
   private Texture backgroundTexture;
+  private final Map<String, Texture> slotPlaceholderTextures = new HashMap<>();
 
   // Equipment slots
   private final Map<String, ItemSlotWidget> equipmentSlots;
@@ -68,14 +74,16 @@ public class EquipmentHUD {
       LibGDXGameScreen gameScreen,
       Viewport viewport,
       BitmapFont font,
-      ItemSlotStyle slotStyle) {
+      ItemSlotStyle slotStyle,
+      ItemTextureManager itemTextureManager) {
     this.gameContext = gameContext;
     this.gameScreen = gameScreen;
     this.viewport = viewport;
     this.font = font;
     this.rootTable = new Table();
     this.rootTable.setFillParent(true);
-    this.slotStyle = slotStyle; // Use shared style
+    this.slotStyle = slotStyle;
+    this.itemTextureManager = itemTextureManager;
     this.equipmentSlots = new HashMap<>();
     this.slotTypeToCategory = new HashMap<>();
     this.dragDropManager = new ItemDragDropHandler(gameContext, gameContext.username);
@@ -87,8 +95,26 @@ public class EquipmentHUD {
     slotTypeToCategory.put("LEGGING", ItemCategory.LEGGING);
     slotTypeToCategory.put("BOOT", ItemCategory.BOOT);
 
+    loadSlotPlaceholderTextures();
     buildUI();
     setupDragAndDrop();
+  }
+
+  private void loadSlotPlaceholderTextures() {
+    Map<String, String> slotIconPaths = new HashMap<>();
+    slotIconPaths.put("HELMET", "icons/helmet_slot.png");
+    slotIconPaths.put("CHEST PLATE", "icons/chest_plate_slot.png");
+    slotIconPaths.put("LEGGING", "icons/legging_slot.png");
+    slotIconPaths.put("BOOT", "icons/boots_slot.png");
+
+    for (Map.Entry<String, String> entry : slotIconPaths.entrySet()) {
+      FileHandle file = Gdx.files.internal(entry.getValue());
+      if (file.exists()) {
+        Texture tex = new Texture(file);
+        tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        slotPlaceholderTextures.put(entry.getKey(), tex);
+      }
+    }
   }
 
   private void buildUI() {
@@ -205,15 +231,13 @@ public class EquipmentHUD {
 
     // Create equipment slots for each armor piece
     for (String slotType : EQUIPMENT_SLOT_TYPES) {
-      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, true);
+      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, true, itemTextureManager);
+      Texture placeholderTex = slotPlaceholderTextures.get(slotType);
+      if (placeholderTex != null) {
+        slot.setEmptySlotTexture(new TextureRegion(placeholderTex));
+      }
       equipmentSlots.put(slotType, slot);
 
-      // Slot type label on the left
-      Label slotLabel = new Label(slotType + ":", labelStyle);
-      slotLabel.setFontScale(0.7f);
-
-      // Layout: [Slot Label] [Slot with item name]
-      panel.add(slotLabel).left().width(90).padRight(5);
       panel.add(slot).size(52, 52);
       panel.row().padBottom(5);
     }
@@ -235,7 +259,8 @@ public class EquipmentHUD {
     // Create inventory slots in a 3x3 grid (9 slots total)
     inventorySlots = new ItemSlotWidget[INVENTORY_SIZE];
     for (int i = 0; i < INVENTORY_SIZE; i++) {
-      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, true); // Show item names
+      ItemSlotWidget slot =
+          new ItemSlotWidget(slotStyle, font, true, itemTextureManager); // Show item names
       inventorySlots[i] = slot;
 
       // Mark first 4 slots as hotbar slots
@@ -338,13 +363,8 @@ public class EquipmentHUD {
               // Visual feedback
               slot.setDragging(true);
 
-              // Drag actor (shown while dragging)
-              Label.LabelStyle dragStyle = new Label.LabelStyle();
-              dragStyle.font = font;
-              dragStyle.fontColor = Color.WHITE;
-              Label dragLabel = new Label(String.valueOf(slot.getItem()), dragStyle);
-              dragLabel.setFontScale(1.5f);
-              payload.setDragActor(dragLabel);
+              payload.setDragActor(
+                  ItemSlotWidget.createDragActor(slot.getItem(), font, itemTextureManager));
 
               return payload;
             }
@@ -417,13 +437,8 @@ public class EquipmentHUD {
               // Visual feedback
               slot.setDragging(true);
 
-              // Drag actor
-              Label.LabelStyle dragStyle = new Label.LabelStyle();
-              dragStyle.font = font;
-              dragStyle.fontColor = Color.WHITE;
-              Label dragLabel = new Label(String.valueOf(slot.getItem()), dragStyle);
-              dragLabel.setFontScale(1.5f);
-              payload.setDragActor(dragLabel);
+              payload.setDragActor(
+                  ItemSlotWidget.createDragActor(slot.getItem(), font, itemTextureManager));
 
               return payload;
             }
@@ -511,9 +526,12 @@ public class EquipmentHUD {
 
   public void dispose() {
     // Don't dispose slotStyle - it's shared across all HUDs
-    // Dispose background texture
     if (backgroundTexture != null) {
       backgroundTexture.dispose();
     }
+    for (Texture tex : slotPlaceholderTextures.values()) {
+      tex.dispose();
+    }
+    slotPlaceholderTextures.clear();
   }
 }

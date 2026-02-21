@@ -28,6 +28,7 @@ import com.noiprocs.core.model.item.Item;
 import com.noiprocs.core.model.item.ItemCategory;
 import com.noiprocs.core.model.mob.character.HumanoidModel;
 import com.noiprocs.core.model.mob.character.PlayerModel;
+import com.noiprocs.resources.ItemTextureManager;
 import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
 import com.noiprocs.ui.libgdx.hud.ItemDragDropHandler;
@@ -48,6 +49,7 @@ public class InventoryHUD {
   private final Viewport viewport;
   private final ItemDragDropHandler dragDropManager;
   private final DragAndDrop dragAndDrop;
+  private final ItemTextureManager itemTextureManager;
   private Texture backgroundTexture;
   private final Table mainContainer;
 
@@ -76,14 +78,16 @@ public class InventoryHUD {
       LibGDXGameScreen gameScreen,
       Viewport viewport,
       BitmapFont font,
-      ItemSlotStyle slotStyle) {
+      ItemSlotStyle slotStyle,
+      ItemTextureManager itemTextureManager) {
     this.gameContext = gameContext;
     this.gameScreen = gameScreen;
     this.viewport = viewport;
     this.font = font;
     this.rootTable = new Table();
     this.rootTable.setFillParent(true);
-    this.slotStyle = slotStyle; // Use shared style
+    this.slotStyle = slotStyle;
+    this.itemTextureManager = itemTextureManager;
     this.dragDropManager = new ItemDragDropHandler(gameContext, gameContext.username);
     this.dragAndDrop = new DragAndDrop();
     this.mainContainer = new Table();
@@ -257,7 +261,7 @@ public class InventoryHUD {
     // Create inventory slots in a 3x3 grid (9 slots total)
     playerInventorySlots = new ItemSlotWidget[PLAYER_INVENTORY_SIZE];
     for (int i = 0; i < PLAYER_INVENTORY_SIZE; i++) {
-      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, true);
+      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, true, itemTextureManager);
       playerInventorySlots[i] = slot;
 
       panel.add(slot).size(48, 48).pad(1);
@@ -277,7 +281,7 @@ public class InventoryHUD {
     // Create container slots in a 3x3 grid (9 slots total)
     containerSlots = new ItemSlotWidget[CONTAINER_SIZE];
     for (int i = 0; i < CONTAINER_SIZE; i++) {
-      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, true);
+      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, true, itemTextureManager);
       containerSlots[i] = slot;
 
       panel.add(slot).size(48, 48).pad(1);
@@ -304,10 +308,10 @@ public class InventoryHUD {
     panel.row();
 
     // Create equipment slots
-    helmetSlot = new ItemSlotWidget(slotStyle, font, true);
-    chestPlateSlot = new ItemSlotWidget(slotStyle, font, true);
-    leggingSlot = new ItemSlotWidget(slotStyle, font, true);
-    bootSlot = new ItemSlotWidget(slotStyle, font, true);
+    helmetSlot = new ItemSlotWidget(slotStyle, font, true, itemTextureManager);
+    chestPlateSlot = new ItemSlotWidget(slotStyle, font, true, itemTextureManager);
+    leggingSlot = new ItemSlotWidget(slotStyle, font, true, itemTextureManager);
+    bootSlot = new ItemSlotWidget(slotStyle, font, true, itemTextureManager);
 
     // Layout equipment slots vertically with labels
     Label.LabelStyle slotLabelStyle = new Label.LabelStyle();
@@ -424,12 +428,8 @@ public class InventoryHUD {
 
               slot.setDragging(true);
 
-              Label.LabelStyle dragStyle = new Label.LabelStyle();
-              dragStyle.font = font;
-              dragStyle.fontColor = Color.WHITE;
-              Label dragLabel = new Label(String.valueOf(slot.getItem()), dragStyle);
-              dragLabel.setFontScale(1.5f);
-              payload.setDragActor(dragLabel);
+              payload.setDragActor(
+                  ItemSlotWidget.createDragActor(slot.getItem(), font, itemTextureManager));
 
               return payload;
             }
@@ -562,12 +562,8 @@ public class InventoryHUD {
 
               slot.setDragging(true);
 
-              Label.LabelStyle dragStyle = new Label.LabelStyle();
-              dragStyle.font = font;
-              dragStyle.fontColor = Color.WHITE;
-              Label dragLabel = new Label(String.valueOf(slot.getItem()), dragStyle);
-              dragLabel.setFontScale(1.5f);
-              payload.setDragActor(dragLabel);
+              payload.setDragActor(
+                  ItemSlotWidget.createDragActor(slot.getItem(), font, itemTextureManager));
 
               return payload;
             }

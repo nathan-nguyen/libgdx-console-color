@@ -22,6 +22,7 @@ import com.noiprocs.core.model.item.receipt.Crafter;
 import com.noiprocs.core.model.item.receipt.CraftingReceipt;
 import com.noiprocs.core.model.item.receipt.CraftingReceipt.MaterialEntry;
 import com.noiprocs.core.model.mob.character.PlayerModel;
+import com.noiprocs.resources.ItemTextureManager;
 import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
 import com.noiprocs.ui.libgdx.hud.ItemDragDropHandler;
@@ -42,6 +43,7 @@ public class CraftingHUD {
   private final ItemSlotStyle slotStyle;
   private final Viewport viewport;
   private final ItemDragDropHandler dragDropManager;
+  private final ItemTextureManager itemTextureManager;
   private Texture backgroundTexture;
 
   // UI Components
@@ -59,14 +61,16 @@ public class CraftingHUD {
       LibGDXGameScreen gameScreen,
       Viewport viewport,
       BitmapFont font,
-      ItemSlotStyle slotStyle) {
+      ItemSlotStyle slotStyle,
+      ItemTextureManager itemTextureManager) {
     this.gameContext = gameContext;
     this.gameScreen = gameScreen;
     this.viewport = viewport;
     this.font = font;
     this.rootTable = new Table();
     this.rootTable.setFillParent(true);
-    this.slotStyle = slotStyle; // Use shared style
+    this.slotStyle = slotStyle;
+    this.itemTextureManager = itemTextureManager;
     this.dragDropManager = new ItemDragDropHandler(gameContext, gameContext.username);
     this.recipeList = new ArrayList<>();
     this.recipeButtons = new ArrayList<>();
@@ -397,7 +401,7 @@ public class CraftingHUD {
       }
 
       // Create a slot showing the required material
-      ItemSlotWidget materialSlot = new ItemSlotWidget(slotStyle, font, true);
+      ItemSlotWidget materialSlot = new ItemSlotWidget(slotStyle, font, true, itemTextureManager);
       materialSlot.setItem(materialName, needed);
 
       // Create label showing available/needed amounts
