@@ -3,8 +3,10 @@ package com.noiprocs.ui.libgdx.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -21,6 +23,7 @@ public class MainMenuScreen implements Screen {
   private final LibGDXApp app;
   private Stage stage;
   private Skin skin;
+  private Texture iconTexture;
 
   public MainMenuScreen(LibGDXApp app) {
     this.app = app;
@@ -39,8 +42,14 @@ public class MainMenuScreen implements Screen {
     table.setFillParent(true);
     stage.addActor(table);
 
+    // App icon
+    iconTexture = new Texture(Gdx.files.internal("icon.png"));
+    Image iconImage = new Image(iconTexture);
+    table.add(iconImage).size(128, 128).padBottom(16);
+    table.row();
+
     // Title label
-    Label titleLabel = new Label("Console Color", skin);
+    Label titleLabel = new Label("Maze Runner", skin);
     table.add(titleLabel).colspan(1).padBottom(30);
     table.row();
 
@@ -121,6 +130,10 @@ public class MainMenuScreen implements Screen {
     if (skin != null) {
       skin.dispose();
       skin = null;
+    }
+    if (iconTexture != null) {
+      iconTexture.dispose();
+      iconTexture = null;
     }
   }
 }
