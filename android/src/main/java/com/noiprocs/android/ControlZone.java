@@ -1,7 +1,6 @@
 package com.noiprocs.android;
 
 import com.badlogic.gdx.math.Circle;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.noiprocs.resources.UIConfig;
 
@@ -16,15 +15,9 @@ public enum ControlZone {
   // Action buttons (bottom right, circular)
   ACTION_SPACE(' '),
   ACTION_FIRE('f'),
-  ACTION_TOGGLE('t'),
+  ACTION_TOGGLE('t');
 
-  // Inventory slots (top left, horizontal row, touching top map border)
-  QUICK_SLOT_1('1'),
-  QUICK_SLOT_2('2'),
-  QUICK_SLOT_3('3'),
-  QUICK_SLOT_4('4');
-
-  private Object shape; // Either Rectangle or Circle (calculated dynamically)
+  private Object shape; // Circle (calculated dynamically)
   private final char command;
 
   ControlZone(char command) {
@@ -51,36 +44,6 @@ public enum ControlZone {
     ACTION_SPACE.shape = new Circle(virtualWidth - 100, 75 * scaleY, 32 * actionScale);
     ACTION_FIRE.shape = new Circle(virtualWidth - 45, 115 * scaleY, 28 * actionScale);
     ACTION_TOGGLE.shape = new Circle(virtualWidth - 45, 35 * scaleY, 28 * actionScale);
-
-    float touchTopBorderY = virtualHeight - 90;
-    float squareButtonDimension = Math.min(45 * scaleX, 45 * scaleY);
-
-    // Inventory slots (top left, horizontal row)
-    float quickSlotPaddingLeft = 5;
-    QUICK_SLOT_1.shape =
-        new Rectangle(
-            quickSlotPaddingLeft * 1 + squareButtonDimension * 0,
-            touchTopBorderY,
-            squareButtonDimension,
-            squareButtonDimension);
-    QUICK_SLOT_2.shape =
-        new Rectangle(
-            quickSlotPaddingLeft * 2 + squareButtonDimension * 1,
-            touchTopBorderY,
-            squareButtonDimension,
-            squareButtonDimension);
-    QUICK_SLOT_3.shape =
-        new Rectangle(
-            quickSlotPaddingLeft * 3 + squareButtonDimension * 2,
-            touchTopBorderY,
-            squareButtonDimension,
-            squareButtonDimension);
-    QUICK_SLOT_4.shape =
-        new Rectangle(
-            quickSlotPaddingLeft * 4 + squareButtonDimension * 3,
-            touchTopBorderY,
-            squareButtonDimension,
-            squareButtonDimension);
   }
 
   /**
@@ -91,9 +54,7 @@ public enum ControlZone {
    * @return true if the point is within this zone
    */
   public boolean contains(float x, float y) {
-    if (shape instanceof Rectangle) {
-      return ((Rectangle) shape).contains(x, y);
-    } else if (shape instanceof Circle) {
+    if (shape instanceof Circle) {
       Circle circle = (Circle) shape;
       float dx = x - circle.x;
       float dy = y - circle.y;
@@ -196,14 +157,6 @@ public enum ControlZone {
     return !isHudControl();
   }
 
-  /** Check if this is a quick slot zone (1-4). */
-  public boolean isQuickSlot() {
-    return this == QUICK_SLOT_1
-        || this == QUICK_SLOT_2
-        || this == QUICK_SLOT_3
-        || this == QUICK_SLOT_4;
-  }
-
   /**
    * Find the zone containing the given point, prioritizing HUD controls if requested.
    *
@@ -214,8 +167,7 @@ public enum ControlZone {
    */
   public static ControlZone findZone(float x, float y, boolean hudMode) {
     for (ControlZone zone : values()) {
-      if (hudMode && !zone.isHudControl() && !zone.isQuickSlot()) {
-        // In HUD mode, allow HUD controls and quick slot buttons
+      if (hudMode && !zone.isHudControl()) {
         continue;
       }
       if (!hudMode && zone.isHudControl()) {
@@ -230,10 +182,7 @@ public enum ControlZone {
 
   /** Get the center position of this zone for rendering. */
   public Vector2 getCenter() {
-    if (shape instanceof Rectangle) {
-      Rectangle rect = (Rectangle) shape;
-      return new Vector2(rect.x + rect.width / 2, rect.y + rect.height / 2);
-    } else if (shape instanceof Circle) {
+    if (shape instanceof Circle) {
       Circle circle = (Circle) shape;
       return new Vector2(circle.x, circle.y);
     }

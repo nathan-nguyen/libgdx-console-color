@@ -90,7 +90,9 @@ public class ItemSlotWidget extends Table {
     qtyStyle.font = font;
     qtyStyle.fontColor = Color.WHITE;
     quantityLabel = new Label("", qtyStyle);
-    quantityLabel.setFontScale(0.7f);
+    // Scale relative to font's data scale so that quantity text renders at a consistent world
+    // size regardless of whether the font was rasterized at physical or virtual resolution.
+    quantityLabel.setFontScale(font.getData().scaleX * 0.7f);
 
     // Quantity overlaid in bottom-right corner
     Table quantityOverlay = new Table();

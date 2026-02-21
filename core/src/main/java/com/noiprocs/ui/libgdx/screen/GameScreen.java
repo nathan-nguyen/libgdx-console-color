@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.noiprocs.core.GameContext;
+import com.noiprocs.core.control.command.InputCommand;
 import com.noiprocs.core.model.Model;
 import com.noiprocs.core.model.mob.character.PlayerModel;
 import com.noiprocs.input.InputController;
@@ -158,7 +159,12 @@ public class GameScreen implements Screen {
     menuOverlay.setOnClose(() -> buttonTable.setVisible(true));
     uiStage.addActor(menuOverlay);
 
-    playerInfoHUD = new PlayerInfoHUD(renderResources.getHudFont());
+    playerInfoHUD =
+        new PlayerInfoHUD(renderResources.getHudFont(), renderResources.getItemTextureManager());
+    playerInfoHUD.setOnSlotSelected(
+        slotIndex ->
+            gameContext.controlManager.processInput(
+                new InputCommand(username, String.valueOf(slotIndex + 1))));
     uiStage.addActor(playerInfoHUD);
   }
 

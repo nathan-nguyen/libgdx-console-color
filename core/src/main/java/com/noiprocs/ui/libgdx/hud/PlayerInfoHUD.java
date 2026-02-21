@@ -7,31 +7,66 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.noiprocs.core.model.item.Inventory;
 import com.noiprocs.core.model.item.Item;
 import com.noiprocs.core.model.mob.character.PlayerModel;
+import com.noiprocs.resources.ItemTextureManager;
 import com.noiprocs.settings.SettingsManager;
+import com.noiprocs.ui.libgdx.hud.widget.ItemSlotStyle;
+import com.noiprocs.ui.libgdx.hud.widget.ItemSlotWidget;
+import java.util.function.IntConsumer;
 
 public class PlayerInfoHUD extends Table {
 
+  private static final int HOTBAR_SIZE = 4;
+
   private final Label nameLabel;
   private final HealthBarActor healthBar;
-  private final Label itemLabel;
+  private final ItemSlotWidget[] hotbarSlots;
+  private final ItemSlotStyle slotStyle;
 
-  public PlayerInfoHUD(BitmapFont font) {
+  private IntConsumer onSlotSelected;
+
+  public PlayerInfoHUD(BitmapFont font, ItemTextureManager itemTextureManager) {
     Label.LabelStyle style = new Label.LabelStyle(font, Color.WHITE);
     this.nameLabel = new Label("", style);
     this.healthBar = new HealthBarActor(font);
-    this.itemLabel = new Label("", style);
+    this.slotStyle = ItemSlotStyle.createDefault();
+    this.hotbarSlots = new ItemSlotWidget[HOTBAR_SIZE];
 
     setFillParent(true);
-    top().left().pad(5);
+    top().left().pad(10);
     add(nameLabel).left();
     add(healthBar).size(HealthBarActor.BAR_WIDTH, HealthBarActor.BAR_HEIGHT).padLeft(6).left();
     row();
-    add(itemLabel).left().colspan(2);
+
+    Table hotbarTable = new Table();
+    for (int i = 0; i < HOTBAR_SIZE; i++) {
+      final int slotIndex = i;
+      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+      slot.setHotbarSlot(true);
+      slot.addListener(
+          new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+              if (onSlotSelected != null) {
+                onSlotSelected.accept(slotIndex);
+              }
+            }
+          });
+      hotbarSlots[i] = slot;
+      hotbarTable.add(slot).size(48, 48).pad(2);
+    }
+    add(hotbarTable).left().colspan(2);
+  }
+
+  public void setOnSlotSelected(IntConsumer onSlotSelected) {
+    this.onSlotSelected = onSlotSelected;
   }
 
   public void update(PlayerModel playerModel, SettingsManager settingsManager) {
@@ -40,25 +75,28 @@ public class PlayerInfoHUD extends Table {
     StringBuilder name = new StringBuilder(playerModel.id);
     if (debug) {
       name.append(" - [").append(playerModel.position).append("]");
+      name.append("  FPS: ").append(Gdx.graphics.getFramesPerSecond());
     }
     nameLabel.setText(name.toString());
 
     healthBar.setHealth(playerModel.getHealth(), playerModel.getMaxHealth());
 
-    StringBuilder inv = new StringBuilder("Item: [");
-    Item item = playerModel.getHoldingItem();
-    if (item != null) {
-      inv.append(item.name).append(": ").append(item.amount);
+    int currentSlot = playerModel.getCurrentInventorySlot();
+    Inventory inventory = playerModel.getInventory();
+    for (int i = 0; i < HOTBAR_SIZE; i++) {
+      Item item = inventory.getItem(i);
+      if (item != null) {
+        hotbarSlots[i].setItem(item, item.amount);
+      } else {
+        hotbarSlots[i].setItem(null, 0);
+      }
+      hotbarSlots[i].setSelected(i == currentSlot);
     }
-    inv.append("]");
-    if (debug) {
-      inv.append("  FPS: ").append(Gdx.graphics.getFramesPerSecond());
-    }
-    itemLabel.setText(inv.toString());
   }
 
   public void dispose() {
     healthBar.dispose();
+    slotStyle.dispose();
   }
 
   private static class HealthBarActor extends Widget {

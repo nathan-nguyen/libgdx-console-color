@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import java.util.Set;
 
@@ -24,8 +23,6 @@ public class VirtualControlRenderer {
   private static final Color COLOR_DPAD_ACTIVE = new Color(0.3f, 0.6f, 1f, 1.0f);
   private static final Color COLOR_ACTION = new Color(1f, 0.3f, 0.3f, 0.5f);
   private static final Color COLOR_ACTION_ACTIVE = new Color(1f, 0.3f, 0.3f, 1.0f);
-  private static final Color COLOR_QUICK = new Color(0.3f, 1f, 0.3f, 0.5f);
-  private static final Color COLOR_QUICK_ACTIVE = new Color(0.3f, 1f, 0.3f, 1.0f);
 
   public VirtualControlRenderer() {
     this.shapeRenderer = new ShapeRenderer();
@@ -64,28 +61,6 @@ public class VirtualControlRenderer {
         COLOR_ACTION,
         COLOR_ACTION_ACTIVE);
 
-    // Render quick slots
-    renderZone(
-        ControlZone.QUICK_SLOT_1,
-        activeZones.contains(ControlZone.QUICK_SLOT_1),
-        COLOR_QUICK,
-        COLOR_QUICK_ACTIVE);
-    renderZone(
-        ControlZone.QUICK_SLOT_2,
-        activeZones.contains(ControlZone.QUICK_SLOT_2),
-        COLOR_QUICK,
-        COLOR_QUICK_ACTIVE);
-    renderZone(
-        ControlZone.QUICK_SLOT_3,
-        activeZones.contains(ControlZone.QUICK_SLOT_3),
-        COLOR_QUICK,
-        COLOR_QUICK_ACTIVE);
-    renderZone(
-        ControlZone.QUICK_SLOT_4,
-        activeZones.contains(ControlZone.QUICK_SLOT_4),
-        COLOR_QUICK,
-        COLOR_QUICK_ACTIVE);
-
     shapeRenderer.end();
 
     // Render labels
@@ -93,10 +68,6 @@ public class VirtualControlRenderer {
     renderLabel(batch, font, "Interact", ControlZone.ACTION_SPACE);
     renderLabel(batch, font, "Attack", ControlZone.ACTION_FIRE);
     renderLabel(batch, font, "Item", ControlZone.ACTION_TOGGLE);
-    renderLabel(batch, font, "1", ControlZone.QUICK_SLOT_1);
-    renderLabel(batch, font, "2", ControlZone.QUICK_SLOT_2);
-    renderLabel(batch, font, "3", ControlZone.QUICK_SLOT_3);
-    renderLabel(batch, font, "4", ControlZone.QUICK_SLOT_4);
     batch.end();
   }
 
@@ -106,14 +77,8 @@ public class VirtualControlRenderer {
     Color color = active ? activeColor : inactiveColor;
     shapeRenderer.setColor(color);
 
-    Object shape = zone.getShape();
-    if (shape instanceof Rectangle) {
-      Rectangle rect = (Rectangle) shape;
-      shapeRenderer.rect(rect.x, rect.y, rect.width, rect.height);
-    } else if (shape instanceof Circle) {
-      Circle circle = (Circle) shape;
-      shapeRenderer.circle(circle.x, circle.y, circle.radius, 32);
-    }
+    Circle circle = (Circle) zone.getShape();
+    shapeRenderer.circle(circle.x, circle.y, circle.radius, 32);
   }
 
   /** Render joystick (outer circle + inner knob). */
