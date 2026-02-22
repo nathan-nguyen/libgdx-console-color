@@ -3,24 +3,12 @@ package com.noiprocs.ui.libgdx.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.noiprocs.core.GameContext;
-import com.noiprocs.core.control.command.InputCommand;
-import com.noiprocs.core.model.Model;
-import com.noiprocs.core.model.mob.character.PlayerModel;
 import com.noiprocs.input.InputController;
 import com.noiprocs.resources.RenderResources;
 import com.noiprocs.resources.UIConfig;
@@ -29,7 +17,6 @@ import com.noiprocs.ui.console.hitbox.ConsoleHitboxManager;
 import com.noiprocs.ui.console.sprite.ConsoleSpriteManager;
 import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
-import com.noiprocs.ui.libgdx.hud.panel.PlayerInfoHUD;
 import com.noiprocs.ui.libgdx.util.UIStyleHelper;
 import com.noiprocs.ui.libgdx.widget.MenuOverlay;
 import java.util.function.Consumer;
@@ -59,9 +46,7 @@ public class GameScreen implements Screen {
   private Stage uiStage;
   private Skin skin;
   private MenuOverlay menuOverlay;
-  private Table buttonTable;
   private HUDManager hudManager;
-  private PlayerInfoHUD playerInfoHUD;
 
   public GameScreen(
       Viewport viewport,
@@ -124,8 +109,12 @@ public class GameScreen implements Screen {
             gameScreen,
             viewport,
             renderResources.getPanelFont(),
-            renderResources.getItemTextureManager());
+            renderResources.getHudFont(),
+            renderResources.getItemTextureManager(),
+            settingsManager,
+            this::toggleMenu);
     gameScreen.setHudManager(hudManager);
+    menuOverlay.setOnClose(() -> hudManager.setButtonsVisible(true));
 
     setupInputMultiplexer();
   }
@@ -134,64 +123,8 @@ public class GameScreen implements Screen {
     uiStage = new Stage(viewport, renderResources.getBatch());
     skin = UIStyleHelper.createSkin(renderResources.getHudFont());
 
-    Texture menuIconTex = new Texture(Gdx.files.internal("icons/menu_button.png"));
-    menuIconTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-    skin.add("menu-icon", menuIconTex);
-    TextureRegionDrawable menuNormal = new TextureRegionDrawable(new TextureRegion(menuIconTex));
-    ImageButton.ImageButtonStyle menuStyle = new ImageButton.ImageButtonStyle();
-    menuStyle.imageUp = menuNormal;
-    menuStyle.imageDown = menuNormal.tint(new Color(1, 1, 1, 0.4f));
-    ImageButton menuButton = new ImageButton(menuStyle);
-    menuButton.getImage().setScaling(Scaling.fit);
-    menuButton.addListener(
-        new ClickListener() {
-          @Override
-          public void clicked(InputEvent event, float x, float y) {
-            toggleMenu();
-          }
-        });
-
-    Texture equipIconTex = new Texture(Gdx.files.internal("icons/equipment_button.png"));
-    equipIconTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-    skin.add("equipment-icon", equipIconTex);
-    TextureRegionDrawable equipNormal = new TextureRegionDrawable(new TextureRegion(equipIconTex));
-    ImageButton.ImageButtonStyle equipStyle = new ImageButton.ImageButtonStyle();
-    equipStyle.imageUp = equipNormal;
-    equipStyle.imageDown = equipNormal.tint(new Color(1, 1, 1, 0.4f));
-    ImageButton equipmentButton = new ImageButton(equipStyle);
-    equipmentButton.getImage().setScaling(Scaling.fit);
-    equipmentButton.addListener(
-        new ClickListener() {
-          @Override
-          public void clicked(InputEvent event, float x, float y) {
-            openEquipmentHUD();
-          }
-        });
-
-    buttonTable = new Table();
-    buttonTable.setFillParent(true);
-    buttonTable.top().right().pad(10);
-    buttonTable.add(equipmentButton).size(50, 50).padRight(10);
-    buttonTable.add(menuButton).size(50, 50);
-    uiStage.addActor(buttonTable);
-
     menuOverlay = new MenuOverlay(settingsManager, showMainMenu, skin);
-    menuOverlay.setOnClose(() -> buttonTable.setVisible(true));
     uiStage.addActor(menuOverlay);
-
-    playerInfoHUD =
-        new PlayerInfoHUD(renderResources.getHudFont(), renderResources.getItemTextureManager());
-    playerInfoHUD.setOnSlotSelected(
-        slotIndex ->
-            gameContext.controlManager.processInput(
-                new InputCommand(username, String.valueOf(slotIndex + 1))));
-    uiStage.addActor(playerInfoHUD);
-  }
-
-  private void openEquipmentHUD() {
-    if (hudManager != null) {
-      hudManager.openEquipmentHUD();
-    }
   }
 
   private void setupInputMultiplexer() {
@@ -206,7 +139,7 @@ public class GameScreen implements Screen {
   private void toggleMenu() {
     boolean show = !menuOverlay.isVisible();
     menuOverlay.setVisible(show);
-    buttonTable.setVisible(!show);
+    hudManager.setButtonsVisible(!show);
   }
 
   @Override
@@ -232,15 +165,8 @@ public class GameScreen implements Screen {
 
     virtualControlsRenderer.run();
 
-    if (hudManager != null && hudManager.isOpen()) {
+    if (hudManager != null) {
       hudManager.render(delta);
-    }
-
-    if (playerInfoHUD != null && gameContext != null) {
-      Model playerModel = gameContext.modelManager.getModel(gameContext.username);
-      if (playerModel instanceof PlayerModel) {
-        playerInfoHUD.update((PlayerModel) playerModel, settingsManager);
-      }
     }
 
     uiStage.act(delta);
@@ -278,10 +204,6 @@ public class GameScreen implements Screen {
     if (hudManager != null) {
       hudManager.dispose();
       hudManager = null;
-    }
-    if (playerInfoHUD != null) {
-      playerInfoHUD.dispose();
-      playerInfoHUD = null;
     }
     if (uiStage != null) {
       uiStage.dispose();
