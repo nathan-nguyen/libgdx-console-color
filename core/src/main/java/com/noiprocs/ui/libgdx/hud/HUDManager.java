@@ -1,6 +1,5 @@
 package com.noiprocs.ui.libgdx.hud;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -19,7 +18,9 @@ import com.noiprocs.core.GameContext;
 import com.noiprocs.core.control.command.InputCommand;
 import com.noiprocs.core.model.Model;
 import com.noiprocs.core.model.mob.character.PlayerModel;
+import com.noiprocs.resources.GameResource;
 import com.noiprocs.resources.ItemTextureManager;
+import com.noiprocs.resources.ResourceLoader;
 import com.noiprocs.settings.SettingsManager;
 import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 import com.noiprocs.ui.libgdx.hud.panel.CraftingHUD;
@@ -83,8 +84,7 @@ public class HUDManager {
   }
 
   private Table buildButtonTable(Runnable onMenuToggle) {
-    Texture menuIconTex = new Texture(Gdx.files.internal("icons/menu_button.png"));
-    menuIconTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+    Texture menuIconTex = ResourceLoader.loadTexture(GameResource.ICON_MENU_BUTTON);
     skin.add("menu-icon", menuIconTex);
     TextureRegionDrawable menuNormal = new TextureRegionDrawable(new TextureRegion(menuIconTex));
     ImageButton.ImageButtonStyle menuStyle = new ImageButton.ImageButtonStyle();
@@ -100,8 +100,7 @@ public class HUDManager {
           }
         });
 
-    Texture equipIconTex = new Texture(Gdx.files.internal("icons/equipment_button.png"));
-    equipIconTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+    Texture equipIconTex = ResourceLoader.loadTexture(GameResource.ICON_EQUIPMENT_BUTTON);
     skin.add("equipment-icon", equipIconTex);
     TextureRegionDrawable equipNormal = new TextureRegionDrawable(new TextureRegion(equipIconTex));
     ImageButton.ImageButtonStyle equipStyle = new ImageButton.ImageButtonStyle();

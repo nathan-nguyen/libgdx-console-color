@@ -13,6 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.noiprocs.LibGDXApp;
+import com.noiprocs.resources.GameResource;
+import com.noiprocs.resources.ResourceLoader;
 import com.noiprocs.ui.libgdx.util.UIStyleHelper;
 
 /**
@@ -31,7 +33,7 @@ public class MainMenuScreen implements Screen {
 
   @Override
   public void show() {
-    backgroundTexture = new Texture(Gdx.files.internal("main_menu_background.png"));
+    backgroundTexture = ResourceLoader.loadTexture(GameResource.BACKGROUND_MAIN_MENU);
 
     // Create stage for UI
     stage = new Stage(app.getViewport(), app.getRenderResources().getBatch());

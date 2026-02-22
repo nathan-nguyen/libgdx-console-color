@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.noiprocs.resources.GameResource;
+import com.noiprocs.resources.ResourceLoader;
 import java.util.Set;
 
 /**
@@ -28,12 +30,9 @@ public class VirtualControlRenderer {
   public VirtualControlRenderer() {
     this.shapeRenderer = new ShapeRenderer();
 
-    attackIcon = new Texture(Gdx.files.internal("icons/attack_button.png"));
-    attackIcon.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-    interactIcon = new Texture(Gdx.files.internal("icons/interact_button.png"));
-    interactIcon.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-    useItemIcon = new Texture(Gdx.files.internal("icons/use_item_button.png"));
-    useItemIcon.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+    attackIcon = ResourceLoader.loadTexture(GameResource.ICON_ATTACK_BUTTON);
+    interactIcon = ResourceLoader.loadTexture(GameResource.ICON_INTERACT_BUTTON);
+    useItemIcon = ResourceLoader.loadTexture(GameResource.ICON_USE_ITEM_BUTTON);
   }
 
   /**

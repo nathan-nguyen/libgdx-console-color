@@ -52,6 +52,7 @@ public class InventoryHUD {
   private final DragAndDrop dragAndDrop;
   private final ItemTextureManager itemTextureManager;
   private Texture backgroundTexture;
+  private Texture panelTexture;
   private final Table mainContainer;
 
   private String containerModelId;
@@ -153,9 +154,10 @@ public class InventoryHUD {
     Table content = new Table();
 
     // Player inventory panel
-    // UI Components
     Table playerInventoryPanel = createPlayerInventoryPanel();
-    content.add(playerInventoryPanel).pad(5).top();
+    playerInventoryPanel.setBackground(getPanelDrawable());
+    playerInventoryPanel.pad(8, 0, 8, 0);
+    content.add(playerInventoryPanel).pad(8).top();
 
     // Add appropriate right panel based on container type
     Table containerPanel;
@@ -191,7 +193,11 @@ public class InventoryHUD {
       scrollPane.setFadeScrollBars(false);
       scrollPane.setOverscroll(false, false);
 
-      content.add(scrollPane).pad(5).top();
+      Table rightBox = new Table();
+      rightBox.setBackground(getPanelDrawable());
+      rightBox.pad(8, 0, 8, 0);
+      rightBox.add(scrollPane).expand().fill();
+      content.add(rightBox).pad(8).top();
     } else {
       // Use regular container panel for chests - align with player inventory
       Table chestColumn = new Table();
@@ -208,7 +214,9 @@ public class InventoryHUD {
       containerPanel = createContainerPanel();
       chestColumn.add(containerPanel);
 
-      content.add(chestColumn).pad(5).top();
+      chestColumn.setBackground(getPanelDrawable());
+      chestColumn.pad(8, 0, 8, 0);
+      content.add(chestColumn).pad(8).top();
     }
 
     mainContainer.add(content).expand().fill().pad(5);
@@ -440,6 +448,17 @@ public class InventoryHUD {
     panel.add(speedValueLabel);
 
     return panel;
+  }
+
+  private Drawable getPanelDrawable() {
+    if (panelTexture == null) {
+      Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+      pixmap.setColor(0.18f, 0.18f, 0.18f, 0.9f);
+      pixmap.fill();
+      panelTexture = new Texture(pixmap);
+      pixmap.dispose();
+    }
+    return new TextureRegionDrawable(panelTexture);
   }
 
   private Drawable createBackground() {
@@ -851,6 +870,9 @@ public class InventoryHUD {
     // Don't dispose slotStyle - it's shared across all HUDs
     if (backgroundTexture != null) {
       backgroundTexture.dispose();
+    }
+    if (panelTexture != null) {
+      panelTexture.dispose();
     }
   }
 }

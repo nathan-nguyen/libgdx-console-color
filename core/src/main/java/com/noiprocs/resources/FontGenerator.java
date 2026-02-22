@@ -3,7 +3,6 @@ package com.noiprocs.resources;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 
 /** Utility class for generating fonts. */
@@ -20,9 +19,6 @@ public class FontGenerator {
    * @return A BitmapFont sized for HUD use
    */
   public BitmapFont generateHUDFont() {
-    FreeTypeFontGenerator generator =
-        new FreeTypeFontGenerator(Gdx.files.internal("DejaVuSansMono.ttf"));
-
     float screenScale = Gdx.graphics.getHeight() / UIConfig.BASE_VIRTUAL_HEIGHT;
 
     FreeTypeFontParameter parameter = new FreeTypeFontParameter();
@@ -30,8 +26,7 @@ public class FontGenerator {
     parameter.characters = ResourceLoader.loadFontCharacters();
     parameter.color = Color.WHITE;
 
-    BitmapFont hudFont = generator.generateFont(parameter);
-    generator.dispose();
+    BitmapFont hudFont = ResourceLoader.loadFont(GameResource.FONT_DEJA_VU_SANS_MONO, parameter);
     hudFont.setUseIntegerPositions(false);
     hudFont.getData().setScale(1f / screenScale);
     return hudFont;
@@ -43,9 +38,6 @@ public class FontGenerator {
    * @return A configured BitmapFont suitable for monospace text rendering with full Unicode support
    */
   public BitmapFont generateMonospaceFont() {
-    FreeTypeFontGenerator generator =
-        new FreeTypeFontGenerator(Gdx.files.internal("DejaVuSansMono.ttf"));
-
     float screenScale = Gdx.graphics.getHeight() / UIConfig.BASE_VIRTUAL_HEIGHT;
 
     FreeTypeFontParameter parameter = new FreeTypeFontParameter();
@@ -54,8 +46,7 @@ public class FontGenerator {
     parameter.characters = ResourceLoader.loadFontCharacters();
     parameter.color = Color.WHITE;
 
-    font = generator.generateFont(parameter);
-    generator.dispose();
+    font = ResourceLoader.loadFont(GameResource.FONT_DEJA_VU_SANS_MONO, parameter);
     font.setUseIntegerPositions(false);
     font.getData().markupEnabled = false;
     font.getData().setScale(1f / screenScale);
@@ -71,16 +62,12 @@ public class FontGenerator {
    * @return A BitmapFont sized for HUD panel use
    */
   public BitmapFont generatePanelFont() {
-    FreeTypeFontGenerator generator =
-        new FreeTypeFontGenerator(Gdx.files.internal("DejaVuSansMono.ttf"));
-
     FreeTypeFontParameter parameter = new FreeTypeFontParameter();
     parameter.size = HUD_FONT_SIZE;
     parameter.characters = ResourceLoader.loadFontCharacters();
     parameter.color = Color.WHITE;
 
-    BitmapFont panelFont = generator.generateFont(parameter);
-    generator.dispose();
+    BitmapFont panelFont = ResourceLoader.loadFont(GameResource.FONT_DEJA_VU_SANS_MONO, parameter);
     panelFont.setUseIntegerPositions(false);
     return panelFont;
   }
