@@ -84,10 +84,7 @@ class AndroidApp extends LibGDXApp {
 
     // Render game controls (graphical HUD handles its own input via Scene2D)
     virtualControlRenderer.renderGameControls(
-        touchState.getActiveZones(),
-        renderResources.getBatch(),
-        renderResources.getHudFont(),
-        touchState);
+        touchState.getActiveZones(), renderResources.getBatch(), touchState);
   }
 
   @Override

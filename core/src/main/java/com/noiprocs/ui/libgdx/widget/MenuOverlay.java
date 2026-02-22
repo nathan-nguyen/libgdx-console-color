@@ -47,7 +47,13 @@ public class MenuOverlay extends Table {
 
     Label titleLabel = new Label("Menu", skin);
     titleLabel.setFontScale(1.5f);
-    menuBox.add(titleLabel).expandX().center().padBottom(20);
+    menuBox.add(titleLabel).expandX().center().padBottom(8);
+    menuBox.row();
+
+    GameContext gameContext = GameContext.get();
+    String playerName = gameContext != null ? gameContext.username : "";
+    Label playerNameLabel = new Label(playerName, skin);
+    menuBox.add(playerNameLabel).expandX().center().padBottom(20);
     menuBox.row();
 
     CheckBox debugModeCheckbox = new CheckBox(" Debug Mode", skin);
@@ -65,7 +71,6 @@ public class MenuOverlay extends Table {
     menuBox.row();
 
     TextButton mainMenuButton = new TextButton("Main Menu", skin);
-    GameContext gameContext = GameContext.get();
     mainMenuButton.addListener(
         new ClickListener() {
           @Override

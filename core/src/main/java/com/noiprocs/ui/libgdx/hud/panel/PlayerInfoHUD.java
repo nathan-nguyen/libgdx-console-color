@@ -1,4 +1,4 @@
-package com.noiprocs.ui.libgdx.hud;
+package com.noiprocs.ui.libgdx.hud.panel;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -25,24 +25,25 @@ public class PlayerInfoHUD extends Table {
 
   private static final int HOTBAR_SIZE = 4;
 
-  private final Label nameLabel;
   private final HealthBarActor healthBar;
+  private final Label debugLabel;
   private final ItemSlotWidget[] hotbarSlots;
   private final ItemSlotStyle slotStyle;
 
   private IntConsumer onSlotSelected;
 
   public PlayerInfoHUD(BitmapFont font, ItemTextureManager itemTextureManager) {
-    Label.LabelStyle style = new Label.LabelStyle(font, Color.WHITE);
-    this.nameLabel = new Label("", style);
     this.healthBar = new HealthBarActor(font);
     this.slotStyle = ItemSlotStyle.createDefault();
     this.hotbarSlots = new ItemSlotWidget[HOTBAR_SIZE];
 
+    Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
+    this.debugLabel = new Label("", labelStyle);
+
     setFillParent(true);
     top().left().pad(10);
-    add(nameLabel).left();
-    add(healthBar).size(HealthBarActor.BAR_WIDTH, HealthBarActor.BAR_HEIGHT).padLeft(6).left();
+    add(healthBar).size(HealthBarActor.BAR_WIDTH, HealthBarActor.BAR_HEIGHT).left();
+    add(debugLabel).padLeft(6).left();
     row();
 
     Table hotbarTable = new Table();
@@ -71,13 +72,12 @@ public class PlayerInfoHUD extends Table {
 
   public void update(PlayerModel playerModel, SettingsManager settingsManager) {
     boolean debug = settingsManager != null && settingsManager.isDebugMode();
-
-    StringBuilder name = new StringBuilder(playerModel.id);
     if (debug) {
-      name.append(" - [").append(playerModel.position).append("]");
-      name.append("  FPS: ").append(Gdx.graphics.getFramesPerSecond());
+      debugLabel.setText(
+          "[" + playerModel.position + "]  FPS: " + Gdx.graphics.getFramesPerSecond());
+    } else {
+      debugLabel.setText("");
     }
-    nameLabel.setText(name.toString());
 
     healthBar.setHealth(playerModel.getHealth(), playerModel.getMaxHealth());
 

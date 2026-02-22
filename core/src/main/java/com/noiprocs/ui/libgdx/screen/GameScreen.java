@@ -3,13 +3,18 @@ package com.noiprocs.ui.libgdx.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.noiprocs.core.GameContext;
@@ -24,7 +29,7 @@ import com.noiprocs.ui.console.hitbox.ConsoleHitboxManager;
 import com.noiprocs.ui.console.sprite.ConsoleSpriteManager;
 import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
-import com.noiprocs.ui.libgdx.hud.PlayerInfoHUD;
+import com.noiprocs.ui.libgdx.hud.panel.PlayerInfoHUD;
 import com.noiprocs.ui.libgdx.util.UIStyleHelper;
 import com.noiprocs.ui.libgdx.widget.MenuOverlay;
 import java.util.function.Consumer;
@@ -129,7 +134,15 @@ public class GameScreen implements Screen {
     uiStage = new Stage(viewport, renderResources.getBatch());
     skin = UIStyleHelper.createSkin(renderResources.getHudFont());
 
-    TextButton menuButton = new TextButton("!!!", skin);
+    Texture menuIconTex = new Texture(Gdx.files.internal("icons/menu_button.png"));
+    menuIconTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+    skin.add("menu-icon", menuIconTex);
+    TextureRegionDrawable menuNormal = new TextureRegionDrawable(new TextureRegion(menuIconTex));
+    ImageButton.ImageButtonStyle menuStyle = new ImageButton.ImageButtonStyle();
+    menuStyle.imageUp = menuNormal;
+    menuStyle.imageDown = menuNormal.tint(new Color(1, 1, 1, 0.4f));
+    ImageButton menuButton = new ImageButton(menuStyle);
+    menuButton.getImage().setScaling(Scaling.fit);
     menuButton.addListener(
         new ClickListener() {
           @Override
@@ -138,7 +151,15 @@ public class GameScreen implements Screen {
           }
         });
 
-    TextButton equipmentButton = new TextButton("E", skin);
+    Texture equipIconTex = new Texture(Gdx.files.internal("icons/equipment_button.png"));
+    equipIconTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+    skin.add("equipment-icon", equipIconTex);
+    TextureRegionDrawable equipNormal = new TextureRegionDrawable(new TextureRegion(equipIconTex));
+    ImageButton.ImageButtonStyle equipStyle = new ImageButton.ImageButtonStyle();
+    equipStyle.imageUp = equipNormal;
+    equipStyle.imageDown = equipNormal.tint(new Color(1, 1, 1, 0.4f));
+    ImageButton equipmentButton = new ImageButton(equipStyle);
+    equipmentButton.getImage().setScaling(Scaling.fit);
     equipmentButton.addListener(
         new ClickListener() {
           @Override
