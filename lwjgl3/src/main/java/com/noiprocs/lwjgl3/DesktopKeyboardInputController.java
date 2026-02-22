@@ -15,8 +15,8 @@ public class DesktopKeyboardInputController implements InputController {
   private final Set<Character> keyPressedSet = new HashSet<>();
 
   @Override
-  public void handleInput(GameContext gameContext, LibGDXGameScreen gameScreen) {
-    // Check for graphical HUD
+  public void handleInput(LibGDXGameScreen gameScreen) {
+    GameContext gameContext = GameContext.get();
     HUDManager hudManager = gameScreen.getHudManager();
 
     if (hudManager != null && hudManager.isOpen()) {

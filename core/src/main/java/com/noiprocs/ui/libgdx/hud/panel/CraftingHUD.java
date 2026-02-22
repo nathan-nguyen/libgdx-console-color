@@ -36,8 +36,6 @@ import java.util.Map;
 
 /** Crafting HUD screen. Displays recipe list and required materials for crafting items. */
 public class CraftingHUD {
-
-  private final GameContext gameContext;
   private final LibGDXGameScreen gameScreen;
   private final BitmapFont font;
   private final Table rootTable;
@@ -58,13 +56,11 @@ public class CraftingHUD {
   private int selectedRecipeIndex = -1;
 
   public CraftingHUD(
-      GameContext gameContext,
       LibGDXGameScreen gameScreen,
       Viewport viewport,
       BitmapFont font,
       ItemSlotStyle slotStyle,
       ItemTextureManager itemTextureManager) {
-    this.gameContext = gameContext;
     this.gameScreen = gameScreen;
     this.viewport = viewport;
     this.font = font;
@@ -72,7 +68,7 @@ public class CraftingHUD {
     this.rootTable.setFillParent(true);
     this.slotStyle = slotStyle;
     this.itemTextureManager = itemTextureManager;
-    this.dragDropManager = new ItemDragDropHandler(gameContext, gameContext.username);
+    this.dragDropManager = new ItemDragDropHandler();
     this.recipeList = new ArrayList<>();
     this.recipeButtons = new ArrayList<>();
 
@@ -237,7 +233,7 @@ public class CraftingHUD {
   }
 
   public void refresh() {
-    // Get player model
+    GameContext gameContext = GameContext.get();
     PlayerModel player = (PlayerModel) gameContext.modelManager.getModel(gameContext.username);
     if (player == null) {
       return;
@@ -366,6 +362,7 @@ public class CraftingHUD {
       return;
     }
 
+    GameContext gameContext = GameContext.get();
     // Get player inventory
     PlayerModel player = (PlayerModel) gameContext.modelManager.getModel(gameContext.username);
     if (player == null) {

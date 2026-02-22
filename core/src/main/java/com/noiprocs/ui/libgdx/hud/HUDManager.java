@@ -3,7 +3,6 @@ package com.noiprocs.ui.libgdx.hud;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.noiprocs.core.GameContext;
 import com.noiprocs.resources.ItemTextureManager;
 import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 import com.noiprocs.ui.libgdx.hud.panel.CraftingHUD;
@@ -13,8 +12,6 @@ import com.noiprocs.ui.libgdx.hud.widget.ItemSlotStyle;
 
 /** Central coordinator for HUD system. Manages which HUD is active and handles rendering. */
 public class HUDManager {
-
-  private final GameContext gameContext;
   private final LibGDXGameScreen gameScreen;
   private final Stage hudStage;
   private final BitmapFont font;
@@ -31,18 +28,15 @@ public class HUDManager {
   /**
    * Creates a new HUDManager.
    *
-   * @param gameContext Game context for accessing game state
    * @param gameScreen Game screen for accessing models
    * @param viewport Viewport for the HUD stage
    * @param font Font for rendering text
    */
   public HUDManager(
-      GameContext gameContext,
       LibGDXGameScreen gameScreen,
       Viewport viewport,
       BitmapFont font,
       ItemTextureManager itemTextureManager) {
-    this.gameContext = gameContext;
     this.gameScreen = gameScreen;
     this.font = font;
     this.hudStage = new Stage(viewport);
@@ -59,12 +53,7 @@ public class HUDManager {
     if (equipmentHUD == null) {
       equipmentHUD =
           new EquipmentHUD(
-              gameContext,
-              gameScreen,
-              hudStage.getViewport(),
-              font,
-              sharedSlotStyle,
-              itemTextureManager);
+              gameScreen, hudStage.getViewport(), font, sharedSlotStyle, itemTextureManager);
     }
 
     equipmentHUD.refresh();
@@ -81,12 +70,7 @@ public class HUDManager {
     if (craftingHUD == null) {
       craftingHUD =
           new CraftingHUD(
-              gameContext,
-              gameScreen,
-              hudStage.getViewport(),
-              font,
-              sharedSlotStyle,
-              itemTextureManager);
+              gameScreen, hudStage.getViewport(), font, sharedSlotStyle, itemTextureManager);
     }
 
     craftingHUD.refresh();
@@ -107,12 +91,7 @@ public class HUDManager {
     if (inventoryHUD == null) {
       inventoryHUD =
           new InventoryHUD(
-              gameContext,
-              gameScreen,
-              hudStage.getViewport(),
-              font,
-              sharedSlotStyle,
-              itemTextureManager);
+              gameScreen, hudStage.getViewport(), font, sharedSlotStyle, itemTextureManager);
     }
 
     inventoryHUD.setContainer(containerModelId);

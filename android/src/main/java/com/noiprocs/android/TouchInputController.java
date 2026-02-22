@@ -26,7 +26,7 @@ public class TouchInputController implements InputController {
   }
 
   @Override
-  public void handleInput(GameContext gameContext, LibGDXGameScreen gameScreen) {
+  public void handleInput(LibGDXGameScreen gameScreen) {
     // Check for graphical HUD (takes priority over text-based HUDs)
     HUDManager hudManager = gameScreen.getHudManager();
 
@@ -34,9 +34,6 @@ public class TouchInputController implements InputController {
       // Graphical HUD handles touch input via Scene2D
       return; // Don't process game input when graphical HUD is open
     }
-
-    // Save previous pointer state for release detection
-    touchState.savePointerState();
 
     // Track which zones are currently touched this frame
     boolean[] zonesTouched = new boolean[ControlZone.values().length];
@@ -87,12 +84,12 @@ public class TouchInputController implements InputController {
     }
 
     // Process game input commands
-    handleGameInput(gameContext, zonesTouched, joystickTouchX, joystickTouchY);
+    handleGameInput(zonesTouched, joystickTouchX, joystickTouchY);
   }
 
   /** Handle game input (movement, actions, quick slots). */
-  private void handleGameInput(
-      GameContext gameContext, boolean[] zonesTouched, float joystickTouchX, float joystickTouchY) {
+  private void handleGameInput(boolean[] zonesTouched, float joystickTouchX, float joystickTouchY) {
+    GameContext gameContext = GameContext.get();
     // Track if any movement is currently active
     boolean anyMovementActive = false;
     char joystickDirection;

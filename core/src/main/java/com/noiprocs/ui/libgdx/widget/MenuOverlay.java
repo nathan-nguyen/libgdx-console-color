@@ -22,8 +22,7 @@ public class MenuOverlay extends Table {
   private final Table menuBox;
   private Runnable onClose;
 
-  public MenuOverlay(
-      SettingsManager settingsManager, GameContext gameContext, Runnable onMainMenu, Skin skin) {
+  public MenuOverlay(SettingsManager settingsManager, Runnable onMainMenu, Skin skin) {
     setFillParent(true);
     setVisible(false);
     setTouchable(Touchable.enabled);
@@ -66,6 +65,7 @@ public class MenuOverlay extends Table {
     menuBox.row();
 
     TextButton mainMenuButton = new TextButton("Main Menu", skin);
+    GameContext gameContext = GameContext.get();
     mainMenuButton.addListener(
         new ClickListener() {
           @Override

@@ -32,8 +32,6 @@ public class LibGDXGameScreen implements GameScreenInterface {
   protected final int renderRange;
   protected final char[][] map;
   protected final char[][] colorMap;
-
-  protected GameContext gameContext;
   private HUDManager hudManager;
 
   public LibGDXGameScreen(int height, int width, int renderRange) {
@@ -55,12 +53,11 @@ public class LibGDXGameScreen implements GameScreenInterface {
   }
 
   @Override
-  public void setGameContext(GameContext gameContext) {
-    this.gameContext = gameContext;
-  }
+  public void setGameContext(GameContext gameContext) {}
 
   @Override
   public void render(int delta) {
+    GameContext gameContext = GameContext.get();
     Model playerModel = gameContext.modelManager.getModel(gameContext.username);
     // Only render when playerModel is existing
     if (playerModel == null) return;
@@ -81,7 +78,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
     Action playerAction = playerModel.getAction();
     if (playerAction instanceof InteractAction) {
       InteractAction interactAction = (InteractAction) playerAction;
-      Model model = gameContext.modelManager.getModel(interactAction.targetId);
+      Model model = GameContext.get().modelManager.getModel(interactAction.targetId);
       if (model instanceof InventoryContainerInterface || isHumanoidButNotPlayer(model)) {
         if (!hudManager.isOpen()) {
           hudManager.openInventoryHUD(interactAction.targetId);
@@ -107,6 +104,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
    */
   public void renderWithBatch(
       SpriteBatch batch, BitmapFont font, float charWidth, float charHeight, float virtualHeight) {
+    GameContext gameContext = GameContext.get();
     Model playerModel = gameContext.modelManager.getModel(gameContext.username);
     if (playerModel == null) return;
 
@@ -176,6 +174,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
     int offsetY = playerModel.position.y - width / 2;
     this.clearMap();
 
+    GameContext gameContext = GameContext.get();
     List<Model> renderableModelList =
         ((ClientModelManager) gameContext.modelManager)
             .getLocalChunk()

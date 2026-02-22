@@ -18,15 +18,9 @@ import org.slf4j.LoggerFactory;
  */
 public class ItemDragDropHandler {
   private static final Logger logger = LoggerFactory.getLogger(ItemDragDropHandler.class);
-
-  private final GameContext gameContext;
-  private final String username;
   private final Map<String, Long> slotTypeToCategory;
 
-  public ItemDragDropHandler(GameContext gameContext, String username) {
-    this.gameContext = gameContext;
-    this.username = username;
-
+  public ItemDragDropHandler() {
     this.slotTypeToCategory = new HashMap<>();
     slotTypeToCategory.put("HELMET", ItemCategory.HELMET);
     slotTypeToCategory.put("CHEST PLATE", ItemCategory.CHEST_PLATE);
@@ -81,7 +75,7 @@ public class ItemDragDropHandler {
    * @param equipmentSlotType Equipment slot type
    */
   public void executeEquip(int inventorySlot, String equipmentSlotType) {
-    executeEquip(username, inventorySlot, equipmentSlotType);
+    executeEquip(GameContext.get().username, inventorySlot, equipmentSlotType);
   }
 
   /**
@@ -97,7 +91,8 @@ public class ItemDragDropHandler {
       return;
     }
 
-    EquipCommand command = new EquipCommand(username, targetModelId, inventorySlot);
+    GameContext gameContext = GameContext.get();
+    EquipCommand command = new EquipCommand(gameContext.username, targetModelId, inventorySlot);
     gameContext.controlManager.processInput(command);
     logger.info(
         "Equipping from inventory slot {} to {} slot on {}",
@@ -112,7 +107,7 @@ public class ItemDragDropHandler {
    * @param equipmentSlotType Equipment slot type to unequip
    */
   public void executeUnequip(String equipmentSlotType) {
-    executeUnequip(username, equipmentSlotType);
+    executeUnequip(GameContext.get().username, equipmentSlotType);
   }
 
   /**
@@ -133,7 +128,8 @@ public class ItemDragDropHandler {
       return;
     }
 
-    UnequipCommand command = new UnequipCommand(username, targetModelId, categoryId);
+    GameContext gameContext = GameContext.get();
+    UnequipCommand command = new UnequipCommand(gameContext.username, targetModelId, categoryId);
     gameContext.controlManager.processInput(command);
     logger.info(
         "Unequipping from {} slot (category {}) on {}",
@@ -173,8 +169,9 @@ public class ItemDragDropHandler {
 
     boolean fromPlayer = "PLAYER".equals(sourceContainerId);
 
-    gameContext.controlManager.transferItem(
-        containerModelId, sourceSlotIndex, transferItem.amount, fromPlayer);
+    GameContext.get()
+        .controlManager
+        .transferItem(containerModelId, sourceSlotIndex, transferItem.amount, fromPlayer);
 
     logger.info(
         "Transferring {} from {}[{}] to {}[{}]",
@@ -192,7 +189,9 @@ public class ItemDragDropHandler {
    * @param slot2Index Second slot index
    */
   public void executeSwap(int slot1Index, int slot2Index) {
-    SwapInventoryCommand command = new SwapInventoryCommand(username, slot1Index, slot2Index);
+    GameContext gameContext = GameContext.get();
+    SwapInventoryCommand command =
+        new SwapInventoryCommand(gameContext.username, slot1Index, slot2Index);
     gameContext.controlManager.processInput(command);
     logger.info("Swapping items at slots {} and {}", slot1Index, slot2Index);
   }
@@ -208,7 +207,8 @@ public class ItemDragDropHandler {
       return;
     }
 
-    CraftCommand command = new CraftCommand(username, targetItemClassName);
+    GameContext gameContext = GameContext.get();
+    CraftCommand command = new CraftCommand(gameContext.username, targetItemClassName);
     gameContext.controlManager.processInput(command);
     logger.info("Crafting item: {}", targetItemClassName);
   }

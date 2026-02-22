@@ -53,11 +53,6 @@ public class LibGDXApp extends Game {
     return renderResources;
   }
 
-  /** Get the game context. */
-  public GameContext getGameContext() {
-    return gameContext;
-  }
-
   /** Set the game context (called by GameScreen wrapper). */
   public void setGameContext(GameContext gameContext) {
     this.gameContext = gameContext;

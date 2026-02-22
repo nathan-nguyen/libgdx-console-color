@@ -14,9 +14,6 @@ public class TouchState {
   // Maps pointer ID to the zone it's currently touching
   private final Map<Integer, ControlZone> activePointers = new HashMap<>();
 
-  // Maps pointer ID to the zone it was touching in the previous frame
-  private final Map<Integer, ControlZone> previousPointers = new HashMap<>();
-
   // Set of commands currently pressed (for debouncing)
   private final Set<Character> commandsPressed = new HashSet<>();
 
@@ -28,15 +25,6 @@ public class TouchState {
   private final Vector2 joystickOffset = new Vector2(); // Normalized offset from center
   private boolean joystickActive = false; // Whether joystick is being touched
   private Integer joystickPointerId = null; // Which pointer owns the joystick
-
-  /**
-   * Save current pointer state before processing new frame. Call this at the start of each input
-   * frame.
-   */
-  public void savePointerState() {
-    previousPointers.clear();
-    previousPointers.putAll(activePointers);
-  }
 
   /**
    * Update the touch state for a pointer.

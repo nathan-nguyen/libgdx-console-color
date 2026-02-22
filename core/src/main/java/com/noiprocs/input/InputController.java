@@ -1,6 +1,5 @@
 package com.noiprocs.input;
 
-import com.noiprocs.core.GameContext;
 import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 
 /**
@@ -11,8 +10,7 @@ public interface InputController {
   /**
    * Handle input for the current frame.
    *
-   * @param gameContext The game context for sending commands
    * @param gameScreen The game screen for HUD state
    */
-  void handleInput(GameContext gameContext, LibGDXGameScreen gameScreen);
+  void handleInput(LibGDXGameScreen gameScreen);
 }

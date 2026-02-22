@@ -116,7 +116,6 @@ public class GameScreen implements Screen {
 
     hudManager =
         new HUDManager(
-            gameContext,
             gameScreen,
             viewport,
             renderResources.getPanelFont(),
@@ -155,7 +154,7 @@ public class GameScreen implements Screen {
     buttonTable.add(menuButton).size(50, 50);
     uiStage.addActor(buttonTable);
 
-    menuOverlay = new MenuOverlay(settingsManager, gameContext, showMainMenu, skin);
+    menuOverlay = new MenuOverlay(settingsManager, showMainMenu, skin);
     menuOverlay.setOnClose(() -> buttonTable.setVisible(true));
     uiStage.addActor(menuOverlay);
 
@@ -192,7 +191,7 @@ public class GameScreen implements Screen {
   @Override
   public void render(float delta) {
     if (inputController != null) {
-      inputController.handleInput(gameContext, gameScreen);
+      inputController.handleInput(gameScreen);
     }
 
     ScreenUtils.clear(0f, 0f, 0f, 1f);

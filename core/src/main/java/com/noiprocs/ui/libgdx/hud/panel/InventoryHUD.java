@@ -43,8 +43,6 @@ import com.noiprocs.ui.libgdx.hud.widget.ItemSlotWidget;
  * side-by-side for transferring items.
  */
 public class InventoryHUD {
-
-  private final GameContext gameContext;
   private final LibGDXGameScreen gameScreen;
   private final BitmapFont font;
   private final Table rootTable;
@@ -83,13 +81,11 @@ public class InventoryHUD {
   private Label speedValueLabel;
 
   public InventoryHUD(
-      GameContext gameContext,
       LibGDXGameScreen gameScreen,
       Viewport viewport,
       BitmapFont font,
       ItemSlotStyle slotStyle,
       ItemTextureManager itemTextureManager) {
-    this.gameContext = gameContext;
     this.gameScreen = gameScreen;
     this.viewport = viewport;
     this.font = font;
@@ -97,7 +93,7 @@ public class InventoryHUD {
     this.rootTable.setFillParent(true);
     this.slotStyle = slotStyle;
     this.itemTextureManager = itemTextureManager;
-    this.dragDropManager = new ItemDragDropHandler(gameContext, gameContext.username);
+    this.dragDropManager = new ItemDragDropHandler();
     this.dragAndDrop = new DragAndDrop();
     this.mainContainer = new Table();
 
@@ -145,7 +141,7 @@ public class InventoryHUD {
   private void rebuildUI() {
     mainContainer.clear();
 
-    Model containerModel = gameContext.modelManager.getModel(containerModelId);
+    Model containerModel = GameContext.get().modelManager.getModel(containerModelId);
     if (containerModel == null) return;
 
     // Header with title and close button
@@ -240,7 +236,7 @@ public class InventoryHUD {
 
     String title = "CONTAINER";
     if (containerModelId != null) {
-      Model containerModel = gameContext.modelManager.getModel(containerModelId);
+      Model containerModel = GameContext.get().modelManager.getModel(containerModelId);
       if (isHumanoidButNotPlayer(containerModel)) {
         title = "HUMANOID";
       }
@@ -463,7 +459,7 @@ public class InventoryHUD {
     // Check if we're interacting with a HumanoidModel
     boolean isHumanoidInteraction = false;
     if (containerModelId != null) {
-      Model containerModel = gameContext.modelManager.getModel(containerModelId);
+      Model containerModel = GameContext.get().modelManager.getModel(containerModelId);
       if (isHumanoidButNotPlayer(containerModel)) {
         isHumanoidInteraction = true;
         setupEquipmentDragAndDrop();
@@ -704,6 +700,7 @@ public class InventoryHUD {
   }
 
   public void refresh() {
+    GameContext gameContext = GameContext.get();
     // Get player model
     PlayerModel player = (PlayerModel) gameContext.modelManager.getModel(gameContext.username);
     if (player == null) {

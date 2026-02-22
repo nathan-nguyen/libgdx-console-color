@@ -46,7 +46,6 @@ import org.slf4j.LoggerFactory;
 public class EquipmentHUD {
   private static final Logger logger = LoggerFactory.getLogger(EquipmentHUD.class);
 
-  private final GameContext gameContext;
   private final LibGDXGameScreen gameScreen;
   private final BitmapFont font;
   private final Table rootTable;
@@ -71,13 +70,11 @@ public class EquipmentHUD {
   private static final int HOTBAR_SIZE = 4; // First 4 slots are hotbar slots
 
   public EquipmentHUD(
-      GameContext gameContext,
       LibGDXGameScreen gameScreen,
       Viewport viewport,
       BitmapFont font,
       ItemSlotStyle slotStyle,
       ItemTextureManager itemTextureManager) {
-    this.gameContext = gameContext;
     this.gameScreen = gameScreen;
     this.viewport = viewport;
     this.font = font;
@@ -87,7 +84,7 @@ public class EquipmentHUD {
     this.itemTextureManager = itemTextureManager;
     this.equipmentSlots = new HashMap<>();
     this.slotTypeToCategory = new HashMap<>();
-    this.dragDropManager = new ItemDragDropHandler(gameContext, gameContext.username);
+    this.dragDropManager = new ItemDragDropHandler();
     this.dragAndDrop = new DragAndDrop();
 
     // Map slot types to ItemCategory constants
@@ -301,6 +298,7 @@ public class EquipmentHUD {
   }
 
   public void refresh() {
+    GameContext gameContext = GameContext.get();
     // Get player model
     PlayerModel player = (PlayerModel) gameContext.modelManager.getModel(gameContext.username);
     if (player == null) {
@@ -483,7 +481,6 @@ public class EquipmentHUD {
             @Override
             public void drop(Source source, Payload payload, float x, float y, int pointer) {
               DragPayload dragPayload = (DragPayload) payload.getObject();
-              Object item = dragPayload.item;
 
               if (dragPayload.isEquipmentSlot) {
                 // Unequipping from equipment to inventory
