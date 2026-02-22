@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.noiprocs.core.GameContext;
+import com.noiprocs.core.common.Config;
 import com.noiprocs.core.graphic.GameScreenInterface;
 import com.noiprocs.core.model.InventoryContainerInterface;
 import com.noiprocs.core.model.Model;
@@ -89,8 +90,8 @@ public class LibGDXGameScreen implements GameScreenInterface {
 
     syncGraphicalHUD((PlayerModel) playerModel);
 
-    int offsetX = playerModel.position.x - height / 2;
-    int offsetY = playerModel.position.y - width / 2;
+    int offsetX = playerModel.position.x / Config.WORLD_SCALE - height / 2;
+    int offsetY = playerModel.position.y / Config.WORLD_SCALE - width / 2;
 
     List<Model> renderableModelList =
         ((ClientModelManager) gameContext.modelManager)
@@ -111,8 +112,8 @@ public class LibGDXGameScreen implements GameScreenInterface {
       ConsoleTexture consoleTexture = consoleSprite.getTexture(model);
       char[][] texture = consoleTexture.texture;
 
-      int posX = model.position.x - offsetX - consoleTexture.offsetX;
-      int posY = model.position.y - offsetY - consoleTexture.offsetY;
+      int posX = model.position.x / Config.WORLD_SCALE - offsetX - consoleTexture.offsetX;
+      int posY = model.position.y / Config.WORLD_SCALE - offsetY - consoleTexture.offsetY;
 
       if (model.id.equals(playerModel.id)) {
         posX = height / 2 - consoleTexture.offsetX;
