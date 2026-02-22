@@ -30,16 +30,12 @@ public class LibGDXGameScreen implements GameScreenInterface {
   protected final int height;
   protected final int width;
   protected final int renderRange;
-  protected final char[][] map;
-  protected final char[][] colorMap;
   private HUDManager hudManager;
 
   public LibGDXGameScreen(int height, int width, int renderRange) {
     this.height = height;
     this.width = width;
     this.renderRange = renderRange;
-    this.map = new char[height][width];
-    this.colorMap = new char[height][width];
   }
 
   // Color character to libGDX Color mapping
@@ -56,15 +52,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
   public void setGameContext(GameContext gameContext) {}
 
   @Override
-  public void render(int delta) {
-    GameContext gameContext = GameContext.get();
-    Model playerModel = gameContext.modelManager.getModel(gameContext.username);
-    // Only render when playerModel is existing
-    if (playerModel == null) return;
-
-    // Construct the screen (populate map and colorMap arrays)
-    this.constructScreen((PlayerModel) playerModel);
-  }
+  public void render(int delta) {}
 
   /**
    * Synchronizes the graphical HUD with the text-based HUD state. When a chest is opened in the
@@ -93,53 +81,73 @@ public class LibGDXGameScreen implements GameScreenInterface {
     return model instanceof HumanoidModel && !(model instanceof PlayerModel);
   }
 
-  /**
-   * Renders the game screen using libGDX rendering API.
-   *
-   * @param batch SpriteBatch for rendering
-   * @param font BitmapFont for rendering characters
-   * @param charWidth Width of a character in pixels (fixed for monospace)
-   * @param charHeight Height of a character in pixels
-   * @param virtualHeight Virtual screen height (scaled for device)
-   */
   public void renderWithBatch(
       SpriteBatch batch, BitmapFont font, float charWidth, float charHeight, float virtualHeight) {
     GameContext gameContext = GameContext.get();
     Model playerModel = gameContext.modelManager.getModel(gameContext.username);
     if (playerModel == null) return;
 
-    // Sync graphical HUD (runs on GL thread)
     syncGraphicalHUD((PlayerModel) playerModel);
 
-    float x = 0;
-    float y = virtualHeight;
+    int offsetX = playerModel.position.x - height / 2;
+    int offsetY = playerModel.position.y - width / 2;
 
-    // 1. Render map without borders (full height)
-    for (int i = 0; i < height; i++) {
-      renderMapLineWithColors(batch, font, i, x, y, charWidth);
-      y -= charHeight;
-    }
-  }
+    List<Model> renderableModelList =
+        ((ClientModelManager) gameContext.modelManager)
+            .getLocalChunk()
+            .flatMap(modelChunk -> modelChunk.map.values().stream())
+            .filter(
+                model ->
+                    model.isVisible
+                        && model.position.manhattanDistanceTo(playerModel.position) <= renderRange)
+            .sorted(Comparator.comparingInt(u -> u.position.x))
+            .collect(Collectors.toList());
 
-  private void renderMapLineWithColors(
-      SpriteBatch batch, BitmapFont font, int mapRow, float x, float y, float charWidth) {
-    float currentX = x;
     Color originalColor = batch.getColor().cpy();
 
-    // Map content with colors - render each character individually for monospace
-    for (int j = 0; j < width; j++) {
-      char ch = map[mapRow][j] == 0 ? ' ' : map[mapRow][j];
-      char colorChar = colorMap[mapRow][j];
+    for (Model model : renderableModelList) {
+      ConsoleSprite consoleSprite =
+          (ConsoleSprite) gameContext.spriteManager.createRenderableObject(model);
+      ConsoleTexture consoleTexture = consoleSprite.getTexture(model);
+      char[][] texture = consoleTexture.texture;
 
-      Color color =
-          (colorChar != 0) ? COLOR_CHAR_MAP.getOrDefault(colorChar, Color.WHITE) : Color.WHITE;
+      int posX = model.position.x - offsetX - consoleTexture.offsetX;
+      int posY = model.position.y - offsetY - consoleTexture.offsetY;
 
-      batch.setColor(color);
-      renderCharAtPosition(batch, font, ch, currentX, y);
-      currentX += charWidth;
+      if (model.id.equals(playerModel.id)) {
+        posX = height / 2 - consoleTexture.offsetX;
+        posY = width / 2 - consoleTexture.offsetY;
+      }
+
+      char overrideColor = 0;
+      if (gameContext.modelManager.hasActiveEvent(model.id, EventType.HURT)) {
+        overrideColor = 'r';
+      }
+
+      logger.debug("Rendering model {}", model);
+
+      for (int i = 0; i < texture.length; i++) {
+        for (int j = 0; j < texture[0].length; j++) {
+          if (texture[i][j] == 0) continue;
+          int x = posX + i;
+          int y = posY + j;
+          if (x >= 0 && x < height && y >= 0 && y < width) {
+            char colorChar =
+                overrideColor != 0
+                    ? overrideColor
+                    : (consoleTexture.colorMap != null ? consoleTexture.colorMap[i][j] : 0);
+            Color color =
+                (colorChar != 0)
+                    ? COLOR_CHAR_MAP.getOrDefault(colorChar, Color.WHITE)
+                    : Color.WHITE;
+            batch.setColor(color);
+            renderCharAtPosition(
+                batch, font, texture[i][j], y * charWidth, virtualHeight - x * charHeight);
+          }
+        }
+      }
     }
 
-    // Restore original color
     batch.setColor(originalColor);
   }
 
@@ -167,51 +175,6 @@ public class LibGDXGameScreen implements GameScreenInterface {
     }
   }
 
-  protected void constructScreen(PlayerModel playerModel) {
-    // Get list of visible objects not far from player
-    // Render order: Models with smaller posX render first.
-    int offsetX = playerModel.position.x - height / 2;
-    int offsetY = playerModel.position.y - width / 2;
-    this.clearMap();
-
-    GameContext gameContext = GameContext.get();
-    List<Model> renderableModelList =
-        ((ClientModelManager) gameContext.modelManager)
-            .getLocalChunk()
-            .flatMap(modelChunk -> modelChunk.map.values().stream())
-            .filter(
-                model ->
-                    model.isVisible
-                        && model.position.manhattanDistanceTo(playerModel.position) <= renderRange)
-            .sorted(Comparator.comparingInt(u -> u.position.x))
-            .collect(Collectors.toList());
-
-    for (Model model : renderableModelList) {
-      ConsoleSprite consoleSprite =
-          (ConsoleSprite) gameContext.spriteManager.createRenderableObject(model);
-      ConsoleTexture consoleTexture = consoleSprite.getTexture(model);
-      char[][] texture = consoleTexture.texture;
-
-      int posX = model.position.x - offsetX - consoleTexture.offsetX;
-      int posY = model.position.y - offsetY - consoleTexture.offsetY;
-
-      // Main player sprite position is always fixed and does not depend on current model position
-      if (model.id.equals(playerModel.id)) {
-        posX = height / 2 - consoleTexture.offsetX;
-        posY = width / 2 - consoleTexture.offsetY;
-      }
-
-      // Check if model has active hurt event and use red color override
-      char overrideColor = 0;
-      if (gameContext.modelManager.hasActiveEvent(model.id, EventType.HURT)) {
-        overrideColor = 'r'; // Red color for hurt models
-      }
-
-      logger.debug("Rendering model {}", model);
-      this.updateMap(posX, posY, texture, consoleTexture.colorMap, overrideColor);
-    }
-  }
-
   /**
    * Sets the HUD manager for this game screen.
    *
@@ -228,34 +191,5 @@ public class LibGDXGameScreen implements GameScreenInterface {
    */
   public HUDManager getHudManager() {
     return hudManager;
-  }
-
-  private void clearMap() {
-    for (int i = 0; i < height; ++i) {
-      for (int j = 0; j < width; ++j) {
-        map[i][j] = 0;
-        colorMap[i][j] = 0;
-      }
-    }
-  }
-
-  private void updateMap(
-      int posX, int posY, char[][] texture, char[][] spriteColorMap, char overrideColor) {
-    for (int i = 0; i < texture.length; ++i) {
-      for (int j = 0; j < texture[0].length; ++j) {
-        if (texture[i][j] == 0) continue;
-        int x = posX + i;
-        int y = posY + j;
-        if (x >= 0 && x < height && y >= 0 && y < width) {
-          map[x][y] = texture[i][j];
-          // Use override color if provided, otherwise use sprite's color map
-          if (overrideColor != 0) {
-            colorMap[x][y] = overrideColor;
-          } else {
-            colorMap[x][y] = (spriteColorMap != null) ? spriteColorMap[i][j] : 0;
-          }
-        }
-      }
-    }
   }
 }
