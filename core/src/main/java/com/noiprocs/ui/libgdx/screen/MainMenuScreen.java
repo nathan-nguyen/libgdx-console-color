@@ -4,9 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -23,7 +23,7 @@ public class MainMenuScreen implements Screen {
   private final LibGDXApp app;
   private Stage stage;
   private Skin skin;
-  private Texture iconTexture;
+  private Texture backgroundTexture;
 
   public MainMenuScreen(LibGDXApp app) {
     this.app = app;
@@ -31,6 +31,8 @@ public class MainMenuScreen implements Screen {
 
   @Override
   public void show() {
+    backgroundTexture = new Texture(Gdx.files.internal("main_menu_background.png"));
+
     // Create stage for UI
     stage = new Stage(app.getViewport(), app.getRenderResources().getBatch());
 
@@ -41,12 +43,6 @@ public class MainMenuScreen implements Screen {
     Table table = new Table();
     table.setFillParent(true);
     stage.addActor(table);
-
-    // App icon
-    iconTexture = new Texture(Gdx.files.internal("icon.png"));
-    Image iconImage = new Image(iconTexture);
-    table.add(iconImage).size(128, 128).padBottom(16);
-    table.row();
 
     // Title label
     Label titleLabel = new Label("Maze Runner", skin);
@@ -94,11 +90,20 @@ public class MainMenuScreen implements Screen {
 
   @Override
   public void render(float delta) {
-    // Clear screen with black background
     Gdx.gl.glClearColor(0, 0, 0, 1);
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-    // Update and draw stage
+    float w = app.getViewport().getWorldWidth();
+    float h = app.getViewport().getWorldHeight();
+    float scale = Math.max(w / backgroundTexture.getWidth(), h / backgroundTexture.getHeight());
+    float drawW = backgroundTexture.getWidth() * scale;
+    float drawH = backgroundTexture.getHeight() * scale;
+    SpriteBatch batch = app.getRenderResources().getBatch();
+    batch.setProjectionMatrix(app.getViewport().getCamera().combined);
+    batch.begin();
+    batch.draw(backgroundTexture, (w - drawW) / 2f, (h - drawH) / 2f, drawW, drawH);
+    batch.end();
+
     stage.act(delta);
     stage.draw();
   }
@@ -131,9 +136,9 @@ public class MainMenuScreen implements Screen {
       skin.dispose();
       skin = null;
     }
-    if (iconTexture != null) {
-      iconTexture.dispose();
-      iconTexture = null;
+    if (backgroundTexture != null) {
+      backgroundTexture.dispose();
+      backgroundTexture = null;
     }
   }
 }
