@@ -5,7 +5,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.noiprocs.core.GameContext;
+import com.noiprocs.core.common.Vector3D;
 import com.noiprocs.core.control.command.InputCommand;
+import com.noiprocs.core.control.command.SetMovingDirectionCommand;
 import com.noiprocs.input.InputController;
 import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
@@ -18,6 +20,7 @@ public class TouchInputController implements InputController {
   private final TouchState touchState;
   private final Viewport viewport;
   private final Vector3 touchPoint; // Reusable vector for coordinate conversion
+  private Vector3D lastSentDirection = Vector3D.ZERO;
 
   public TouchInputController(Viewport viewport) {
     this.touchState = new TouchState();
@@ -90,29 +93,21 @@ public class TouchInputController implements InputController {
   /** Handle game input (movement, actions, quick slots). */
   private void handleGameInput(boolean[] zonesTouched, float joystickTouchX, float joystickTouchY) {
     GameContext gameContext = GameContext.get();
-    // Track if any movement is currently active
     boolean anyMovementActive = false;
-    char joystickDirection;
 
     // Handle joystick input
     if (zonesTouched[ControlZone.JOYSTICK.ordinal()]) {
-      joystickDirection = ControlZone.JOYSTICK.getJoystickDirection(joystickTouchX, joystickTouchY);
       Vector2 offset = ControlZone.JOYSTICK.getJoystickOffset(joystickTouchX, joystickTouchY);
       touchState.updateJoystick(joystickTouchX, joystickTouchY, offset);
 
-      if (joystickDirection != '\0') {
+      if (offset.x != 0 || offset.y != 0) {
         anyMovementActive = true;
-        // Send movement command if direction changed
-        if (!touchState.isCommandPressed(joystickDirection)) {
-          // Clear old movement commands
-          touchState.clearCommand('w');
-          touchState.clearCommand('a');
-          touchState.clearCommand('s');
-          touchState.clearCommand('d');
-          // Set new direction
-          touchState.pressCommand(joystickDirection);
+        // libGDX: x=right, y=up  →  game: Vector3D(x=north/south, y=east/west)
+        Vector3D direction = new Vector3D((int) (-offset.y * 100), (int) (offset.x * 100), 0);
+        if (!direction.equals(lastSentDirection)) {
+          lastSentDirection = direction;
           gameContext.controlManager.processInput(
-              new InputCommand(gameContext.username, joystickDirection));
+              new SetMovingDirectionCommand(gameContext.username, direction));
         }
       }
     } else {
@@ -129,13 +124,11 @@ public class TouchInputController implements InputController {
       boolean isTouched = zonesTouched[zone.ordinal()];
 
       if (isTouched) {
-        // For all controls, send command if not already pressed
         if (!touchState.isCommandPressed(command)) {
           touchState.pressCommand(command);
           gameContext.controlManager.processInput(new InputCommand(gameContext.username, command));
         }
       } else {
-        // Clear specific command if no longer touched
         if (touchState.isCommandPressed(command)) {
           touchState.clearCommand(command);
         }
@@ -144,12 +137,8 @@ public class TouchInputController implements InputController {
 
     // Send halt command if movement stopped (joystick released)
     if (touchState.wasMovementActive() && !anyMovementActive) {
+      lastSentDirection = Vector3D.ZERO;
       gameContext.controlManager.processInput(new InputCommand(gameContext.username, "h"));
-      // Clear all movement commands
-      touchState.clearCommand('w');
-      touchState.clearCommand('a');
-      touchState.clearCommand('s');
-      touchState.clearCommand('d');
     }
 
     // Update movement state for next frame
