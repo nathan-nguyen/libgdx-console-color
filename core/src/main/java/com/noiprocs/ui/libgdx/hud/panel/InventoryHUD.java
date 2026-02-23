@@ -438,7 +438,7 @@ public class InventoryHUD {
     // Speed stat
     Label speedLabel = new Label("  Speed: ", labelStyle);
     speedLabel.setFontScale(0.8f);
-    speedValueLabel = new Label(humanoidModel.getSpeed().toString(), valueLabelStyle);
+    speedValueLabel = new Label(String.valueOf(humanoidModel.getSpeed()), valueLabelStyle);
     speedValueLabel.setFontScale(0.8f);
 
     // Add stats in a horizontal layout
@@ -752,7 +752,7 @@ public class InventoryHUD {
           healthValueLabel.setText(String.valueOf(humanoidModel.getHealth()));
         }
         if (speedValueLabel != null) {
-          speedValueLabel.setText(humanoidModel.getSpeed().toString());
+          speedValueLabel.setText(String.valueOf(humanoidModel.getSpeed()));
         }
 
         // Refresh equipment slots
