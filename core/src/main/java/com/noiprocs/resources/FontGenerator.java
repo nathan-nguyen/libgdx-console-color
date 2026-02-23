@@ -81,10 +81,10 @@ public class FontGenerator {
       }
       for (BitmapFont.Glyph glyph : page) {
         if (glyph != null) {
-          glyph.xadvance = Math.round(UIConfig.CHAR_WIDTH * screenScale);
+          glyph.xadvance = Math.round(UIConfig.CHAR_SIZE * screenScale);
         }
       }
     }
-    fontData.spaceXadvance = Math.round(UIConfig.CHAR_HEIGHT * screenScale);
+    fontData.spaceXadvance = Math.round(UIConfig.CHAR_SIZE * screenScale);
   }
 }

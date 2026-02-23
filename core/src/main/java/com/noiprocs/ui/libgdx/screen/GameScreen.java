@@ -82,8 +82,8 @@ public class GameScreen implements Screen {
     float virtualHeight = viewport.getWorldHeight();
     float virtualWidth = viewport.getWorldWidth();
 
-    int screenHeight = Math.round(virtualHeight / UIConfig.CHAR_HEIGHT);
-    int screenWidth = Math.round(virtualWidth / UIConfig.CHAR_WIDTH);
+    int screenHeight = Math.round(virtualHeight / UIConfig.CHAR_SIZE);
+    int screenWidth = Math.round(virtualWidth / UIConfig.CHAR_SIZE);
     gameScreen = new LibGDXGameScreen(screenHeight, screenWidth, 12000);
 
     gameContext =
@@ -158,8 +158,8 @@ public class GameScreen implements Screen {
     gameScreen.renderWithBatch(
         renderResources.getBatch(),
         renderResources.getFont(),
-        UIConfig.CHAR_WIDTH,
-        UIConfig.CHAR_HEIGHT,
+        UIConfig.CHAR_SIZE,
+        UIConfig.CHAR_SIZE,
         viewport.getWorldHeight());
     renderResources.getBatch().end();
 
