@@ -102,8 +102,9 @@ public class TouchInputController implements InputController {
 
       if (offset.x != 0 || offset.y != 0) {
         anyMovementActive = true;
-        // libGDX: x=right, y=up  →  game: Vector3D(x=north/south, y=east/west)
-        Vector3D direction = new Vector3D((int) (-offset.y * 100), (int) (offset.x * 100), 0);
+        // Isometric: screen-right = northeast, screen-up = northwest
+        // game.x = -(offset.x + offset.y), game.y = (offset.x - offset.y)
+        Vector3D direction = new Vector3D((int) ((-offset.x - offset.y) * 100), (int) ((offset.x - offset.y) * 100), 0);
         if (!direction.equals(lastSentDirection)) {
           lastSentDirection = direction;
           gameContext.controlManager.processInput(

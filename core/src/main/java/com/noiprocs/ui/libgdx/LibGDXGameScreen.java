@@ -17,6 +17,7 @@ import com.noiprocs.core.model.mob.character.PlayerModel;
 import com.noiprocs.ui.console.sprite.ConsoleSprite;
 import com.noiprocs.ui.console.sprite.ConsoleTexture;
 import com.noiprocs.ui.console.util.ColorMapper;
+import com.noiprocs.resources.UIConfig;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -101,7 +102,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
                 model ->
                     model.isVisible
                         && model.position.manhattanDistanceTo(playerModel.position) <= renderRange)
-            .sorted(Comparator.comparingInt(u -> u.position.x))
+            .sorted(Comparator.comparingInt(u -> u.position.x + u.position.y))
             .collect(Collectors.toList());
 
     Color originalColor = batch.getColor().cpy();
@@ -127,12 +128,25 @@ public class LibGDXGameScreen implements GameScreenInterface {
 
       logger.debug("Rendering model {}", model);
 
+      boolean isoTexture = IsometricRenderPolicy.useIsometricTexture(model);
+      float baseScreenX = (posY - posX) * charWidth / 2f + charWidth * (width + height) / 4f;
+      float baseScreenY =
+          virtualHeight / 2f + charHeight / 4f * ((height + width) / 2f - posX - posY);
+
       for (int i = 0; i < texture.length; i++) {
         for (int j = 0; j < texture[0].length; j++) {
           if (texture[i][j] == 0) continue;
-          float x = posX + i;
-          float y = posY + j;
-          if (x >= 0 && x < height && y >= 0 && y < width) {
+          float screenX, screenY;
+          if (isoTexture) {
+            float x = posX + i;
+            float y = posY + j;
+            screenX = (y - x) * charWidth / 2f + charWidth * (width + height) / 4f;
+            screenY = virtualHeight / 2f + charHeight / 4f * ((height + width) / 2f - x - y);
+          } else {
+            screenX = baseScreenX + j * UIConfig.CHAR_WIDTH;
+            screenY = baseScreenY - i * UIConfig.CHAR_HEIGHT;
+          }
+          if (screenX >= 0 && screenX < width * charWidth && screenY >= 0 && screenY < virtualHeight) {
             char colorChar =
                 overrideColor != 0
                     ? overrideColor
@@ -142,8 +156,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
                     ? COLOR_CHAR_MAP.getOrDefault(colorChar, Color.WHITE)
                     : Color.WHITE;
             batch.setColor(color);
-            renderCharAtPosition(
-                batch, font, texture[i][j], y * charWidth, virtualHeight - x * charHeight);
+            renderCharAtPosition(batch, font, texture[i][j], screenX, screenY);
           }
         }
       }
