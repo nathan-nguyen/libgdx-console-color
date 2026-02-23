@@ -90,8 +90,8 @@ public class LibGDXGameScreen implements GameScreenInterface {
 
     syncGraphicalHUD((PlayerModel) playerModel);
 
-    int offsetX = playerModel.position.x / Config.WORLD_SCALE - height / 2;
-    int offsetY = playerModel.position.y / Config.WORLD_SCALE - width / 2;
+    float offsetX = (float) playerModel.position.x / Config.WORLD_SCALE - height / 2;
+    float offsetY = (float) playerModel.position.y / Config.WORLD_SCALE - width / 2;
 
     List<Model> renderableModelList =
         ((ClientModelManager) gameContext.modelManager)
@@ -112,8 +112,8 @@ public class LibGDXGameScreen implements GameScreenInterface {
       ConsoleTexture consoleTexture = consoleSprite.getTexture(model);
       char[][] texture = consoleTexture.texture;
 
-      int posX = model.position.x / Config.WORLD_SCALE - offsetX - consoleTexture.offsetX;
-      int posY = model.position.y / Config.WORLD_SCALE - offsetY - consoleTexture.offsetY;
+      float posX = (float) model.position.x / Config.WORLD_SCALE - offsetX - consoleTexture.offsetX;
+      float posY = (float) model.position.y / Config.WORLD_SCALE - offsetY - consoleTexture.offsetY;
 
       if (model.id.equals(playerModel.id)) {
         posX = height / 2 - consoleTexture.offsetX;
@@ -130,8 +130,8 @@ public class LibGDXGameScreen implements GameScreenInterface {
       for (int i = 0; i < texture.length; i++) {
         for (int j = 0; j < texture[0].length; j++) {
           if (texture[i][j] == 0) continue;
-          int x = posX + i;
-          int y = posY + j;
+          float x = posX + i;
+          float y = posY + j;
           if (x >= 0 && x < height && y >= 0 && y < width) {
             char colorChar =
                 overrideColor != 0
