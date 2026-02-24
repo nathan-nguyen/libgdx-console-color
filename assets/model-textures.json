@@ -1,0 +1,9 @@
+{
+  "com.noiprocs.gameplay.model.environment.MazePartModel": {
+    "imagePath": "textures/maze_wall.png",
+    "offsetX": -155,
+    "offsetY": -145,
+    "scaleX": 0.63,
+    "scaleY": 0.55
+  }
+}

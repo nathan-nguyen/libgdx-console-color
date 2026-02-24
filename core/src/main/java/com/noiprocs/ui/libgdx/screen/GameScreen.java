@@ -86,7 +86,9 @@ public class GameScreen implements Screen {
 
     int screenHeight = Math.round(virtualHeight / UIConfig.CHAR_SIZE);
     int screenWidth = Math.round(virtualWidth / UIConfig.CHAR_SIZE);
-    gameScreen = new LibGDXGameScreen(screenHeight, screenWidth, 12000);
+    gameScreen =
+        new LibGDXGameScreen(
+            screenHeight, screenWidth, 12000, renderResources.getModelTextureManager());
     hitboxDebugRenderer = new HitboxDebugRenderer(gameScreen);
 
     gameContext =

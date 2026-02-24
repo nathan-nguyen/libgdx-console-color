@@ -14,6 +14,7 @@ import com.noiprocs.core.model.event.EventType;
 import com.noiprocs.core.model.manager.ClientModelManager;
 import com.noiprocs.core.model.mob.character.HumanoidModel;
 import com.noiprocs.core.model.mob.character.PlayerModel;
+import com.noiprocs.resources.ModelTextureManager;
 import com.noiprocs.resources.UIConfig;
 import com.noiprocs.ui.console.sprite.ConsoleSprite;
 import com.noiprocs.ui.console.sprite.ConsoleTexture;
@@ -34,11 +35,14 @@ public class LibGDXGameScreen implements GameScreenInterface {
   protected final int width;
   protected final int renderRange;
   private HUDManager hudManager;
+  private ModelTextureManager modelTextureManager;
 
-  public LibGDXGameScreen(int height, int width, int renderRange) {
+  public LibGDXGameScreen(
+      int height, int width, int renderRange, ModelTextureManager modelTextureManager) {
     this.height = height;
     this.width = width;
     this.renderRange = renderRange;
+    this.modelTextureManager = modelTextureManager;
   }
 
   // Color character to libGDX Color mapping
@@ -99,6 +103,29 @@ public class LibGDXGameScreen implements GameScreenInterface {
     Color originalColor = batch.getColor().cpy();
 
     for (Model model : renderableModelList) {
+      logger.debug("Rendering model {}", model);
+
+      ModelTextureManager.TextureConfig texConfig =
+          modelTextureManager != null ? modelTextureManager.getConfig(model) : null;
+
+      if (texConfig != null) {
+        float modelX = (float) model.position.x / Config.WORLD_SCALE - offsetX;
+        float modelY = (float) model.position.y / Config.WORLD_SCALE - offsetY;
+        float screenX =
+            (modelY - modelX) * charWidth / 2f
+                + charWidth * (width + height) / 4f
+                + texConfig.offsetX;
+        float screenY =
+            virtualHeight / 2f
+                + charHeight / 4f * ((height + width) / 2f - modelX - modelY)
+                + texConfig.offsetY;
+        float imgW = texConfig.textureRegion.getRegionWidth() * texConfig.scaleX;
+        float imgH = texConfig.textureRegion.getRegionHeight() * texConfig.scaleY;
+        batch.setColor(Color.WHITE);
+        batch.draw(texConfig.textureRegion, screenX, screenY, imgW, imgH);
+        continue;
+      }
+
       ConsoleSprite consoleSprite =
           (ConsoleSprite) gameContext.spriteManager.createRenderableObject(model);
       ConsoleTexture consoleTexture = consoleSprite.getTexture(model);
@@ -117,17 +144,12 @@ public class LibGDXGameScreen implements GameScreenInterface {
         overrideColor = 'r';
       }
 
-      logger.debug("Rendering model {}", model);
-
       boolean isoTexture = IsometricRenderPolicy.useIsometricTexture(model);
       float baseScreenX, baseScreenY;
       if (isoTexture) {
         baseScreenX = (posY - posX) * charWidth / 2f + charWidth * (width + height) / 4f;
         baseScreenY = virtualHeight / 2f + charHeight / 4f * ((height + width) / 2f - posX - posY);
       } else {
-        // Recover the model's world anchor (without texture offset) then apply the offset in
-        // screen space so that character (offsetX, offsetY) lands exactly at the isometric
-        // screen position of the model's world coordinates.
         float anchorX = posX + consoleTexture.offsetX;
         float anchorY = posY + consoleTexture.offsetY;
         float anchorScreenX =

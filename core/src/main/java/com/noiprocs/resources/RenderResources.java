@@ -10,6 +10,7 @@ public class RenderResources {
   private final BitmapFont hudFont;
   private final BitmapFont panelFont;
   private final ItemTextureManager itemTextureManager;
+  private final ModelTextureManager modelTextureManager;
   private final ShapeRenderer shapeRenderer;
 
   public RenderResources() {
@@ -19,6 +20,7 @@ public class RenderResources {
     hudFont = fontGenerator.generateHUDFont();
     panelFont = fontGenerator.generatePanelFont();
     itemTextureManager = new ItemTextureManager();
+    modelTextureManager = new ModelTextureManager();
     shapeRenderer = new ShapeRenderer();
   }
 
@@ -42,6 +44,10 @@ public class RenderResources {
     return itemTextureManager;
   }
 
+  public ModelTextureManager getModelTextureManager() {
+    return modelTextureManager;
+  }
+
   public ShapeRenderer getShapeRenderer() {
     return shapeRenderer;
   }
@@ -52,6 +58,7 @@ public class RenderResources {
     hudFont.dispose();
     panelFont.dispose();
     itemTextureManager.dispose();
+    modelTextureManager.dispose();
     shapeRenderer.dispose();
   }
 }
