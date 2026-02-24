@@ -14,11 +14,12 @@ import com.noiprocs.core.model.event.EventType;
 import com.noiprocs.core.model.manager.ClientModelManager;
 import com.noiprocs.core.model.mob.character.HumanoidModel;
 import com.noiprocs.core.model.mob.character.PlayerModel;
+import com.noiprocs.resources.UIConfig;
 import com.noiprocs.ui.console.sprite.ConsoleSprite;
 import com.noiprocs.ui.console.sprite.ConsoleTexture;
 import com.noiprocs.ui.console.util.ColorMapper;
-import com.noiprocs.resources.UIConfig;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -91,19 +92,9 @@ public class LibGDXGameScreen implements GameScreenInterface {
 
     syncGraphicalHUD((PlayerModel) playerModel);
 
-    float offsetX = (float) playerModel.position.x / Config.WORLD_SCALE - height / 2;
-    float offsetY = (float) playerModel.position.y / Config.WORLD_SCALE - width / 2;
-
-    List<Model> renderableModelList =
-        ((ClientModelManager) gameContext.modelManager)
-            .getLocalChunk()
-            .flatMap(modelChunk -> modelChunk.map.values().stream())
-            .filter(
-                model ->
-                    model.isVisible
-                        && model.position.manhattanDistanceTo(playerModel.position) <= renderRange)
-            .sorted(Comparator.comparingInt(u -> u.position.x + u.position.y))
-            .collect(Collectors.toList());
+    float offsetX = getOffsetX(playerModel);
+    float offsetY = getOffsetY(playerModel);
+    List<Model> renderableModelList = getRenderableModels(playerModel);
 
     Color originalColor = batch.getColor().cpy();
 
@@ -129,9 +120,23 @@ public class LibGDXGameScreen implements GameScreenInterface {
       logger.debug("Rendering model {}", model);
 
       boolean isoTexture = IsometricRenderPolicy.useIsometricTexture(model);
-      float baseScreenX = (posY - posX) * charWidth / 2f + charWidth * (width + height) / 4f;
-      float baseScreenY =
-          virtualHeight / 2f + charHeight / 4f * ((height + width) / 2f - posX - posY);
+      float baseScreenX, baseScreenY;
+      if (isoTexture) {
+        baseScreenX = (posY - posX) * charWidth / 2f + charWidth * (width + height) / 4f;
+        baseScreenY = virtualHeight / 2f + charHeight / 4f * ((height + width) / 2f - posX - posY);
+      } else {
+        // Recover the model's world anchor (without texture offset) then apply the offset in
+        // screen space so that character (offsetX, offsetY) lands exactly at the isometric
+        // screen position of the model's world coordinates.
+        float anchorX = posX + consoleTexture.offsetX;
+        float anchorY = posY + consoleTexture.offsetY;
+        float anchorScreenX =
+            (anchorY - anchorX) * charWidth / 2f + charWidth * (width + height) / 4f;
+        float anchorScreenY =
+            virtualHeight / 2f + charHeight / 4f * ((height + width) / 2f - anchorX - anchorY);
+        baseScreenX = anchorScreenX - consoleTexture.offsetY * UIConfig.CHAR_WIDTH;
+        baseScreenY = anchorScreenY + consoleTexture.offsetX * UIConfig.CHAR_HEIGHT;
+      }
 
       for (int i = 0; i < texture.length; i++) {
         for (int j = 0; j < texture[0].length; j++) {
@@ -146,7 +151,10 @@ public class LibGDXGameScreen implements GameScreenInterface {
             screenX = baseScreenX + j * UIConfig.CHAR_WIDTH;
             screenY = baseScreenY - i * UIConfig.CHAR_HEIGHT;
           }
-          if (screenX >= 0 && screenX < width * charWidth && screenY >= 0 && screenY < virtualHeight) {
+          if (screenX >= 0
+              && screenX < width * charWidth
+              && screenY >= 0
+              && screenY < virtualHeight) {
             char colorChar =
                 overrideColor != 0
                     ? overrideColor
@@ -187,6 +195,26 @@ public class LibGDXGameScreen implements GameScreenInterface {
           glyph.u2,
           glyph.v2);
     }
+  }
+
+  float getOffsetX(Model playerModel) {
+    return (float) playerModel.position.x / Config.WORLD_SCALE - height / 2;
+  }
+
+  float getOffsetY(Model playerModel) {
+    return (float) playerModel.position.y / Config.WORLD_SCALE - width / 2;
+  }
+
+  List<Model> getRenderableModels(Model playerModel) {
+    return ((ClientModelManager) GameContext.get().modelManager)
+        .getLocalChunk()
+        .flatMap(modelChunk -> new ArrayList<>(modelChunk.map.values()).stream())
+        .filter(
+            model ->
+                model.isVisible
+                    && model.position.manhattanDistanceTo(playerModel.position) <= renderRange)
+        .sorted(Comparator.comparingInt(u -> u.position.x + u.position.y))
+        .collect(Collectors.toList());
   }
 
   /**

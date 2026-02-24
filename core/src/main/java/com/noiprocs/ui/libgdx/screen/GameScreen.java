@@ -15,6 +15,7 @@ import com.noiprocs.resources.UIConfig;
 import com.noiprocs.settings.SettingsManager;
 import com.noiprocs.ui.console.hitbox.ConsoleHitboxManager;
 import com.noiprocs.ui.console.sprite.ConsoleSpriteManager;
+import com.noiprocs.ui.libgdx.HitboxDebugRenderer;
 import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
 import com.noiprocs.ui.libgdx.util.UIStyleHelper;
@@ -41,6 +42,7 @@ public class GameScreen implements Screen {
   private final String platform;
 
   private LibGDXGameScreen gameScreen;
+  private HitboxDebugRenderer hitboxDebugRenderer;
   private GameContext gameContext;
   private Thread gameThread;
   private Stage uiStage;
@@ -85,6 +87,7 @@ public class GameScreen implements Screen {
     int screenHeight = Math.round(virtualHeight / UIConfig.CHAR_SIZE);
     int screenWidth = Math.round(virtualWidth / UIConfig.CHAR_SIZE);
     gameScreen = new LibGDXGameScreen(screenHeight, screenWidth, 12000);
+    hitboxDebugRenderer = new HitboxDebugRenderer(gameScreen);
 
     gameContext =
         GameContext.build(
@@ -162,6 +165,15 @@ public class GameScreen implements Screen {
         UIConfig.CHAR_SIZE,
         viewport.getWorldHeight());
     renderResources.getBatch().end();
+
+    if (settingsManager.isDebugMode()) {
+      renderResources.getShapeRenderer().setProjectionMatrix(camera.combined);
+      hitboxDebugRenderer.render(
+          renderResources.getShapeRenderer(),
+          UIConfig.CHAR_SIZE,
+          UIConfig.CHAR_SIZE,
+          viewport.getWorldHeight());
+    }
 
     virtualControlsRenderer.run();
 
