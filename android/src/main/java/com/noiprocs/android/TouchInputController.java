@@ -102,6 +102,7 @@ public class TouchInputController implements InputController {
 
       if (offset.x != 0 || offset.y != 0) {
         anyMovementActive = true;
+        offset = snapToEightDirections(offset);
         // Isometric: screen-right = northeast, screen-up = northwest
         // game.x = -(offset.x + offset.y), game.y = (offset.x - offset.y)
         Vector3D direction =
@@ -146,6 +147,13 @@ public class TouchInputController implements InputController {
 
     // Update movement state for next frame
     touchState.updateMovementState(anyMovementActive);
+  }
+
+  /** Snaps a joystick offset to the nearest of 8 directions (multiples of 45°). */
+  private Vector2 snapToEightDirections(Vector2 offset) {
+    double angle = Math.atan2(offset.y, offset.x);
+    double snappedAngle = Math.round(angle / (Math.PI / 4)) * (Math.PI / 4);
+    return new Vector2((float) Math.cos(snappedAngle), (float) Math.sin(snappedAngle));
   }
 
   /** Get the touch state for rendering purposes. */

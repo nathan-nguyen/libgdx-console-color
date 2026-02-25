@@ -36,6 +36,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
   protected final int renderRange;
   private HUDManager hudManager;
   private final ModelTextureManager modelTextureManager;
+  private final OcclusionAlphaResolver occlusionAlphaResolver = new OcclusionAlphaResolver();
 
   public LibGDXGameScreen(
       int height, int width, int renderRange, ModelTextureManager modelTextureManager) {
@@ -122,7 +123,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
         float imgW = texConfig.textureRegion.getRegionWidth() * texConfig.scaleX;
         float imgH = texConfig.textureRegion.getRegionHeight() * texConfig.scaleY;
         float alpha =
-            OcclusionAlphaResolver.resolve(
+            occlusionAlphaResolver.resolve(
                 model,
                 playerModel,
                 charWidth,
@@ -171,37 +172,21 @@ public class LibGDXGameScreen implements GameScreenInterface {
         baseScreenY = anchorScreenY + consoleTexture.offsetX * UIConfig.CHAR_HEIGHT;
       }
 
-      float alpha = OcclusionAlphaResolver.FULL_ALPHA;
-      if (texture.length > 0 && texture[0].length > 0) {
-        int rows = texture.length;
-        int cols = texture[0].length;
-        float spritMinSX, spritMaxSX, spritMinSY, spritMaxSY;
-        if (isoTexture) {
-          float isoOffset = charWidth * (width + height) / 4f;
-          float hw = (height + width) / 2f;
-          spritMinSX = (posY - posX - (rows - 1)) * charWidth / 2f + isoOffset;
-          spritMaxSX = (posY + (cols - 1) - posX) * charWidth / 2f + isoOffset;
-          spritMaxSY = virtualHeight / 2f + charHeight / 4f * (hw - posX - posY);
-          spritMinSY =
-              virtualHeight / 2f + charHeight / 4f * (hw - posX - (rows - 1) - posY - (cols - 1));
-        } else {
-          spritMinSX = baseScreenX;
-          spritMaxSX = baseScreenX + cols * UIConfig.CHAR_WIDTH;
-          spritMinSY = baseScreenY - rows * UIConfig.CHAR_HEIGHT;
-          spritMaxSY = baseScreenY;
-        }
-        alpha =
-            OcclusionAlphaResolver.resolve(
-                model,
-                playerModel,
-                charWidth,
-                width,
-                virtualHeight,
-                spritMinSX,
-                spritMaxSX,
-                spritMinSY,
-                spritMaxSY);
-      }
+      float alpha =
+          occlusionAlphaResolver.resolve(
+              model,
+              playerModel,
+              texture,
+              isoTexture,
+              posX,
+              posY,
+              baseScreenX,
+              baseScreenY,
+              charWidth,
+              charHeight,
+              width,
+              height,
+              virtualHeight);
 
       for (int i = 0; i < texture.length; i++) {
         for (int j = 0; j < texture[0].length; j++) {
