@@ -5,5 +5,40 @@
     "offsetY": -145,
     "scaleX": 0.63,
     "scaleY": 0.55
+  },
+  "com.noiprocs.gameplay.model.item.WoodLogItem": {
+    "imagePath": "icons/wood_log.png",
+    "offsetX": -6,
+    "offsetY": -11,
+    "scaleX": 0.03,
+    "scaleY": 0.03
+  },
+  "com.noiprocs.gameplay.model.item.SaplingItem": {
+    "imagePath": "icons/sapling.png",
+    "offsetX": -9,
+    "offsetY": -14,
+    "scaleX": 0.03,
+    "scaleY": 0.03
+  },
+  "com.noiprocs.gameplay.model.item.AppleItem": {
+    "imagePath": "icons/apple.png",
+    "offsetX": -8,
+    "offsetY": -13,
+    "scaleX": 0.03,
+    "scaleY": 0.03
+  },
+  "com.noiprocs.gameplay.model.item.PebbleItem": {
+    "imagePath": "icons/pebble.png",
+    "offsetX": -10,
+    "offsetY": -15,
+    "scaleX": 0.04,
+    "scaleY": 0.04
+  },
+  "com.noiprocs.gameplay.model.item.TreeBranchItem": {
+    "imagePath": "icons/tree_branch.png",
+    "offsetX": -10,
+    "offsetY": -10,
+    "scaleX": 0.03,
+    "scaleY": 0.03
   }
 }

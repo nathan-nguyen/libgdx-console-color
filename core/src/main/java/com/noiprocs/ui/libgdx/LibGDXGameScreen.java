@@ -35,7 +35,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
   protected final int width;
   protected final int renderRange;
   private HUDManager hudManager;
-  private ModelTextureManager modelTextureManager;
+  private final ModelTextureManager modelTextureManager;
 
   public LibGDXGameScreen(
       int height, int width, int renderRange, ModelTextureManager modelTextureManager) {
@@ -102,8 +102,14 @@ public class LibGDXGameScreen implements GameScreenInterface {
 
     Color originalColor = batch.getColor().cpy();
 
+    int playerDepth = playerModel.position.x + playerModel.position.y;
+    float playerScreenX = charWidth * width / 2f;
+    float playerScreenY = virtualHeight / 2f;
+
     for (Model model : renderableModelList) {
       logger.debug("Rendering model {}", model);
+
+      boolean isDeeper = model.position.x + model.position.y > playerDepth;
 
       ModelTextureManager.TextureConfig texConfig =
           modelTextureManager != null ? modelTextureManager.getConfig(model) : null;
@@ -121,7 +127,16 @@ public class LibGDXGameScreen implements GameScreenInterface {
                 + texConfig.offsetY;
         float imgW = texConfig.textureRegion.getRegionWidth() * texConfig.scaleX;
         float imgH = texConfig.textureRegion.getRegionHeight() * texConfig.scaleY;
-        batch.setColor(Color.WHITE);
+        float alpha =
+            OcclusionAlphaResolver.resolve(
+                isDeeper,
+                playerScreenX,
+                playerScreenY,
+                screenX,
+                screenX + imgW,
+                screenY,
+                screenY + imgH);
+        batch.setColor(1f, 1f, 1f, alpha);
         batch.draw(texConfig.textureRegion, screenX, screenY, imgW, imgH);
         continue;
       }
@@ -135,8 +150,8 @@ public class LibGDXGameScreen implements GameScreenInterface {
       float posY = (float) model.position.y / Config.WORLD_SCALE - offsetY - consoleTexture.offsetY;
 
       if (model.id.equals(playerModel.id)) {
-        posX = height / 2 - consoleTexture.offsetX;
-        posY = width / 2 - consoleTexture.offsetY;
+        posX = height / 2f - consoleTexture.offsetX;
+        posY = width / 2f - consoleTexture.offsetY;
       }
 
       char overrideColor = 0;
@@ -158,6 +173,36 @@ public class LibGDXGameScreen implements GameScreenInterface {
             virtualHeight / 2f + charHeight / 4f * ((height + width) / 2f - anchorX - anchorY);
         baseScreenX = anchorScreenX - consoleTexture.offsetY * UIConfig.CHAR_WIDTH;
         baseScreenY = anchorScreenY + consoleTexture.offsetX * UIConfig.CHAR_HEIGHT;
+      }
+
+      float alpha = OcclusionAlphaResolver.FULL_ALPHA;
+      if (texture.length > 0 && texture[0].length > 0) {
+        int rows = texture.length;
+        int cols = texture[0].length;
+        float spritMinSX, spritMaxSX, spritMinSY, spritMaxSY;
+        if (isoTexture) {
+          float isoOffset = charWidth * (width + height) / 4f;
+          float hw = (height + width) / 2f;
+          spritMinSX = (posY - posX - (rows - 1)) * charWidth / 2f + isoOffset;
+          spritMaxSX = (posY + (cols - 1) - posX) * charWidth / 2f + isoOffset;
+          spritMaxSY = virtualHeight / 2f + charHeight / 4f * (hw - posX - posY);
+          spritMinSY =
+              virtualHeight / 2f + charHeight / 4f * (hw - posX - (rows - 1) - posY - (cols - 1));
+        } else {
+          spritMinSX = baseScreenX;
+          spritMaxSX = baseScreenX + cols * UIConfig.CHAR_WIDTH;
+          spritMinSY = baseScreenY - rows * UIConfig.CHAR_HEIGHT;
+          spritMaxSY = baseScreenY;
+        }
+        alpha =
+            OcclusionAlphaResolver.resolve(
+                isDeeper,
+                playerScreenX,
+                playerScreenY,
+                spritMinSX,
+                spritMaxSX,
+                spritMinSY,
+                spritMaxSY);
       }
 
       for (int i = 0; i < texture.length; i++) {
@@ -185,7 +230,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
                 (colorChar != 0)
                     ? COLOR_CHAR_MAP.getOrDefault(colorChar, Color.WHITE)
                     : Color.WHITE;
-            batch.setColor(color);
+            batch.setColor(color.r, color.g, color.b, alpha);
             renderCharAtPosition(batch, font, texture[i][j], screenX, screenY);
           }
         }
@@ -220,11 +265,11 @@ public class LibGDXGameScreen implements GameScreenInterface {
   }
 
   float getOffsetX(Model playerModel) {
-    return (float) playerModel.position.x / Config.WORLD_SCALE - height / 2;
+    return (float) playerModel.position.x / Config.WORLD_SCALE - height / 2f;
   }
 
   float getOffsetY(Model playerModel) {
-    return (float) playerModel.position.y / Config.WORLD_SCALE - width / 2;
+    return (float) playerModel.position.y / Config.WORLD_SCALE - width / 2f;
   }
 
   List<Model> getRenderableModels(Model playerModel) {

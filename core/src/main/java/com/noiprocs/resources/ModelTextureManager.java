@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.noiprocs.core.model.item.ItemModel;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,6 +64,9 @@ public class ModelTextureManager implements Disposable {
   /** Returns the texture config for the given model instance, or null if none is configured. */
   public TextureConfig getConfig(Object model) {
     if (model == null) return null;
+    if (model instanceof ItemModel) {
+      return configs.get(((ItemModel) model).itemClass.getName());
+    }
     return configs.get(model.getClass().getName());
   }
 
