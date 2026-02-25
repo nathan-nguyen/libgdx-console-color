@@ -1,9 +1,14 @@
 package com.noiprocs.ui.libgdx;
 
+import com.noiprocs.core.model.Model;
+import com.noiprocs.gameplay.model.environment.MazePartModel;
+
 /**
- * Determines the render alpha for a model that may occlude the player. Alpha fades smoothly from
- * FULL_ALPHA to OCCLUDED_ALPHA as the player's screen position approaches and enters the model's
- * screen bounding box, avoiding the abrupt flash of a hard cutoff.
+ * Determines the render alpha for a model that may occlude the player. Only models for which
+ * {@link #isOccludable} returns true can have reduced alpha. A model occludes the player when it
+ * is isometrically deeper (x+y greater) than the player. Alpha fades smoothly from FULL_ALPHA to
+ * OCCLUDED_ALPHA as the player's screen position approaches and enters the model's screen bounding
+ * box, avoiding the abrupt flash of a hard cutoff.
  */
 public class OcclusionAlphaResolver {
 
@@ -13,15 +18,36 @@ public class OcclusionAlphaResolver {
   /** Pixel radius around the bounding box over which the fade transition occurs. */
   private static final float FADE_DISTANCE = 80f;
 
+  private static boolean isOccludable(Model model) {
+    return model instanceof MazePartModel;
+  }
+
+  private static boolean isDeeper(Model model, Model playerModel) {
+    return model.position.x + model.position.y > playerModel.position.x + playerModel.position.y;
+  }
+
+  private static float playerScreenX(float charWidth, int width) {
+    return charWidth * width / 2f;
+  }
+
+  private static float playerScreenY(float virtualHeight) {
+    return virtualHeight / 2f;
+  }
+
   public static float resolve(
-      boolean isDeeper,
-      float playerScreenX,
-      float playerScreenY,
+      Model model,
+      Model playerModel,
+      float charWidth,
+      int width,
+      float virtualHeight,
       float minX,
       float maxX,
       float minY,
       float maxY) {
-    if (!isDeeper) return FULL_ALPHA;
+    if (!isOccludable(model) || !isDeeper(model, playerModel)) return FULL_ALPHA;
+
+    float playerScreenX = playerScreenX(charWidth, width);
+    float playerScreenY = playerScreenY(virtualHeight);
 
     // Distance from the player's screen point to the nearest point on the bounding box.
     // Zero when the player is inside the box.

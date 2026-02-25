@@ -102,14 +102,8 @@ public class LibGDXGameScreen implements GameScreenInterface {
 
     Color originalColor = batch.getColor().cpy();
 
-    int playerDepth = playerModel.position.x + playerModel.position.y;
-    float playerScreenX = charWidth * width / 2f;
-    float playerScreenY = virtualHeight / 2f;
-
     for (Model model : renderableModelList) {
       logger.debug("Rendering model {}", model);
-
-      boolean isDeeper = model.position.x + model.position.y > playerDepth;
 
       ModelTextureManager.TextureConfig texConfig =
           modelTextureManager != null ? modelTextureManager.getConfig(model) : null;
@@ -129,9 +123,11 @@ public class LibGDXGameScreen implements GameScreenInterface {
         float imgH = texConfig.textureRegion.getRegionHeight() * texConfig.scaleY;
         float alpha =
             OcclusionAlphaResolver.resolve(
-                isDeeper,
-                playerScreenX,
-                playerScreenY,
+                model,
+                playerModel,
+                charWidth,
+                width,
+                virtualHeight,
                 screenX,
                 screenX + imgW,
                 screenY,
@@ -196,9 +192,11 @@ public class LibGDXGameScreen implements GameScreenInterface {
         }
         alpha =
             OcclusionAlphaResolver.resolve(
-                isDeeper,
-                playerScreenX,
-                playerScreenY,
+                model,
+                playerModel,
+                charWidth,
+                width,
+                virtualHeight,
                 spritMinSX,
                 spritMaxSX,
                 spritMinSY,

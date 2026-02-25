@@ -1,4 +1,25 @@
 {
+  "com.noiprocs.gameplay.model.building.ChestModel": {
+    "imagePath": "textures/chest.png",
+    "offsetX": -25,
+    "offsetY": -30,
+    "scaleX": 0.1,
+    "scaleY": 0.1
+  },
+  "com.noiprocs.gameplay.model.building.MazeExitPortalModel": {
+    "imagePath": "textures/portal.png",
+    "offsetX": -75,
+    "offsetY": -50,
+    "scaleX": 0.3,
+    "scaleY": 0.3
+  },
+  "com.noiprocs.gameplay.model.building.PortalModel": {
+    "imagePath": "textures/portal.png",
+    "offsetX": -75,
+    "offsetY": -50,
+    "scaleX": 0.3,
+    "scaleY": 0.3
+  },
   "com.noiprocs.gameplay.model.environment.MazePartModel": {
     "imagePath": "textures/maze_wall.png",
     "offsetX": -155,
