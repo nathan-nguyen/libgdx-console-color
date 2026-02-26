@@ -263,7 +263,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
             model ->
                 model.isVisible
                     && model.position.manhattanDistanceTo(playerModel.position) <= renderRange)
-        .sorted(Comparator.comparingInt(u -> u.position.x + u.position.y))
+        .sorted(Comparator.comparingInt(IsometricRenderPolicy::isoDepth))
         .collect(Collectors.toList());
   }
 

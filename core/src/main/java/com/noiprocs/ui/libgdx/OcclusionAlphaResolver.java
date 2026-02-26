@@ -17,14 +17,14 @@ public class OcclusionAlphaResolver {
   public final float OCCLUDED_ALPHA = 0.3f;
 
   /** Pixel radius around the bounding box over which the fade transition occurs. */
-  private final float FADE_DISTANCE = 80f;
+  private final float FADE_DISTANCE = 2f;
 
   private boolean isOccludable(Model model) {
     return model instanceof MazePartModel;
   }
 
   private boolean isDeeper(Model model, Model playerModel) {
-    return model.position.x + model.position.y > playerModel.position.x + playerModel.position.y;
+    return IsometricRenderPolicy.isoDepth(model) > IsometricRenderPolicy.isoDepth(playerModel);
   }
 
   private float playerScreenX(float charWidth, int width) {
