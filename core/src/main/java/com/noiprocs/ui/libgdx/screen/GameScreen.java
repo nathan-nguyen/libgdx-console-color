@@ -165,7 +165,8 @@ public class GameScreen implements Screen {
         renderResources.getFont(),
         UIConfig.CHAR_SIZE,
         UIConfig.CHAR_SIZE,
-        viewport.getWorldHeight());
+        viewport.getWorldHeight(),
+        settingsManager.isDebugMode());
     renderResources.getBatch().end();
 
     if (settingsManager.isDebugMode()) {

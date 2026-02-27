@@ -21,4 +21,8 @@ public class IsometricRenderPolicy {
         || model instanceof WallTrapModel
         || model instanceof MazePartModel;
   }
+
+  public static boolean useImageTexture(Model model, boolean isDebugMode) {
+    return !(isDebugMode && model instanceof MazePartModel);
+  }
 }

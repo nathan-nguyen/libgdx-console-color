@@ -90,7 +90,12 @@ public class LibGDXGameScreen implements GameScreenInterface {
   }
 
   public void renderWithBatch(
-      SpriteBatch batch, BitmapFont font, float charWidth, float charHeight, float virtualHeight) {
+      SpriteBatch batch,
+      BitmapFont font,
+      float charWidth,
+      float charHeight,
+      float virtualHeight,
+      boolean debugMode) {
     GameContext gameContext = GameContext.get();
     Model playerModel = gameContext.modelManager.getModel(gameContext.username);
     if (playerModel == null) return;
@@ -109,7 +114,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
       ModelTextureManager.TextureConfig texConfig =
           modelTextureManager != null ? modelTextureManager.getConfig(model) : null;
 
-      if (texConfig != null) {
+      if (texConfig != null && IsometricRenderPolicy.useImageTexture(model, debugMode)) {
         float modelX = (float) model.position.x / Config.WORLD_SCALE - offsetX;
         float modelY = (float) model.position.y / Config.WORLD_SCALE - offsetY;
         float screenX =
