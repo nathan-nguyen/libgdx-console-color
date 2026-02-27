@@ -7,15 +7,14 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
-import com.noiprocs.core.model.item.ItemModel;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Manages image textures for model rendering. Loads mappings from model-textures.json, keyed by
- * full model class name. Each entry configures the image path and rendering parameters.
+ * Loads image textures for models from model-textures.json, keyed by full model class name. Each
+ * entry configures the image path and rendering parameters.
  */
-public class ModelTextureManager implements Disposable {
+public class ModelTextureLoader implements Disposable {
 
   private static final String MODEL_TEXTURES_JSON = "model-textures.json";
 
@@ -38,7 +37,7 @@ public class ModelTextureManager implements Disposable {
 
   private final Map<String, TextureConfig> configs = new HashMap<>();
 
-  public ModelTextureManager() {
+  public ModelTextureLoader() {
     FileHandle jsonFile = Gdx.files.internal(MODEL_TEXTURES_JSON);
     if (!jsonFile.exists()) return;
 
@@ -61,13 +60,9 @@ public class ModelTextureManager implements Disposable {
     }
   }
 
-  /** Returns the texture config for the given model instance, or null if none is configured. */
-  public TextureConfig getConfig(Object model) {
-    if (model == null) return null;
-    if (model instanceof ItemModel) {
-      return configs.get(((ItemModel) model).itemClass.getName());
-    }
-    return configs.get(model.getClass().getName());
+  /** Returns the texture config for the given class name, or null if none is configured. */
+  public TextureConfig getConfig(String className) {
+    return configs.get(className);
   }
 
   @Override

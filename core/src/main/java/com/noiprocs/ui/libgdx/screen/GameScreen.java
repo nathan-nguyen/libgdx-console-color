@@ -18,6 +18,7 @@ import com.noiprocs.ui.console.sprite.ConsoleSpriteManager;
 import com.noiprocs.ui.libgdx.HitboxDebugRenderer;
 import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
+import com.noiprocs.ui.libgdx.sprite.LibGDXSpriteManager;
 import com.noiprocs.ui.libgdx.util.UIStyleHelper;
 import com.noiprocs.ui.libgdx.widget.MenuOverlay;
 import java.util.function.Consumer;
@@ -88,7 +89,10 @@ public class GameScreen implements Screen {
     int screenWidth = Math.round(virtualWidth / UIConfig.CHAR_SIZE);
     gameScreen =
         new LibGDXGameScreen(
-            screenHeight, screenWidth, 12000, renderResources.getModelTextureManager());
+            screenHeight,
+            screenWidth,
+            12000,
+            new LibGDXSpriteManager(renderResources.getModelTextureLoader()));
     hitboxDebugRenderer = new HitboxDebugRenderer(gameScreen);
 
     gameContext =

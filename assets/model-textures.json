@@ -1,11 +1,4 @@
 {
-  "com.noiprocs.core.model.mob.character.PlayerModel": {
-    "imagePath": "textures/player.png",
-    "offsetX": -60,
-    "offsetY": -35,
-    "scaleX": 0.11,
-    "scaleY": 0.11
-  },
   "com.noiprocs.gameplay.model.building.ChestModel": {
     "imagePath": "textures/chest.png",
     "offsetX": -45,
@@ -69,24 +62,10 @@
     "scaleX": 0.05,
     "scaleY": 0.05
   },
-  "com.noiprocs.gameplay.model.mob.CotMobModel": {
-    "imagePath": "textures/cot_mob.png",
-    "offsetX": -45,
-    "offsetY": -35,
-    "scaleX": 0.08,
-    "scaleY": 0.08
-  },
-  "com.noiprocs.gameplay.model.mob.character.GolemModel": {
-    "imagePath": "textures/stone_golem.png",
-    "offsetX": -55,
-    "offsetY": -45,
-    "scaleX": 0.1,
-    "scaleY": 0.1
-  },
   "com.noiprocs.gameplay.model.plant.BirchTreeModel": {
     "imagePath": "textures/birch_tree.png",
     "offsetX": -115,
-    "offsetY": -110,
+    "offsetY": -65,
     "scaleX": 0.25,
     "scaleY": 0.25
   },

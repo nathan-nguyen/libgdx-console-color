@@ -14,12 +14,13 @@ import com.noiprocs.core.model.event.EventType;
 import com.noiprocs.core.model.manager.ClientModelManager;
 import com.noiprocs.core.model.mob.character.HumanoidModel;
 import com.noiprocs.core.model.mob.character.PlayerModel;
-import com.noiprocs.resources.ModelTextureManager;
+import com.noiprocs.resources.ModelTextureLoader.TextureConfig;
 import com.noiprocs.resources.UIConfig;
 import com.noiprocs.ui.console.sprite.ConsoleSprite;
 import com.noiprocs.ui.console.sprite.ConsoleTexture;
 import com.noiprocs.ui.console.util.ColorMapper;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
+import com.noiprocs.ui.libgdx.sprite.LibGDXSpriteManager;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -35,15 +36,15 @@ public class LibGDXGameScreen implements GameScreenInterface {
   protected final int width;
   protected final int renderRange;
   private HUDManager hudManager;
-  private final ModelTextureManager modelTextureManager;
+  private final LibGDXSpriteManager libgdxSpriteManager;
   private final OcclusionAlphaResolver occlusionAlphaResolver = new OcclusionAlphaResolver();
 
   public LibGDXGameScreen(
-      int height, int width, int renderRange, ModelTextureManager modelTextureManager) {
+      int height, int width, int renderRange, LibGDXSpriteManager libgdxSpriteManager) {
     this.height = height;
     this.width = width;
     this.renderRange = renderRange;
-    this.modelTextureManager = modelTextureManager;
+    this.libgdxSpriteManager = libgdxSpriteManager;
   }
 
   // Color character to libGDX Color mapping
@@ -111,8 +112,8 @@ public class LibGDXGameScreen implements GameScreenInterface {
     for (Model model : renderableModelList) {
       logger.debug("Rendering model {}", model);
 
-      ModelTextureManager.TextureConfig texConfig =
-          modelTextureManager != null ? modelTextureManager.getConfig(model) : null;
+      TextureConfig texConfig =
+          libgdxSpriteManager != null ? libgdxSpriteManager.getConfig(model) : null;
 
       if (texConfig != null && IsometricRenderPolicy.useImageTexture(model, debugMode)) {
         float modelX = (float) model.position.x / Config.WORLD_SCALE - offsetX;
@@ -138,6 +139,15 @@ public class LibGDXGameScreen implements GameScreenInterface {
                 screenX + imgW,
                 screenY,
                 screenY + imgH);
+        if (gameContext.modelManager.hasActiveEvent(model.id, EventType.HURT)) {
+          float blurAlpha = alpha * 0.35f;
+          batch.setColor(1f, 1f, 1f, blurAlpha);
+          for (float dx : new float[] {-3f, 3f, 0f, 0f}) {
+            for (float dy : new float[] {0f, 0f, -3f, 3f}) {
+              batch.draw(texConfig.textureRegion, screenX + dx, screenY + dy, imgW, imgH);
+            }
+          }
+        }
         batch.setColor(1f, 1f, 1f, alpha);
         batch.draw(texConfig.textureRegion, screenX, screenY, imgW, imgH);
         continue;

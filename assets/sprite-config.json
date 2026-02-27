@@ -1,0 +1,31 @@
+{
+  "sprites": [
+    {
+      "modelClasses": ["com.noiprocs.core.model.mob.character.PlayerModel"],
+      "imagePath": "textures/player.png",
+      "offsetX": -60,
+      "offsetY": -35,
+      "scaleX": 0.11,
+      "scaleY": 0.11,
+      "spriteClass": "com.noiprocs.ui.libgdx.sprite.PlayerSprite"
+    },
+    {
+      "modelClasses": ["com.noiprocs.gameplay.model.mob.CotMobModel"],
+      "imagePath": "textures/cot_mob.png",
+      "offsetX": -45,
+      "offsetY": -35,
+      "scaleX": 0.08,
+      "scaleY": 0.08,
+      "spriteClass": "com.noiprocs.ui.libgdx.sprite.CotMobSprite"
+    },
+    {
+      "modelClasses": ["com.noiprocs.gameplay.model.mob.character.GolemModel"],
+      "imagePath": "textures/stone_golem.png",
+      "offsetX": -55,
+      "offsetY": -45,
+      "scaleX": 0.1,
+      "scaleY": 0.1,
+      "spriteClass": "com.noiprocs.ui.libgdx.sprite.GolemSprite"
+    }
+  ]
+}
