@@ -96,7 +96,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
       float charWidth,
       float charHeight,
       float virtualHeight,
-      boolean debugMode) {
+      boolean showWalls) {
     GameContext gameContext = GameContext.get();
     Model playerModel = gameContext.modelManager.getModel(gameContext.username);
     if (playerModel == null) return;
@@ -115,7 +115,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
       TextureConfig texConfig =
           libgdxSpriteManager != null ? libgdxSpriteManager.getConfig(model) : null;
 
-      if (texConfig != null && IsometricRenderPolicy.useImageTexture(model, debugMode)) {
+      if (texConfig != null && IsometricRenderPolicy.useImageTexture(model, showWalls)) {
         float modelX = (float) model.position.x / Config.WORLD_SCALE - offsetX;
         float modelY = (float) model.position.y / Config.WORLD_SCALE - offsetY;
         float screenX =

@@ -22,7 +22,7 @@ public class IsometricRenderPolicy {
         || model instanceof MazePartModel;
   }
 
-  public static boolean useImageTexture(Model model, boolean isDebugMode) {
-    return !(isDebugMode && model instanceof MazePartModel);
+  public static boolean useImageTexture(Model model, boolean showWalls) {
+    return showWalls || !(model instanceof MazePartModel);
   }
 }

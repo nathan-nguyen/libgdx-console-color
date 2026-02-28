@@ -6,6 +6,20 @@
     "scaleX": 0.08,
     "scaleY": 0.08
   },
+  "com.noiprocs.gameplay.model.building.FenceModel": {
+    "imagePath": "icons/fence.png",
+    "offsetX": -30,
+    "offsetY": -40,
+    "scaleX": 0.06,
+    "scaleY": 0.06
+  },
+  "com.noiprocs.gameplay.model.building.IronHorseModel": {
+    "imagePath": "textures/iron_horse.png",
+    "offsetX": -100,
+    "offsetY": -95,
+    "scaleX": 0.2,
+    "scaleY": 0.2
+  },
   "com.noiprocs.gameplay.model.building.MazeExitPortalModel": {
     "imagePath": "textures/portal.png",
     "offsetX": -110,
@@ -57,17 +71,17 @@
   },
   "com.noiprocs.gameplay.model.item.TreeBranchItem": {
     "imagePath": "icons/tree_branch.png",
-    "offsetX": -25,
-    "offsetY": -35,
+    "offsetX": -35,
+    "offsetY": -38,
     "scaleX": 0.05,
     "scaleY": 0.05
   },
   "com.noiprocs.gameplay.model.plant.BirchTreeModel": {
     "imagePath": "textures/birch_tree.png",
-    "offsetX": -115,
-    "offsetY": -65,
-    "scaleX": 0.25,
-    "scaleY": 0.25
+    "offsetX": -155,
+    "offsetY": -55,
+    "scaleX": 0.3,
+    "scaleY": 0.3
   },
   "com.noiprocs.gameplay.model.plant.PineTreeModel": {
     "imagePath": "textures/pine_tree.png",

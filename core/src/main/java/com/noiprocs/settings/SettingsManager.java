@@ -15,12 +15,14 @@ public class SettingsManager {
   private static final String KEY_HOSTNAME = "hostname";
   private static final String KEY_PORT = "port";
   private static final String KEY_DEBUG_MODE = "debugMode";
+  private static final String KEY_SHOW_WALLS = "showWalls";
 
   // Default values
   private static final String DEFAULT_USERNAME = "player";
   private static final String DEFAULT_HOSTNAME = "localhost";
   private static final int DEFAULT_PORT = 8080;
   private static final boolean DEFAULT_DEBUG_MODE = false;
+  private static final boolean DEFAULT_SHOW_WALLS = true;
 
   private final Preferences prefs;
 
@@ -98,6 +100,14 @@ public class SettingsManager {
    */
   public void setDebugMode(boolean debugMode) {
     prefs.putBoolean(KEY_DEBUG_MODE, debugMode);
+  }
+
+  public boolean isShowWalls() {
+    return prefs.getBoolean(KEY_SHOW_WALLS, DEFAULT_SHOW_WALLS);
+  }
+
+  public void setShowWalls(boolean showWalls) {
+    prefs.putBoolean(KEY_SHOW_WALLS, showWalls);
   }
 
   /**
