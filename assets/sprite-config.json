@@ -2,7 +2,7 @@
   "sprites": [
     {
       "modelClasses": ["com.noiprocs.core.model.mob.character.PlayerModel"],
-      "spriteClass": "com.noiprocs.ui.libgdx.sprite.PlayerSprite",
+      "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.character.PlayerSprite",
       "images": {
         "default": {
           "imagePath": "textures/player_down.png",
@@ -19,12 +19,28 @@
           "offsetY": -30,
           "scaleX": 0.11,
           "scaleY": 0.11
+        },
+        "down_action": {
+          "imagePath": "textures/player_down_action.png",
+          "offsetX": -60,
+          "offsetY": -35,
+          "flippedOffsetX": -55,
+          "flippedOffsetY": -35,
+          "scaleX": 0.11,
+          "scaleY": 0.11
+        },
+        "up_action": {
+          "imagePath": "textures/player_up_action.png",
+          "offsetX": -55,
+          "offsetY": -30,
+          "scaleX": 0.11,
+          "scaleY": 0.11
         }
       }
     },
     {
       "modelClasses": ["com.noiprocs.gameplay.model.mob.CotMobModel"],
-      "spriteClass": "com.noiprocs.ui.libgdx.sprite.CotMobSprite",
+      "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.CotMobSprite",
       "images": {
         "default": {
           "imagePath": "textures/cot_mob_down.png",
@@ -43,21 +59,93 @@
           "flippedOffsetY": -35,
           "scaleX": 0.08,
           "scaleY": 0.08
+        },
+        "down_action": {
+          "imagePath": "textures/cot_mob_down_action.png",
+          "offsetX": -45,
+          "offsetY": -35,
+          "flippedOffsetX": -35,
+          "flippedOffsetY": -35,
+          "scaleX": 0.08,
+          "scaleY": 0.08
+        },
+        "up_action": {
+          "imagePath": "textures/cot_mob_up_action.png",
+          "offsetX": -45,
+          "offsetY": -35,
+          "flippedOffsetX": -35,
+          "flippedOffsetY": -35,
+          "scaleX": 0.08,
+          "scaleY": 0.08
         }
       }
     },
     {
       "modelClasses": ["com.noiprocs.gameplay.model.mob.character.GolemModel"],
-      "spriteClass": "com.noiprocs.ui.libgdx.sprite.GolemSprite",
+      "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.character.GolemSprite",
       "images": {
         "default": {
-          "imagePath": "textures/stone_golem.png",
+          "imagePath": "textures/stone_golem_down.png",
           "offsetX": -55,
           "offsetY": -45,
           "flippedOffsetX": -55,
           "flippedOffsetY": -40,
           "scaleX": 0.1,
           "scaleY": 0.1
+        },
+        "up": {
+          "imagePath": "textures/stone_golem_up.png",
+          "offsetX": -55,
+          "offsetY": -45,
+          "flippedOffsetX": -55,
+          "flippedOffsetY": -40,
+          "scaleX": 0.1,
+          "scaleY": 0.1
+        },
+        "down_action": {
+          "imagePath": "textures/stone_golem_down_action.png",
+          "offsetX": -55,
+          "offsetY": -45,
+          "flippedOffsetX": -55,
+          "flippedOffsetY": -40,
+          "scaleX": 0.1,
+          "scaleY": 0.1
+        },
+        "up_action": {
+          "imagePath": "textures/stone_golem_up_action.png",
+          "offsetX": -55,
+          "offsetY": -45,
+          "flippedOffsetX": -55,
+          "flippedOffsetY": -40,
+          "scaleX": 0.1,
+          "scaleY": 0.1
+        }
+      }
+    },
+    {
+      "modelClasses": ["com.noiprocs.gameplay.model.plant.TreeModel"],
+      "spriteClass": "com.noiprocs.ui.libgdx.sprite.plant.TreeSprite",
+      "images": {
+        "default": {
+          "imagePath": "textures/oak_tree_mature.png",
+          "offsetX": -150,
+          "offsetY": -75,
+          "scaleX": 0.3,
+          "scaleY": 0.3
+        },
+        "young": {
+          "imagePath": "textures/oak_tree_young.png",
+          "offsetX": -35,
+          "offsetY": -35,
+          "scaleX": 0.07,
+          "scaleY": 0.07
+        },
+        "middle": {
+          "imagePath": "textures/oak_tree_middle.png",
+          "offsetX": -80,
+          "offsetY": -50,
+          "scaleX": 0.16,
+          "scaleY": 0.16
         }
       }
     }
