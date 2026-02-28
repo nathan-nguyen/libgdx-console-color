@@ -12,22 +12,22 @@ public class LibGDXSpriteFactory {
       String className, ModelTextureLoader textureLoader, SpriteConfigLoader spriteConfigLoader) {
     SpriteEntry entry = spriteConfigLoader.getEntry(className);
     if (entry != null) {
-      return instantiateSprite(entry.spriteClass, entry.textureConfig);
+      return instantiateSprite(entry.spriteClass, entry);
     }
 
     TextureConfig baseConfig = textureLoader.getConfig(className);
     return baseConfig != null ? new LibGDXSprite(baseConfig) : null;
   }
 
-  private static LibGDXSprite instantiateSprite(String spriteClass, TextureConfig config) {
+  private static LibGDXSprite instantiateSprite(String spriteClass, SpriteEntry entry) {
     if (spriteClass == null) {
-      return new LibGDXSprite(config);
+      return new LibGDXSprite(entry);
     }
     try {
-      Constructor<?> ctor = Class.forName(spriteClass).getConstructor(TextureConfig.class);
-      return (LibGDXSprite) ctor.newInstance(config);
+      Constructor<?> ctor = Class.forName(spriteClass).getConstructor(SpriteEntry.class);
+      return (LibGDXSprite) ctor.newInstance(entry);
     } catch (Exception e) {
-      return new LibGDXSprite(config);
+      return new LibGDXSprite(entry);
     }
   }
 }

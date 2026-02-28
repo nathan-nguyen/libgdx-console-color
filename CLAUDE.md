@@ -21,3 +21,15 @@
   `2*(position.x + position.y) + dim.x + dim.y`. The factor of 2 is intentional —
   it equals `near_corner_depth + far_corner_depth`, which is `2 × center_depth`.
 - Encapsulated in `IsometricRenderPolicy.isoDepth()`.
+
+### Direction → Screen Mapping
+World directions (from `Direction.java`) map to isometric screen directions as follows:
+- `NORTH (-1, 0)` → NE on screen
+- `SOUTH (+1, 0)` → SW on screen
+- `WEST (0, -1)` → NW on screen
+- `EAST (0, +1)` → SE on screen
+
+## Bug Fixing Principles
+
+### Fix at the source
+Always trace a bug to its root cause and fix it there. Never wrap or convert to work around a wrong type/value downstream (e.g. wrapping a HashMap in a ConcurrentHashMap) — change the original declaration to the correct type directly.

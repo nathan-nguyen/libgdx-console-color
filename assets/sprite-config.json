@@ -2,30 +2,64 @@
   "sprites": [
     {
       "modelClasses": ["com.noiprocs.core.model.mob.character.PlayerModel"],
-      "imagePath": "textures/player.png",
-      "offsetX": -60,
-      "offsetY": -35,
-      "scaleX": 0.11,
-      "scaleY": 0.11,
-      "spriteClass": "com.noiprocs.ui.libgdx.sprite.PlayerSprite"
+      "spriteClass": "com.noiprocs.ui.libgdx.sprite.PlayerSprite",
+      "images": {
+        "default": {
+          "imagePath": "textures/player_down.png",
+          "offsetX": -60,
+          "offsetY": -35,
+          "flippedOffsetX": -55,
+          "flippedOffsetY": -35,
+          "scaleX": 0.11,
+          "scaleY": 0.11
+        },
+        "up": {
+          "imagePath": "textures/player_up.png",
+          "offsetX": -55,
+          "offsetY": -30,
+          "scaleX": 0.11,
+          "scaleY": 0.11
+        }
+      }
     },
     {
       "modelClasses": ["com.noiprocs.gameplay.model.mob.CotMobModel"],
-      "imagePath": "textures/cot_mob.png",
-      "offsetX": -45,
-      "offsetY": -35,
-      "scaleX": 0.08,
-      "scaleY": 0.08,
-      "spriteClass": "com.noiprocs.ui.libgdx.sprite.CotMobSprite"
+      "spriteClass": "com.noiprocs.ui.libgdx.sprite.CotMobSprite",
+      "images": {
+        "default": {
+          "imagePath": "textures/cot_mob_down.png",
+          "offsetX": -45,
+          "offsetY": -35,
+          "flippedOffsetX": -35,
+          "flippedOffsetY": -35,
+          "scaleX": 0.08,
+          "scaleY": 0.08
+        },
+        "up": {
+          "imagePath": "textures/cot_mob_up.png",
+          "offsetX": -45,
+          "offsetY": -35,
+          "flippedOffsetX": -35,
+          "flippedOffsetY": -35,
+          "scaleX": 0.08,
+          "scaleY": 0.08
+        }
+      }
     },
     {
       "modelClasses": ["com.noiprocs.gameplay.model.mob.character.GolemModel"],
-      "imagePath": "textures/stone_golem.png",
-      "offsetX": -55,
-      "offsetY": -45,
-      "scaleX": 0.1,
-      "scaleY": 0.1,
-      "spriteClass": "com.noiprocs.ui.libgdx.sprite.GolemSprite"
+      "spriteClass": "com.noiprocs.ui.libgdx.sprite.GolemSprite",
+      "images": {
+        "default": {
+          "imagePath": "textures/stone_golem.png",
+          "offsetX": -55,
+          "offsetY": -45,
+          "flippedOffsetX": -55,
+          "flippedOffsetY": -40,
+          "scaleX": 0.1,
+          "scaleY": 0.1
+        }
+      }
     }
   ]
 }

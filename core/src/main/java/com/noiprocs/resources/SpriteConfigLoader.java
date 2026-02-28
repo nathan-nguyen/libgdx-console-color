@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.noiprocs.resources.ModelTextureLoader.TextureConfig;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,10 +24,13 @@ public class SpriteConfigLoader implements Disposable {
 
   public static class SpriteEntry {
     public final TextureConfig textureConfig;
+    public final Map<String, TextureConfig> namedConfigs;
     public final String spriteClass;
 
-    public SpriteEntry(TextureConfig textureConfig, String spriteClass) {
+    public SpriteEntry(
+        TextureConfig textureConfig, Map<String, TextureConfig> namedConfigs, String spriteClass) {
       this.textureConfig = textureConfig;
+      this.namedConfigs = namedConfigs;
       this.spriteClass = spriteClass;
     }
   }
@@ -43,28 +47,51 @@ public class SpriteConfigLoader implements Disposable {
     if (sprites == null) return;
 
     for (JsonValue entry = sprites.child; entry != null; entry = entry.next) {
-      String imagePath = entry.getString("imagePath");
-      float offsetX = entry.getFloat("offsetX", 0f);
-      float offsetY = entry.getFloat("offsetY", 0f);
-      float scaleX = entry.getFloat("scaleX", 1f);
-      float scaleY = entry.getFloat("scaleY", 1f);
       String spriteClass = entry.getString("spriteClass", null);
+      Map<String, TextureConfig> namedConfigs = new LinkedHashMap<>();
 
-      FileHandle imgFile = Gdx.files.internal(imagePath);
-      if (!imgFile.exists()) continue;
+      JsonValue imagesNode = entry.get("images");
+      if (imagesNode != null) {
+        for (JsonValue imgEntry = imagesNode.child; imgEntry != null; imgEntry = imgEntry.next) {
+          TextureConfig config = loadTextureConfig(imgEntry);
+          if (config != null) namedConfigs.put(imgEntry.name, config);
+        }
+      } else {
+        TextureConfig config = loadTextureConfig(entry);
+        if (config == null) continue;
+        namedConfigs.put("default", config);
+      }
 
-      Texture tex = new Texture(imgFile);
-      tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-      textures.add(tex);
-      TextureConfig config =
-          new TextureConfig(new TextureRegion(tex), offsetX, offsetY, scaleX, scaleY);
-      SpriteEntry spriteEntry = new SpriteEntry(config, spriteClass);
+      TextureConfig baseConfig =
+          namedConfigs.getOrDefault(
+              "default", namedConfigs.isEmpty() ? null : namedConfigs.values().iterator().next());
+      SpriteEntry spriteEntry = new SpriteEntry(baseConfig, namedConfigs, spriteClass);
 
       JsonValue modelClasses = entry.get("modelClasses");
       for (JsonValue cn = modelClasses.child; cn != null; cn = cn.next) {
         entries.put(cn.asString(), spriteEntry);
       }
     }
+  }
+
+  private TextureConfig loadTextureConfig(JsonValue node) {
+    String imagePath = node.getString("imagePath", null);
+    if (imagePath == null) return null;
+    FileHandle imgFile = Gdx.files.internal(imagePath);
+    if (!imgFile.exists()) return null;
+
+    float offsetX = node.getFloat("offsetX", 0f);
+    float offsetY = node.getFloat("offsetY", 0f);
+    float scaleX = node.getFloat("scaleX", 1f);
+    float scaleY = node.getFloat("scaleY", 1f);
+    float flippedOffsetX = node.getFloat("flippedOffsetX", offsetX);
+    float flippedOffsetY = node.getFloat("flippedOffsetY", offsetY);
+
+    Texture tex = new Texture(imgFile);
+    tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+    textures.add(tex);
+    return new TextureConfig(
+        new TextureRegion(tex), offsetX, offsetY, scaleX, scaleY, flippedOffsetX, flippedOffsetY);
   }
 
   public SpriteEntry getEntry(String className) {

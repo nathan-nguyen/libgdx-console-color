@@ -84,6 +84,20 @@ public class MenuOverlay extends Table {
     menuBox.add(showWallsCheckbox).left().padBottom(20);
     menuBox.row();
 
+    CheckBox occludeCheckbox = new CheckBox(" Occlude", skin);
+    occludeCheckbox.setChecked(settingsManager.isOcclude());
+    occludeCheckbox.addListener(
+        new ClickListener() {
+          @Override
+          public void clicked(InputEvent event, float x, float y) {
+            boolean isChecked = occludeCheckbox.isChecked();
+            settingsManager.setOcclude(isChecked);
+            settingsManager.save();
+          }
+        });
+    menuBox.add(occludeCheckbox).left().padBottom(20);
+    menuBox.row();
+
     TextButton mainMenuButton = new TextButton("Main Menu", skin);
     mainMenuButton.addListener(
         new ClickListener() {
@@ -99,7 +113,7 @@ public class MenuOverlay extends Table {
     menuBox.add(mainMenuButton).width(300).height(60);
     menuBox.row();
 
-    add(menuBox).width(400).height(420);
+    add(menuBox).width(400).height(460);
 
     addCaptureListener(
         new InputListener() {

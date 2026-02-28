@@ -78,10 +78,10 @@
   },
   "com.noiprocs.gameplay.model.plant.BirchTreeModel": {
     "imagePath": "textures/birch_tree.png",
-    "offsetX": -155,
-    "offsetY": -55,
-    "scaleX": 0.3,
-    "scaleY": 0.3
+    "offsetX": -130,
+    "offsetY": -50,
+    "scaleX": 0.25,
+    "scaleY": 0.25
   },
   "com.noiprocs.gameplay.model.plant.PineTreeModel": {
     "imagePath": "textures/pine_tree.png",
@@ -93,7 +93,7 @@
   "com.noiprocs.gameplay.model.plant.TreeModel": {
     "imagePath": "textures/oak_tree.png",
     "offsetX": -150,
-    "offsetY": -90,
+    "offsetY": -75,
     "scaleX": 0.3,
     "scaleY": 0.3
   }

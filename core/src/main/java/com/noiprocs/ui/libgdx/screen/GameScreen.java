@@ -170,7 +170,8 @@ public class GameScreen implements Screen {
         UIConfig.CHAR_SIZE,
         UIConfig.CHAR_SIZE,
         viewport.getWorldHeight(),
-        settingsManager.isShowWalls());
+        settingsManager.isShowWalls(),
+        settingsManager.isOcclude());
     renderResources.getBatch().end();
 
     if (settingsManager.isDebugMode()) {

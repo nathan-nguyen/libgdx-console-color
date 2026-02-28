@@ -96,7 +96,8 @@ public class LibGDXGameScreen implements GameScreenInterface {
       float charWidth,
       float charHeight,
       float virtualHeight,
-      boolean showWalls) {
+      boolean showWalls,
+      boolean occlude) {
     GameContext gameContext = GameContext.get();
     Model playerModel = gameContext.modelManager.getModel(gameContext.username);
     if (playerModel == null) return;
@@ -132,6 +133,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
             occlusionAlphaResolver.resolve(
                 model,
                 playerModel,
+                occlude,
                 charWidth,
                 width,
                 virtualHeight,
@@ -191,6 +193,7 @@ public class LibGDXGameScreen implements GameScreenInterface {
           occlusionAlphaResolver.resolve(
               model,
               playerModel,
+              occlude,
               texture,
               isoTexture,
               posX,

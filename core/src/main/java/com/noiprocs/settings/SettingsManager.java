@@ -16,6 +16,7 @@ public class SettingsManager {
   private static final String KEY_PORT = "port";
   private static final String KEY_DEBUG_MODE = "debugMode";
   private static final String KEY_SHOW_WALLS = "showWalls";
+  private static final String KEY_OCCLUDE = "occlude";
 
   // Default values
   private static final String DEFAULT_USERNAME = "player";
@@ -23,6 +24,7 @@ public class SettingsManager {
   private static final int DEFAULT_PORT = 8080;
   private static final boolean DEFAULT_DEBUG_MODE = false;
   private static final boolean DEFAULT_SHOW_WALLS = true;
+  private static final boolean DEFAULT_OCCLUDE = false;
 
   private final Preferences prefs;
 
@@ -108,6 +110,14 @@ public class SettingsManager {
 
   public void setShowWalls(boolean showWalls) {
     prefs.putBoolean(KEY_SHOW_WALLS, showWalls);
+  }
+
+  public boolean isOcclude() {
+    return prefs.getBoolean(KEY_OCCLUDE, DEFAULT_OCCLUDE);
+  }
+
+  public void setOcclude(boolean occlude) {
+    prefs.putBoolean(KEY_OCCLUDE, occlude);
   }
 
   /**
