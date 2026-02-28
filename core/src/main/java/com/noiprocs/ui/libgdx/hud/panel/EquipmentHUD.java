@@ -28,7 +28,6 @@ import com.noiprocs.core.model.item.Item;
 import com.noiprocs.core.model.item.ItemCategory;
 import com.noiprocs.core.model.mob.character.PlayerModel;
 import com.noiprocs.resources.ItemTextureManager;
-import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
 import com.noiprocs.ui.libgdx.hud.ItemDragDropHandler;
 import com.noiprocs.ui.libgdx.hud.widget.ItemIconRenderer;
@@ -46,7 +45,7 @@ import org.slf4j.LoggerFactory;
 public class EquipmentHUD {
   private static final Logger logger = LoggerFactory.getLogger(EquipmentHUD.class);
 
-  private final LibGDXGameScreen gameScreen;
+  private final HUDManager hudManager;
   private final BitmapFont font;
   private final Table rootTable;
   private final ItemSlotStyle slotStyle;
@@ -70,12 +69,12 @@ public class EquipmentHUD {
   private static final int HOTBAR_SIZE = 4; // First 4 slots are hotbar slots
 
   public EquipmentHUD(
-      LibGDXGameScreen gameScreen,
+      HUDManager hudManager,
       Viewport viewport,
       BitmapFont font,
       ItemSlotStyle slotStyle,
       ItemTextureManager itemTextureManager) {
-    this.gameScreen = gameScreen;
+    this.hudManager = hudManager;
     this.viewport = viewport;
     this.font = font;
     this.rootTable = new Table();
@@ -192,10 +191,7 @@ public class EquipmentHUD {
   }
 
   private void openCraftingHUD() {
-    HUDManager hudManager = gameScreen.getHudManager();
-    if (hudManager != null) {
-      hudManager.openCraftingHUD();
-    }
+    hudManager.openCraftingHUD();
   }
 
   private Table createEquipmentPanel() {
@@ -344,11 +340,7 @@ public class EquipmentHUD {
   }
 
   private void close() {
-    // Close HUD by calling manager
-    HUDManager hudManager = gameScreen.getHudManager();
-    if (hudManager != null) {
-      hudManager.close();
-    }
+    hudManager.close();
   }
 
   public Actor getRoot() {

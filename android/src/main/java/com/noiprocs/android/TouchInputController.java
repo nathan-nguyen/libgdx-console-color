@@ -9,7 +9,6 @@ import com.noiprocs.core.common.Vector3D;
 import com.noiprocs.core.control.command.InputCommand;
 import com.noiprocs.core.control.command.SetMovingDirectionCommand;
 import com.noiprocs.input.InputController;
-import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
 
 /**
@@ -29,9 +28,7 @@ public class TouchInputController implements InputController {
   }
 
   @Override
-  public void handleInput(LibGDXGameScreen gameScreen) {
-    // Check for graphical HUD (takes priority over text-based HUDs)
-    HUDManager hudManager = gameScreen.getHudManager();
+  public void handleInput(HUDManager hudManager) {
 
     if (hudManager != null && hudManager.isOpen()) {
       // Graphical HUD handles touch input via Scene2D

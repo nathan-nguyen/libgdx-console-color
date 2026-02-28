@@ -2,10 +2,13 @@ package com.noiprocs.ui.libgdx.widget;
 
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -14,15 +17,27 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.noiprocs.core.GameContext;
 import com.noiprocs.core.control.command.DisconnectCommand;
 import com.noiprocs.settings.SettingsManager;
+import com.noiprocs.ui.libgdx.util.UIStyleHelper;
 
 public class MenuOverlay extends Table {
   private final Table menuBox;
+  private final Skin skin;
+  private final Stage stage;
   private Runnable onClose;
 
-  public MenuOverlay(SettingsManager settingsManager, Runnable onMainMenu, Skin skin) {
+  public MenuOverlay(
+      SettingsManager settingsManager,
+      Runnable onMainMenu,
+      BitmapFont font,
+      Viewport viewport,
+      SpriteBatch batch) {
+    this.skin = UIStyleHelper.createSkin(font);
+    this.stage = new Stage(viewport, batch);
+    this.stage.addActor(this);
     setFillParent(true);
     setVisible(false);
     setTouchable(Touchable.enabled);
@@ -128,6 +143,20 @@ public class MenuOverlay extends Table {
             return false;
           }
         });
+  }
+
+  public Stage getStage() {
+    return stage;
+  }
+
+  public void render(float delta) {
+    stage.act(delta);
+    stage.draw();
+  }
+
+  public void dispose() {
+    stage.dispose();
+    skin.dispose();
   }
 
   public void setOnClose(Runnable onClose) {

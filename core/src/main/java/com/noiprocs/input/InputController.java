@@ -1,6 +1,6 @@
 package com.noiprocs.input;
 
-import com.noiprocs.ui.libgdx.LibGDXGameScreen;
+import com.noiprocs.ui.libgdx.hud.HUDManager;
 
 /**
  * Platform-agnostic input controller interface. Different platforms (desktop, mobile, web)
@@ -10,7 +10,7 @@ public interface InputController {
   /**
    * Handle input for the current frame.
    *
-   * @param gameScreen The game screen for HUD state
+   * @param hudManager The HUD manager for checking and controlling HUD state
    */
-  void handleInput(LibGDXGameScreen gameScreen);
+  void handleInput(HUDManager hudManager);
 }

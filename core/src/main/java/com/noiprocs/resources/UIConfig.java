@@ -9,7 +9,9 @@ public class UIConfig {
   // Square character size in virtual pixels (used for isometric tile rendering)
   public static final float CHAR_SIZE = 16f;
 
-  // Non-isometric character dimensions matching the original console grid
-  public static final float CHAR_WIDTH = 440f / 62;
-  public static final float CHAR_HEIGHT = 690f / 44;
+  // Text textures come in two types:
+  //   - Isometric: each character maps to one tile, positioned using CHAR_SIZE
+  //   - Non-isometric: characters are laid out on a flat grid, stepped by CHAR_WIDTH/CHAR_HEIGHT
+  public static final float CHAR_WIDTH = CHAR_SIZE / 2;
+  public static final float CHAR_HEIGHT = CHAR_SIZE;
 }

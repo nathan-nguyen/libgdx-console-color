@@ -16,13 +16,16 @@ import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.noiprocs.core.GameContext;
 import com.noiprocs.core.control.command.InputCommand;
+import com.noiprocs.core.model.InventoryContainerInterface;
 import com.noiprocs.core.model.Model;
+import com.noiprocs.core.model.action.Action;
+import com.noiprocs.core.model.action.InteractAction;
+import com.noiprocs.core.model.mob.character.HumanoidModel;
 import com.noiprocs.core.model.mob.character.PlayerModel;
 import com.noiprocs.resources.GameResource;
 import com.noiprocs.resources.ItemTextureManager;
 import com.noiprocs.resources.ResourceLoader;
 import com.noiprocs.settings.SettingsManager;
-import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 import com.noiprocs.ui.libgdx.hud.panel.CraftingHUD;
 import com.noiprocs.ui.libgdx.hud.panel.EquipmentHUD;
 import com.noiprocs.ui.libgdx.hud.panel.InventoryHUD;
@@ -32,7 +35,6 @@ import com.noiprocs.ui.libgdx.util.UIStyleHelper;
 
 /** Central coordinator for HUD system. Manages which HUD is active and handles rendering. */
 public class HUDManager {
-  private final LibGDXGameScreen gameScreen;
   private final Stage hudStage;
   private final BitmapFont font;
   private final ItemSlotStyle sharedSlotStyle;
@@ -51,14 +53,12 @@ public class HUDManager {
   private InventoryHUD inventoryHUD;
 
   public HUDManager(
-      LibGDXGameScreen gameScreen,
       Viewport viewport,
       BitmapFont panelFont,
       BitmapFont hudFont,
       ItemTextureManager itemTextureManager,
       SettingsManager settingsManager,
       Runnable onMenuToggle) {
-    this.gameScreen = gameScreen;
     this.font = panelFont;
     this.hudStage = new Stage(viewport);
     this.currentMode = HUDMode.NONE;
@@ -135,8 +135,7 @@ public class HUDManager {
 
     if (equipmentHUD == null) {
       equipmentHUD =
-          new EquipmentHUD(
-              gameScreen, hudStage.getViewport(), font, sharedSlotStyle, itemTextureManager);
+          new EquipmentHUD(this, hudStage.getViewport(), font, sharedSlotStyle, itemTextureManager);
     }
 
     equipmentHUD.refresh();
@@ -151,8 +150,7 @@ public class HUDManager {
 
     if (craftingHUD == null) {
       craftingHUD =
-          new CraftingHUD(
-              gameScreen, hudStage.getViewport(), font, sharedSlotStyle, itemTextureManager);
+          new CraftingHUD(this, hudStage.getViewport(), font, sharedSlotStyle, itemTextureManager);
     }
 
     craftingHUD.refresh();
@@ -171,8 +169,7 @@ public class HUDManager {
 
     if (inventoryHUD == null) {
       inventoryHUD =
-          new InventoryHUD(
-              gameScreen, hudStage.getViewport(), font, sharedSlotStyle, itemTextureManager);
+          new InventoryHUD(this, hudStage.getViewport(), font, sharedSlotStyle, itemTextureManager);
     }
 
     inventoryHUD.setContainer(containerModelId);
@@ -205,12 +202,31 @@ public class HUDManager {
     if (ctx != null) {
       Model playerModel = ctx.modelManager.getModel(ctx.username);
       if (playerModel instanceof PlayerModel) {
-        playerInfoHUD.update((PlayerModel) playerModel, settingsManager);
+        PlayerModel player = (PlayerModel) playerModel;
+        playerInfoHUD.update(player, settingsManager);
+        syncInventoryHUD(ctx, player);
       }
     }
 
     hudStage.act(delta);
     hudStage.draw();
+  }
+
+  private void syncInventoryHUD(GameContext ctx, PlayerModel playerModel) {
+    Action playerAction = playerModel.getAction();
+    if (playerAction instanceof InteractAction) {
+      InteractAction interactAction = (InteractAction) playerAction;
+      Model model = ctx.modelManager.getModel(interactAction.targetId);
+      if (model instanceof InventoryContainerInterface || isHumanoidButNotPlayer(model)) {
+        if (!isOpen()) {
+          openInventoryHUD(interactAction.targetId);
+        }
+      }
+    }
+  }
+
+  private static boolean isHumanoidButNotPlayer(Model model) {
+    return model instanceof HumanoidModel && !(model instanceof PlayerModel);
   }
 
   /**

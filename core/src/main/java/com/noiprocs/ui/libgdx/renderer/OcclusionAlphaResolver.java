@@ -1,29 +1,34 @@
-package com.noiprocs.ui.libgdx;
+package com.noiprocs.ui.libgdx.renderer;
 
 import com.noiprocs.core.model.Model;
 import com.noiprocs.resources.UIConfig;
+import com.noiprocs.settings.SettingsManager;
 
 /**
- * Determines the render alpha for a model that may occlude the player. When {@code occlude} is
- * true, any model that is isometrically deeper (x+y greater) than the player may have reduced
- * alpha. Alpha fades smoothly from FULL_ALPHA to OCCLUDED_ALPHA as the player's screen position
- * approaches and enters the model's screen bounding box, avoiding the abrupt flash of a hard
- * cutoff.
+ * Determines the render alpha for a model that may occlude the player. When occlude is enabled, any
+ * model that is isometrically deeper (x+y greater) than the player may have reduced alpha. Alpha
+ * fades smoothly from FULL_ALPHA to OCCLUDED_ALPHA as the player's screen position approaches and
+ * enters the model's screen bounding box, avoiding the abrupt flash of a hard cutoff.
  */
 public class OcclusionAlphaResolver {
 
   public final float FULL_ALPHA = 1f;
   public final float OCCLUDED_ALPHA = 0.3f;
+  private final SettingsManager settingsManager;
 
   /** Pixel radius around the bounding box over which the fade transition occurs. */
   private final float FADE_DISTANCE = 2f;
+
+  public OcclusionAlphaResolver(SettingsManager settingsManager) {
+    this.settingsManager = settingsManager;
+  }
 
   private boolean isDeeper(Model model, Model playerModel) {
     return IsometricRenderPolicy.isoDepth(model) > IsometricRenderPolicy.isoDepth(playerModel);
   }
 
-  private float playerScreenX(float charWidth, int width) {
-    return charWidth * width / 2f;
+  private float playerScreenX(int width) {
+    return UIConfig.CHAR_SIZE * width / 2f;
   }
 
   private float playerScreenY(float virtualHeight) {
@@ -33,17 +38,15 @@ public class OcclusionAlphaResolver {
   public float resolve(
       Model model,
       Model playerModel,
-      boolean occlude,
-      float charWidth,
       int width,
       float virtualHeight,
       float minX,
       float maxX,
       float minY,
       float maxY) {
-    if (!occlude || !isDeeper(model, playerModel)) return FULL_ALPHA;
+    if (!settingsManager.isOcclude() || !isDeeper(model, playerModel)) return FULL_ALPHA;
 
-    float playerScreenX = playerScreenX(charWidth, width);
+    float playerScreenX = playerScreenX(width);
     float playerScreenY = playerScreenY(virtualHeight);
 
     // Distance from the player's screen point to the nearest point on the bounding box.
@@ -60,15 +63,12 @@ public class OcclusionAlphaResolver {
   public float resolve(
       Model model,
       Model playerModel,
-      boolean occlude,
       char[][] texture,
       boolean isoTexture,
       float posX,
       float posY,
       float baseScreenX,
       float baseScreenY,
-      float charWidth,
-      float charHeight,
       int width,
       int height,
       float virtualHeight) {
@@ -78,18 +78,20 @@ public class OcclusionAlphaResolver {
     int cols = texture[0].length;
     float minX, maxX, minY, maxY;
     if (isoTexture) {
-      float isoOffset = charWidth * (width + height) / 4f;
+      float isoOffset = UIConfig.CHAR_SIZE * (width + height) / 4f;
       float hw = (height + width) / 2f;
-      minX = (posY - posX - (rows - 1)) * charWidth / 2f + isoOffset;
-      maxX = (posY + (cols - 1) - posX) * charWidth / 2f + isoOffset;
-      maxY = virtualHeight / 2f + charHeight / 4f * (hw - posX - posY);
-      minY = virtualHeight / 2f + charHeight / 4f * (hw - posX - (rows - 1) - posY - (cols - 1));
+      minX = (posY - posX - (rows - 1)) * UIConfig.CHAR_SIZE / 2f + isoOffset;
+      maxX = (posY + (cols - 1) - posX) * UIConfig.CHAR_SIZE / 2f + isoOffset;
+      maxY = virtualHeight / 2f + UIConfig.CHAR_SIZE / 4f * (hw - posX - posY);
+      minY =
+          virtualHeight / 2f
+              + UIConfig.CHAR_SIZE / 4f * (hw - posX - (rows - 1) - posY - (cols - 1));
     } else {
       minX = baseScreenX;
       maxX = baseScreenX + cols * UIConfig.CHAR_WIDTH;
       minY = baseScreenY - rows * UIConfig.CHAR_HEIGHT;
       maxY = baseScreenY;
     }
-    return resolve(model, playerModel, occlude, charWidth, width, virtualHeight, minX, maxX, minY, maxY);
+    return resolve(model, playerModel, width, virtualHeight, minX, maxX, minY, maxY);
   }
 }

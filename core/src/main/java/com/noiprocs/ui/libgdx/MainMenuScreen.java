@@ -1,4 +1,4 @@
-package com.noiprocs.ui.libgdx.screen;
+package com.noiprocs.ui.libgdx;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;

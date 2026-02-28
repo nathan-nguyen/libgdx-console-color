@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input;
 import com.noiprocs.core.GameContext;
 import com.noiprocs.core.control.command.InputCommand;
 import com.noiprocs.input.InputController;
-import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,9 +14,8 @@ public class DesktopKeyboardInputController implements InputController {
   private final Set<Character> keyPressedSet = new HashSet<>();
 
   @Override
-  public void handleInput(LibGDXGameScreen gameScreen) {
+  public void handleInput(HUDManager hudManager) {
     GameContext gameContext = GameContext.get();
-    HUDManager hudManager = gameScreen.getHudManager();
 
     if (hudManager != null && hudManager.isOpen()) {
       // Graphical HUD handles input via Scene2D

@@ -2,17 +2,17 @@ package com.noiprocs;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.noiprocs.core.GameContext;
 import com.noiprocs.input.InputController;
 import com.noiprocs.resources.RenderResources;
 import com.noiprocs.resources.UIConfig;
 import com.noiprocs.settings.SettingsManager;
 import com.noiprocs.ui.console.ConsoleUIConfig;
-import com.noiprocs.ui.libgdx.screen.GameScreen;
-import com.noiprocs.ui.libgdx.screen.MainMenuScreen;
-import com.noiprocs.ui.libgdx.screen.SettingsScreen;
+import com.noiprocs.ui.libgdx.GameScreen;
+import com.noiprocs.ui.libgdx.MainMenuScreen;
+import com.noiprocs.ui.libgdx.SettingsScreen;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class LibGDXApp extends Game {
@@ -21,10 +21,9 @@ public class LibGDXApp extends Game {
   protected float virtualHeight;
 
   protected RenderResources renderResources;
-  private GameContext gameContext;
   private OrthographicCamera camera;
   private Viewport viewport;
-  private Runnable renderVirtualControls; // For Android touch controls
+  private Stage virtualControlsStage;
   private SettingsManager settingsManager;
 
   // Configuration
@@ -53,19 +52,14 @@ public class LibGDXApp extends Game {
     return renderResources;
   }
 
-  /** Set the game context (called by GameScreen wrapper). */
-  public void setGameContext(GameContext gameContext) {
-    this.gameContext = gameContext;
-  }
-
   /** Get the input controller. */
   public InputController getInputController() {
     return inputController;
   }
 
-  /** Set the virtual control renderer callback (for Android platform). */
-  public void setVirtualControlsRenderer(Runnable renderer) {
-    this.renderVirtualControls = renderer;
+  /** Set the virtual controls stage (for Android platform). */
+  public void setVirtualControlsStage(Stage stage) {
+    this.virtualControlsStage = stage;
   }
 
   /**
@@ -122,21 +116,13 @@ public class LibGDXApp extends Game {
             renderResources,
             getInputController(),
             settingsManager,
-            this::renderVirtualControls,
-            this::setGameContext,
+            virtualControlsStage,
             this::showMainMenu,
             settingsManager.getUsername(),
             settingsManager.getHostname(),
             settingsManager.getPort(),
             type,
             platform));
-  }
-
-  /** Render virtual controls (called by GameScreen for Android). */
-  public void renderVirtualControls() {
-    if (renderVirtualControls != null) {
-      renderVirtualControls.run();
-    }
   }
 
   @Override

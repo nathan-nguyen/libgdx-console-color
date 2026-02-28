@@ -1,4 +1,4 @@
-package com.noiprocs.resources;
+package com.noiprocs.ui.libgdx.sprite;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
-import com.noiprocs.resources.ModelTextureLoader.TextureConfig;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -18,18 +17,21 @@ import java.util.Map;
  * Loads sprite configurations from sprite-config.json, mapping model class names to their texture
  * config and sprite class.
  */
-public class SpriteConfigLoader implements Disposable {
+public class LibgdxSpriteConfigLoader implements Disposable {
 
   private static final String SPRITE_CONFIG_JSON = "sprite-config.json";
+  private static LibgdxSpriteConfigLoader instance;
+
+  public static LibgdxSpriteConfigLoader get() {
+    if (instance == null) instance = new LibgdxSpriteConfigLoader();
+    return instance;
+  }
 
   public static class SpriteEntry {
-    public final TextureConfig textureConfig;
-    public final Map<String, TextureConfig> namedConfigs;
+    public final Map<String, LibgdxTexture> namedConfigs;
     public final String spriteClass;
 
-    public SpriteEntry(
-        TextureConfig textureConfig, Map<String, TextureConfig> namedConfigs, String spriteClass) {
-      this.textureConfig = textureConfig;
+    public SpriteEntry(Map<String, LibgdxTexture> namedConfigs, String spriteClass) {
       this.namedConfigs = namedConfigs;
       this.spriteClass = spriteClass;
     }
@@ -38,7 +40,7 @@ public class SpriteConfigLoader implements Disposable {
   private final Map<String, SpriteEntry> entries = new HashMap<>();
   private final List<Texture> textures = new ArrayList<>();
 
-  public SpriteConfigLoader() {
+  private LibgdxSpriteConfigLoader() {
     FileHandle jsonFile = Gdx.files.internal(SPRITE_CONFIG_JSON);
     if (!jsonFile.exists()) return;
 
@@ -48,24 +50,21 @@ public class SpriteConfigLoader implements Disposable {
 
     for (JsonValue entry = sprites.child; entry != null; entry = entry.next) {
       String spriteClass = entry.getString("spriteClass", null);
-      Map<String, TextureConfig> namedConfigs = new LinkedHashMap<>();
+      Map<String, LibgdxTexture> namedConfigs = new LinkedHashMap<>();
 
       JsonValue imagesNode = entry.get("images");
       if (imagesNode != null) {
         for (JsonValue imgEntry = imagesNode.child; imgEntry != null; imgEntry = imgEntry.next) {
-          TextureConfig config = loadTextureConfig(imgEntry);
+          LibgdxTexture config = loadTextureConfig(imgEntry);
           if (config != null) namedConfigs.put(imgEntry.name, config);
         }
       } else {
-        TextureConfig config = loadTextureConfig(entry);
+        LibgdxTexture config = loadTextureConfig(entry);
         if (config == null) continue;
         namedConfigs.put("default", config);
       }
 
-      TextureConfig baseConfig =
-          namedConfigs.getOrDefault(
-              "default", namedConfigs.isEmpty() ? null : namedConfigs.values().iterator().next());
-      SpriteEntry spriteEntry = new SpriteEntry(baseConfig, namedConfigs, spriteClass);
+      SpriteEntry spriteEntry = new SpriteEntry(namedConfigs, spriteClass);
 
       JsonValue modelClasses = entry.get("modelClasses");
       for (JsonValue cn = modelClasses.child; cn != null; cn = cn.next) {
@@ -74,7 +73,7 @@ public class SpriteConfigLoader implements Disposable {
     }
   }
 
-  private TextureConfig loadTextureConfig(JsonValue node) {
+  private LibgdxTexture loadTextureConfig(JsonValue node) {
     String imagePath = node.getString("imagePath", null);
     if (imagePath == null) return null;
     FileHandle imgFile = Gdx.files.internal(imagePath);
@@ -90,12 +89,17 @@ public class SpriteConfigLoader implements Disposable {
     Texture tex = new Texture(imgFile);
     tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     textures.add(tex);
-    return new TextureConfig(
+    return new LibgdxTexture(
         new TextureRegion(tex), offsetX, offsetY, scaleX, scaleY, flippedOffsetX, flippedOffsetY);
   }
 
   public SpriteEntry getEntry(String className) {
     return entries.get(className);
+  }
+
+  public LibgdxTexture getTexture(String className, String name) {
+    SpriteEntry entry = entries.get(className);
+    return entry != null ? entry.namedConfigs.get(name) : null;
   }
 
   @Override

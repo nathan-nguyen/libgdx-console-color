@@ -4,6 +4,7 @@ import android.os.Bundle;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.noiprocs.LibGDXApp;
 import com.noiprocs.input.InputController;
 import com.noiprocs.resources.UIConfig;
@@ -31,6 +32,7 @@ public class AndroidLauncher extends AndroidApplication {
 class AndroidApp extends LibGDXApp {
   private TouchInputController touchInputController;
   private VirtualControlRenderer virtualControlRenderer;
+  private Stage virtualControlsStage;
 
   public AndroidApp(String platform, String type) {
     super(platform, type, null);
@@ -64,27 +66,18 @@ class AndroidApp extends LibGDXApp {
   public void create() {
     super.create();
 
-    // Now that viewport is created, we can initialize touch controls
     touchInputController = new TouchInputController(getViewport());
     virtualControlRenderer = new VirtualControlRenderer();
 
-    // Set up the virtual controls renderer callback
-    setVirtualControlsRenderer(this::renderTouchControls);
+    virtualControlsStage = new Stage(getViewport(), renderResources.getBatch());
+    virtualControlsStage.addActor(
+        new VirtualControlsActor(virtualControlRenderer, touchInputController));
+    setVirtualControlsStage(virtualControlsStage);
   }
 
   @Override
   public InputController getInputController() {
-    // Return touch input controller for use by GameScreen
     return touchInputController;
-  }
-
-  private void renderTouchControls() {
-    virtualControlRenderer.setProjectionMatrix(getCamera().combined);
-    TouchState touchState = touchInputController.getTouchState();
-
-    // Render game controls (graphical HUD handles its own input via Scene2D)
-    virtualControlRenderer.renderGameControls(
-        touchState.getActiveZones(), renderResources.getBatch(), touchState);
   }
 
   @Override
@@ -92,6 +85,9 @@ class AndroidApp extends LibGDXApp {
     super.dispose();
     if (virtualControlRenderer != null) {
       virtualControlRenderer.dispose();
+    }
+    if (virtualControlsStage != null) {
+      virtualControlsStage.dispose();
     }
   }
 }

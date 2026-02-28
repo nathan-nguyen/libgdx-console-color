@@ -2,25 +2,25 @@ package com.noiprocs.ui.libgdx.sprite.plant;
 
 import com.noiprocs.core.model.Model;
 import com.noiprocs.gameplay.model.plant.TreeModel;
-import com.noiprocs.resources.ModelTextureLoader.TextureConfig;
-import com.noiprocs.resources.SpriteConfigLoader.SpriteEntry;
-import com.noiprocs.ui.libgdx.sprite.LibGDXSprite;
+import com.noiprocs.ui.libgdx.sprite.LibgdxSprite;
+import com.noiprocs.ui.libgdx.sprite.LibgdxTexture;
 
-public class TreeSprite extends LibGDXSprite {
-  private final TextureConfig youngConfig;
-  private final TextureConfig middleConfig;
+public class TreeSprite extends LibgdxSprite {
+  private static final String MODEL_CLASS = TreeModel.class.getName();
 
-  public TreeSprite(SpriteEntry entry) {
-    super(entry);
-    this.youngConfig = namedConfigs.get("young");
-    this.middleConfig = namedConfigs.get("middle");
+  private static final LibgdxTexture DEFAULT_TEXTURE = loadTexture(MODEL_CLASS, "default");
+  private static final LibgdxTexture YOUNG_TEXTURE = loadTexture(MODEL_CLASS, "young");
+  private static final LibgdxTexture MIDDLE_TEXTURE = loadTexture(MODEL_CLASS, "middle");
+
+  public TreeSprite() {
+    super(DEFAULT_TEXTURE);
   }
 
   @Override
-  public TextureConfig getConfig(Model model) {
+  public LibgdxTexture getTexture(Model model) {
     TreeModel treeModel = (TreeModel) model;
-    if (treeModel.isYoungAge()) return youngConfig;
-    if (treeModel.isMiddleAge()) return middleConfig;
-    return super.getConfig(model);
+    if (treeModel.isYoungAge()) return YOUNG_TEXTURE;
+    if (treeModel.isMiddleAge()) return MIDDLE_TEXTURE;
+    return super.getTexture(model);
   }
 }

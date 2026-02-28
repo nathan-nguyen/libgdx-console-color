@@ -31,7 +31,6 @@ import com.noiprocs.core.model.item.ItemCategory;
 import com.noiprocs.core.model.mob.character.HumanoidModel;
 import com.noiprocs.core.model.mob.character.PlayerModel;
 import com.noiprocs.resources.ItemTextureManager;
-import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
 import com.noiprocs.ui.libgdx.hud.ItemDragDropHandler;
 import com.noiprocs.ui.libgdx.hud.widget.ItemIconRenderer;
@@ -43,7 +42,7 @@ import com.noiprocs.ui.libgdx.hud.widget.ItemSlotWidget;
  * side-by-side for transferring items.
  */
 public class InventoryHUD {
-  private final LibGDXGameScreen gameScreen;
+  private final HUDManager hudManager;
   private final BitmapFont font;
   private final Table rootTable;
   private final ItemSlotStyle slotStyle;
@@ -82,12 +81,12 @@ public class InventoryHUD {
   private Label speedValueLabel;
 
   public InventoryHUD(
-      LibGDXGameScreen gameScreen,
+      HUDManager hudManager,
       Viewport viewport,
       BitmapFont font,
       ItemSlotStyle slotStyle,
       ItemTextureManager itemTextureManager) {
-    this.gameScreen = gameScreen;
+    this.hudManager = hudManager;
     this.viewport = viewport;
     this.font = font;
     this.rootTable = new Table();
@@ -841,11 +840,7 @@ public class InventoryHUD {
   }
 
   private void close() {
-    // Close HUD by calling manager
-    HUDManager hudManager = gameScreen.getHudManager();
-    if (hudManager != null) {
-      hudManager.close();
-    }
+    hudManager.close();
   }
 
   /** Schedules a UI refresh after a short delay to allow server to process commands. */

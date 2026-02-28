@@ -1,4 +1,4 @@
-package com.noiprocs.ui.libgdx;
+package com.noiprocs.ui.libgdx.renderer;
 
 import com.noiprocs.core.GameContext;
 import com.noiprocs.core.common.Vector3D;

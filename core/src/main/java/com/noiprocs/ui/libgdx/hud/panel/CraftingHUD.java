@@ -24,7 +24,6 @@ import com.noiprocs.core.model.item.receipt.CraftingReceipt;
 import com.noiprocs.core.model.item.receipt.CraftingReceipt.MaterialEntry;
 import com.noiprocs.core.model.mob.character.PlayerModel;
 import com.noiprocs.resources.ItemTextureManager;
-import com.noiprocs.ui.libgdx.LibGDXGameScreen;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
 import com.noiprocs.ui.libgdx.hud.ItemDragDropHandler;
 import com.noiprocs.ui.libgdx.hud.widget.ItemSlotStyle;
@@ -36,7 +35,7 @@ import java.util.Map;
 
 /** Crafting HUD screen. Displays recipe list and required materials for crafting items. */
 public class CraftingHUD {
-  private final LibGDXGameScreen gameScreen;
+  private final HUDManager hudManager;
   private final BitmapFont font;
   private final Table rootTable;
   private final ItemSlotStyle slotStyle;
@@ -56,12 +55,12 @@ public class CraftingHUD {
   private int selectedRecipeIndex = -1;
 
   public CraftingHUD(
-      LibGDXGameScreen gameScreen,
+      HUDManager hudManager,
       Viewport viewport,
       BitmapFont font,
       ItemSlotStyle slotStyle,
       ItemTextureManager itemTextureManager) {
-    this.gameScreen = gameScreen;
+    this.hudManager = hudManager;
     this.viewport = viewport;
     this.font = font;
     this.rootTable = new Table();
@@ -468,11 +467,7 @@ public class CraftingHUD {
   }
 
   private void close() {
-    // Close HUD by calling manager
-    HUDManager hudManager = gameScreen.getHudManager();
-    if (hudManager != null) {
-      hudManager.close();
-    }
+    hudManager.close();
   }
 
   public Actor getRoot() {

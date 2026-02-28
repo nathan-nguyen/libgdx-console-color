@@ -3,7 +3,7 @@ package com.noiprocs.android;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Matrix4;
@@ -21,7 +21,6 @@ public class VirtualControlRenderer {
   private final Texture attackIcon;
   private final Texture interactIcon;
   private final Texture useItemIcon;
-  private Matrix4 projectionMatrix;
 
   // Colors for joystick states
   private static final Color COLOR_DPAD = new Color(0.3f, 0.6f, 1f, 0.5f);
@@ -35,28 +34,16 @@ public class VirtualControlRenderer {
     useItemIcon = ResourceLoader.loadTexture(GameResource.ICON_USE_ITEM_BUTTON);
   }
 
-  /**
-   * Render game controls (joystick, action buttons, quick actions).
-   *
-   * @param activeZones Set of currently active zones
-   * @param batch SpriteBatch for rendering icons
-   * @param touchState Touch state for joystick position
-   */
-  public void renderGameControls(
-      Set<ControlZone> activeZones, SpriteBatch batch, TouchState touchState) {
+  /** Render joystick and shape-based controls via ShapeRenderer. */
+  public void renderShapes(TouchState touchState) {
     shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-    Gdx.gl.glLineWidth(3.0f); // Make borders bolder
-
-    // Render joystick
+    Gdx.gl.glLineWidth(3.0f);
     renderJoystick(touchState);
-
     shapeRenderer.end();
+  }
 
-    // Render button icons
-    if (projectionMatrix != null) {
-      batch.setProjectionMatrix(projectionMatrix);
-    }
-    batch.begin();
+  /** Render button icons into an already-open Batch. */
+  public void renderIcons(Batch batch, Set<ControlZone> activeZones) {
     renderIcon(
         batch,
         interactIcon,
@@ -69,11 +56,10 @@ public class VirtualControlRenderer {
         useItemIcon,
         ControlZone.ACTION_TOGGLE,
         activeZones.contains(ControlZone.ACTION_TOGGLE));
-    batch.end();
   }
 
   /** Render a texture icon centered on a control zone. */
-  private void renderIcon(SpriteBatch batch, Texture icon, ControlZone zone, boolean active) {
+  private void renderIcon(Batch batch, Texture icon, ControlZone zone, boolean active) {
     Circle circle = (Circle) zone.getShape();
     float size = circle.radius * 2.5f;
     float x = circle.x - size / 2f;
@@ -102,9 +88,8 @@ public class VirtualControlRenderer {
     shapeRenderer.circle(knobX, knobY, knobRadius, 24);
   }
 
-  /** Set the projection matrix for the shape renderer and icon rendering. */
+  /** Set the projection matrix for the shape renderer. */
   public void setProjectionMatrix(Matrix4 matrix) {
-    this.projectionMatrix = matrix;
     shapeRenderer.setProjectionMatrix(matrix);
   }
 

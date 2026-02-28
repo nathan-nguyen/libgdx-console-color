@@ -1,33 +1,25 @@
 package com.noiprocs.ui.libgdx.sprite;
 
-import com.noiprocs.resources.ModelTextureLoader;
-import com.noiprocs.resources.ModelTextureLoader.TextureConfig;
-import com.noiprocs.resources.SpriteConfigLoader;
-import com.noiprocs.resources.SpriteConfigLoader.SpriteEntry;
+import com.noiprocs.ui.libgdx.sprite.LibgdxSpriteConfigLoader.SpriteEntry;
 import java.lang.reflect.Constructor;
 
 public class LibGDXSpriteFactory {
 
-  public static LibGDXSprite create(
-      String className, ModelTextureLoader textureLoader, SpriteConfigLoader spriteConfigLoader) {
-    SpriteEntry entry = spriteConfigLoader.getEntry(className);
-    if (entry != null) {
-      return instantiateSprite(entry.spriteClass, entry);
-    }
-
-    TextureConfig baseConfig = textureLoader.getConfig(className);
-    return baseConfig != null ? new LibGDXSprite(baseConfig) : null;
+  public static LibgdxSprite create(String className) {
+    SpriteEntry entry = LibgdxSpriteConfigLoader.get().getEntry(className);
+    if (entry == null) return null;
+    return instantiateSprite(entry.spriteClass, className);
   }
 
-  private static LibGDXSprite instantiateSprite(String spriteClass, SpriteEntry entry) {
+  private static LibgdxSprite instantiateSprite(String spriteClass, String modelClass) {
     if (spriteClass == null) {
-      return new LibGDXSprite(entry);
+      return new LibgdxSprite(LibgdxSprite.loadTexture(modelClass, "default"));
     }
     try {
-      Constructor<?> ctor = Class.forName(spriteClass).getConstructor(SpriteEntry.class);
-      return (LibGDXSprite) ctor.newInstance(entry);
+      Constructor<?> ctor = Class.forName(spriteClass).getConstructor();
+      return (LibgdxSprite) ctor.newInstance();
     } catch (Exception e) {
-      return new LibGDXSprite(entry);
+      return new LibgdxSprite(LibgdxSprite.loadTexture(modelClass, "default"));
     }
   }
 }
