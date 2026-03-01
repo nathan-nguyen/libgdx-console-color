@@ -4,8 +4,8 @@
       "modelClasses": ["com.noiprocs.core.model.mob.character.PlayerModel"],
       "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.character.PlayerSprite",
       "images": {
-        "default": {
-          "imagePath": "textures/player_down.png",
+        "stand_sw": {
+          "imagePath": "textures/player_stand_sw.png",
           "offsetX": -60,
           "offsetY": -35,
           "flippedOffsetX": -55,
@@ -13,15 +13,15 @@
           "scaleX": 0.11,
           "scaleY": 0.11
         },
-        "up": {
-          "imagePath": "textures/player_up.png",
+        "stand_ne": {
+          "imagePath": "textures/player_stand_ne.png",
           "offsetX": -55,
           "offsetY": -30,
           "scaleX": 0.11,
           "scaleY": 0.11
         },
-        "down_action": {
-          "imagePath": "textures/player_down_action.png",
+        "action_sw": {
+          "imagePath": "textures/player_action_sw.png",
           "offsetX": -60,
           "offsetY": -35,
           "flippedOffsetX": -55,
@@ -29,10 +29,44 @@
           "scaleX": 0.11,
           "scaleY": 0.11
         },
-        "up_action": {
-          "imagePath": "textures/player_up_action.png",
+        "action_ne": {
+          "imagePath": "textures/player_action_ne.png",
           "offsetX": -55,
           "offsetY": -30,
+          "scaleX": 0.11,
+          "scaleY": 0.11
+        },
+        "chop_tree_sw": {
+          "imagePath": "textures/player_chop_tree_sw.png",
+          "offsetX": -60,
+          "offsetY": -35,
+          "flippedOffsetX": -55,
+          "flippedOffsetY": -35,
+          "scaleX": 0.11,
+          "scaleY": 0.11
+        },
+        "chop_tree_ne": {
+          "imagePath": "textures/player_chop_tree_ne.png",
+          "offsetX": -55,
+          "offsetY": -30,
+          "scaleX": 0.11,
+          "scaleY": 0.11
+        },
+        "pickup_sw": {
+          "imagePath": "textures/player_pickup_sw.png",
+          "offsetX": -60,
+          "offsetY": -35,
+          "flippedOffsetX": -55,
+          "flippedOffsetY": -35,
+          "scaleX": 0.11,
+          "scaleY": 0.11
+        },
+        "pickup_nw": {
+          "imagePath": "textures/player_pickup_nw.png",
+          "offsetX": -60,
+          "offsetY": -35,
+          "flippedOffsetX": -55,
+          "flippedOffsetY": -35,
           "scaleX": 0.11,
           "scaleY": 0.11
         }
@@ -42,8 +76,8 @@
       "modelClasses": ["com.noiprocs.gameplay.model.mob.CotMobModel"],
       "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.CotMobSprite",
       "images": {
-        "default": {
-          "imagePath": "textures/cot_mob_down.png",
+        "stand_sw": {
+          "imagePath": "textures/cot_mob_stand_sw.png",
           "offsetX": -45,
           "offsetY": -35,
           "flippedOffsetX": -35,
@@ -51,8 +85,8 @@
           "scaleX": 0.08,
           "scaleY": 0.08
         },
-        "up": {
-          "imagePath": "textures/cot_mob_up.png",
+        "stand_ne": {
+          "imagePath": "textures/cot_mob_stand_ne.png",
           "offsetX": -45,
           "offsetY": -35,
           "flippedOffsetX": -35,
@@ -60,8 +94,8 @@
           "scaleX": 0.08,
           "scaleY": 0.08
         },
-        "down_action": {
-          "imagePath": "textures/cot_mob_down_action.png",
+        "action_sw": {
+          "imagePath": "textures/cot_mob_action_sw.png",
           "offsetX": -45,
           "offsetY": -35,
           "flippedOffsetX": -35,
@@ -69,8 +103,8 @@
           "scaleX": 0.08,
           "scaleY": 0.08
         },
-        "up_action": {
-          "imagePath": "textures/cot_mob_up_action.png",
+        "action_ne": {
+          "imagePath": "textures/cot_mob_action_ne.png",
           "offsetX": -45,
           "offsetY": -35,
           "flippedOffsetX": -35,
@@ -84,8 +118,8 @@
       "modelClasses": ["com.noiprocs.gameplay.model.mob.character.GolemModel"],
       "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.character.GolemSprite",
       "images": {
-        "default": {
-          "imagePath": "textures/stone_golem_down.png",
+        "stand_sw": {
+          "imagePath": "textures/stone_golem_stand_sw.png",
           "offsetX": -55,
           "offsetY": -45,
           "flippedOffsetX": -55,
@@ -93,8 +127,8 @@
           "scaleX": 0.1,
           "scaleY": 0.1
         },
-        "up": {
-          "imagePath": "textures/stone_golem_up.png",
+        "stand_ne": {
+          "imagePath": "textures/stone_golem_stand_ne.png",
           "offsetX": -55,
           "offsetY": -45,
           "flippedOffsetX": -55,
@@ -102,8 +136,8 @@
           "scaleX": 0.1,
           "scaleY": 0.1
         },
-        "down_action": {
-          "imagePath": "textures/stone_golem_down_action.png",
+        "action_sw": {
+          "imagePath": "textures/stone_golem_action_sw.png",
           "offsetX": -55,
           "offsetY": -45,
           "flippedOffsetX": -55,
@@ -111,8 +145,8 @@
           "scaleX": 0.1,
           "scaleY": 0.1
         },
-        "up_action": {
-          "imagePath": "textures/stone_golem_up_action.png",
+        "action_ne": {
+          "imagePath": "textures/stone_golem_action_ne.png",
           "offsetX": -55,
           "offsetY": -45,
           "flippedOffsetX": -55,

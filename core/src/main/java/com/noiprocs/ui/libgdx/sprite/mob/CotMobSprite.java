@@ -11,17 +11,17 @@ import com.noiprocs.ui.libgdx.sprite.LibgdxTexture;
 public class CotMobSprite extends LibgdxSprite {
   private static final String MODEL_CLASS = CotMobModel.class.getName();
 
-  private static final LibgdxTexture DEFAULT_TEXTURE = loadTexture(MODEL_CLASS, "default");
-  private static final LibgdxTexture DOWN_FLIPPED_TEXTURE = DEFAULT_TEXTURE.flipped();
-  private static final LibgdxTexture UP_TEXTURE = loadTexture(MODEL_CLASS, "up");
-  private static final LibgdxTexture UP_FLIPPED_TEXTURE = UP_TEXTURE.flipped();
-  private static final LibgdxTexture DOWN_ACTION_TEXTURE = loadTexture(MODEL_CLASS, "down_action");
-  private static final LibgdxTexture DOWN_ACTION_FLIPPED_TEXTURE = DOWN_ACTION_TEXTURE.flipped();
-  private static final LibgdxTexture UP_ACTION_TEXTURE = loadTexture(MODEL_CLASS, "up_action");
-  private static final LibgdxTexture UP_ACTION_FLIPPED_TEXTURE = UP_ACTION_TEXTURE.flipped();
+  private static final LibgdxTexture STAND_SW_TEXTURE = loadTexture(MODEL_CLASS, "stand_sw");
+  private static final LibgdxTexture STAND_SE_TEXTURE = STAND_SW_TEXTURE.flipped();
+  private static final LibgdxTexture STAND_NE_TEXTURE = loadTexture(MODEL_CLASS, "stand_ne");
+  private static final LibgdxTexture STAND_NW_TEXTURE = STAND_NE_TEXTURE.flipped();
+  private static final LibgdxTexture ACTION_SW_TEXTURE = loadTexture(MODEL_CLASS, "action_sw");
+  private static final LibgdxTexture ACTION_SE_TEXTURE = ACTION_SW_TEXTURE.flipped();
+  private static final LibgdxTexture ACTION_NE_TEXTURE = loadTexture(MODEL_CLASS, "action_ne");
+  private static final LibgdxTexture ACTION_NW_TEXTURE = ACTION_NE_TEXTURE.flipped();
 
   public CotMobSprite() {
-    super(DEFAULT_TEXTURE);
+    super(STAND_SW_TEXTURE);
   }
 
   @Override
@@ -31,10 +31,10 @@ public class CotMobSprite extends LibgdxSprite {
     boolean isActing = mobModel.getAction() instanceof AnimatedAction;
 
     if (facingDirection.x + facingDirection.y < 0) {
-      if (facingDirection.y < 0) return isActing ? UP_ACTION_FLIPPED_TEXTURE : UP_FLIPPED_TEXTURE;
-      return isActing ? UP_ACTION_TEXTURE : UP_TEXTURE;
+      if (facingDirection.y < 0) return isActing ? ACTION_NW_TEXTURE : STAND_NW_TEXTURE;
+      return isActing ? ACTION_NE_TEXTURE : STAND_NE_TEXTURE;
     }
-    if (facingDirection.y > 0) return isActing ? DOWN_ACTION_FLIPPED_TEXTURE : DOWN_FLIPPED_TEXTURE;
-    return isActing ? DOWN_ACTION_TEXTURE : super.getTexture(model);
+    if (facingDirection.y > 0) return isActing ? ACTION_SE_TEXTURE : STAND_SE_TEXTURE;
+    return isActing ? ACTION_SW_TEXTURE : super.getTexture(model);
   }
 }
