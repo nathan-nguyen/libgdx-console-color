@@ -6,7 +6,6 @@ import com.noiprocs.core.model.Model;
 import com.noiprocs.core.model.action.AnimatedAction;
 import com.noiprocs.core.model.action.AttackAction;
 import com.noiprocs.core.model.action.InteractAction;
-import com.noiprocs.core.model.action.NearestAction;
 import com.noiprocs.core.model.item.ItemModel;
 import com.noiprocs.core.model.mob.character.PlayerModel;
 import com.noiprocs.gameplay.model.item.AxeItem;
@@ -26,19 +25,19 @@ public class PlayerSprite extends LibgdxSprite {
   static {
     LibgdxTexture standSw = loadTexture(MODEL_CLASS, "stand_sw");
     LibgdxTexture standNe = loadTexture(MODEL_CLASS, "stand_ne");
-    STAND = new LibgdxTexture[]{ standSw, standSw.flipped(), standNe, standNe.flipped() };
+    STAND = new LibgdxTexture[] {standSw, standSw.flipped(), standNe, standNe.flipped()};
 
     LibgdxTexture actionSw = loadTexture(MODEL_CLASS, "action_sw");
     LibgdxTexture actionNe = loadTexture(MODEL_CLASS, "action_ne");
-    ACTION = new LibgdxTexture[]{ actionSw, actionSw.flipped(), actionNe, actionNe.flipped() };
+    ACTION = new LibgdxTexture[] {actionSw, actionSw.flipped(), actionNe, actionNe.flipped()};
 
     LibgdxTexture chopSw = loadTexture(MODEL_CLASS, "chop_tree_sw");
     LibgdxTexture chopNe = loadTexture(MODEL_CLASS, "chop_tree_ne");
-    CHOP_TREE = new LibgdxTexture[]{ chopSw, chopSw.flipped(), chopNe, chopNe.flipped() };
+    CHOP_TREE = new LibgdxTexture[] {chopSw, chopSw.flipped(), chopNe, chopNe.flipped()};
 
     LibgdxTexture pickupSw = loadTexture(MODEL_CLASS, "pickup_sw");
     LibgdxTexture pickupNw = loadTexture(MODEL_CLASS, "pickup_nw");
-    PICKUP = new LibgdxTexture[]{ pickupSw, pickupSw.flipped(), pickupNw.flipped(), pickupNw };
+    PICKUP = new LibgdxTexture[] {pickupSw, pickupSw.flipped(), pickupNw.flipped(), pickupNw};
   }
 
   public PlayerSprite() {
