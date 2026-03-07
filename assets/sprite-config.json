@@ -226,7 +226,7 @@
       }
     },
     {
-      "modelClasses": ["com.noiprocs.gameplay.model.building.ChestModel"],
+      "modelClasses": ["com.noiprocs.core.model.building.ChestModel"],
       "images": {
         "default": {
           "imagePath": "textures/chest.png",
