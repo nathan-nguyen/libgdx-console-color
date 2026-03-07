@@ -115,6 +115,48 @@
       }
     },
     {
+      "modelClasses": ["com.noiprocs.gameplay.model.mob.GoblinModel"],
+      "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.GoblinSprite",
+      "images": {
+        "stand_sw": {
+          "imagePath": "textures/goblin_stand_sw.png",
+          "offsetX": -45,
+          "offsetY": -35,
+          "flippedOffsetX": -35,
+          "flippedOffsetY": -35,
+          "scaleX": 0.08,
+          "scaleY": 0.08
+        },
+        "stand_ne": {
+          "imagePath": "textures/goblin_stand_ne.png",
+          "offsetX": -45,
+          "offsetY": -35,
+          "flippedOffsetX": -40,
+          "flippedOffsetY": -35,
+          "scaleX": 0.08,
+          "scaleY": 0.08
+        },
+        "attack_sw": {
+          "imagePath": "textures/goblin_attack_sw.png",
+          "offsetX": -45,
+          "offsetY": -35,
+          "flippedOffsetX": -35,
+          "flippedOffsetY": -35,
+          "scaleX": 0.08,
+          "scaleY": 0.08
+        },
+        "attack_ne": {
+          "imagePath": "textures/goblin_attack_ne.png",
+          "offsetX": -45,
+          "offsetY": -35,
+          "flippedOffsetX": -35,
+          "flippedOffsetY": -35,
+          "scaleX": 0.08,
+          "scaleY": 0.08
+        }
+      }
+    },
+    {
       "modelClasses": ["com.noiprocs.gameplay.model.mob.character.GolemModel"],
       "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.character.GolemSprite",
       "images": {
