@@ -24,7 +24,7 @@ public class LibgdxSprite {
 
   /** Returns {screenX, screenY, imgW, imgH} for the given texture at the model's world position. */
   protected float[] screenBounds(
-      LibgdxTexture tex, Model model, float offsetX, float offsetY, SpriteRenderContext ctx) {
+      LibgdxTexture tex, Model model, float offsetX, float offsetY, LibgdxRenderContext ctx) {
     float modelX = (float) model.position.x / Config.WORLD_SCALE - offsetX;
     float modelY = (float) model.position.y / Config.WORLD_SCALE - offsetY;
     float screenX =
@@ -46,7 +46,7 @@ public class LibgdxSprite {
       Model playerModel,
       float offsetX,
       float offsetY,
-      SpriteRenderContext ctx) {
+      LibgdxRenderContext ctx) {
     LibgdxTexture tex = getTexture(model);
     float[] b = screenBounds(tex, model, offsetX, offsetY, ctx);
     float screenX = b[0], screenY = b[1], imgW = b[2], imgH = b[3];

@@ -4,29 +4,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.noiprocs.core.model.Model;
 import com.noiprocs.settings.SettingsManager;
 import com.noiprocs.ui.libgdx.sprite.LibGDXSpriteManager;
+import com.noiprocs.ui.libgdx.sprite.LibgdxRenderContext;
 import com.noiprocs.ui.libgdx.sprite.LibgdxSprite;
-import com.noiprocs.ui.libgdx.sprite.SpriteRenderContext;
 
 public class LibgdxTextureRenderer {
-  private final SpriteRenderContext renderContext;
+  private final LibgdxRenderContext renderContext;
   private final SettingsManager settingsManager;
   private final LibGDXSpriteManager libgdxSpriteManager = new LibGDXSpriteManager();
 
-  public LibgdxTextureRenderer(
-      int height,
-      int width,
-      float virtualHeight,
-      OcclusionAlphaResolver occlusionAlphaResolver,
-      SettingsManager settingsManager) {
+  public LibgdxTextureRenderer(LibgdxRenderContext renderContext, SettingsManager settingsManager) {
     this.settingsManager = settingsManager;
-    this.renderContext =
-        new SpriteRenderContext(
-            height,
-            width,
-            virtualHeight,
-            (model, playerModel, minX, maxX, minY, maxY) ->
-                occlusionAlphaResolver.resolve(
-                    model, playerModel, width, virtualHeight, minX, maxX, minY, maxY));
+    this.renderContext = renderContext;
   }
 
   public boolean canRender(Model model) {

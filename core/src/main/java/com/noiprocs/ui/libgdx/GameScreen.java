@@ -26,6 +26,7 @@ import com.noiprocs.ui.libgdx.renderer.HitboxDebugRenderer;
 import com.noiprocs.ui.libgdx.renderer.IsometricRenderPolicy;
 import com.noiprocs.ui.libgdx.renderer.LibgdxTextureRenderer;
 import com.noiprocs.ui.libgdx.renderer.OcclusionAlphaResolver;
+import com.noiprocs.ui.libgdx.sprite.LibgdxRenderContext;
 import com.noiprocs.ui.libgdx.widget.MenuOverlay;
 import java.util.Comparator;
 import java.util.List;
@@ -101,9 +102,16 @@ public class GameScreen implements Screen {
     screenHeight = Math.round(virtualHeight / UIConfig.CHAR_SIZE);
     screenWidth = Math.round(virtualWidth / UIConfig.CHAR_SIZE);
     OcclusionAlphaResolver occlusionAlphaResolver = new OcclusionAlphaResolver(settingsManager);
-    libgdxTextureRenderer =
-        new LibgdxTextureRenderer(
-            screenHeight, screenWidth, virtualHeight, occlusionAlphaResolver, settingsManager);
+    LibgdxRenderContext renderContext =
+        new LibgdxRenderContext(
+            screenHeight,
+            screenWidth,
+            virtualHeight,
+            (model, playerModel, minX, maxX, minY, maxY) ->
+                occlusionAlphaResolver.resolve(
+                    model, playerModel, screenWidth, virtualHeight, minX, maxX, minY, maxY),
+            renderResources.getShapeRenderer());
+    libgdxTextureRenderer = new LibgdxTextureRenderer(renderContext, settingsManager);
     consoleCharRenderer =
         new ConsoleCharRenderer(screenHeight, screenWidth, virtualHeight, occlusionAlphaResolver);
     hitboxDebugRenderer = new HitboxDebugRenderer(screenHeight, screenWidth, virtualHeight);

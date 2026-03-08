@@ -7,9 +7,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.noiprocs.core.model.DurableModel;
 import com.noiprocs.core.model.Model;
+import com.noiprocs.ui.libgdx.sprite.LibgdxRenderContext;
 import com.noiprocs.ui.libgdx.sprite.LibgdxSprite;
 import com.noiprocs.ui.libgdx.sprite.LibgdxTexture;
-import com.noiprocs.ui.libgdx.sprite.SpriteRenderContext;
 
 public class MobSprite extends LibgdxSprite {
   private static final float BAR_HEIGHT = 3f;
@@ -39,13 +39,13 @@ public class MobSprite extends LibgdxSprite {
       Model playerModel,
       float offsetX,
       float offsetY,
-      SpriteRenderContext ctx) {
+      LibgdxRenderContext ctx) {
     super.render(batch, model, playerModel, offsetX, offsetY, ctx);
     renderHealthBar(batch, model, offsetX, offsetY, ctx);
   }
 
   private void renderHealthBar(
-      SpriteBatch batch, Model model, float offsetX, float offsetY, SpriteRenderContext ctx) {
+      SpriteBatch batch, Model model, float offsetX, float offsetY, LibgdxRenderContext ctx) {
     DurableModel durableModel = (DurableModel) model;
     int health = durableModel.getHealth();
     int maxHealth = durableModel.getMaxHealth();

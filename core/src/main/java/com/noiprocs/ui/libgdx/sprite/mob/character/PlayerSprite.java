@@ -1,16 +1,26 @@
 package com.noiprocs.ui.libgdx.sprite.mob.character;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.noiprocs.core.GameContext;
+import com.noiprocs.core.common.Config;
 import com.noiprocs.core.common.Vector3D;
 import com.noiprocs.core.model.Model;
 import com.noiprocs.core.model.action.AnimatedAction;
 import com.noiprocs.core.model.action.AttackAction;
 import com.noiprocs.core.model.action.InteractAction;
+import com.noiprocs.core.model.item.Item;
 import com.noiprocs.core.model.item.ItemModel;
+import com.noiprocs.core.model.item.PlacableItem;
 import com.noiprocs.core.model.mob.character.PlayerModel;
 import com.noiprocs.gameplay.model.item.AxeItem;
 import com.noiprocs.gameplay.model.mob.GoblinModel;
 import com.noiprocs.gameplay.model.plant.TreeModel;
+import com.noiprocs.resources.UIConfig;
+import com.noiprocs.ui.libgdx.sprite.LibgdxRenderContext;
 import com.noiprocs.ui.libgdx.sprite.LibgdxSprite;
 import com.noiprocs.ui.libgdx.sprite.LibgdxTexture;
 
@@ -77,5 +87,71 @@ public class PlayerSprite extends LibgdxSprite {
   private LibgdxTexture selectByDirection(Vector3D dir, LibgdxTexture[] textures) {
     if (dir.x + dir.y < 0) return textures[dir.y < 0 ? 3 : 2]; // NW=3, NE=2
     return textures[dir.y > 0 ? 1 : 0]; // SE=1, SW=0
+  }
+
+  @Override
+  public void render(
+      SpriteBatch batch,
+      Model model,
+      Model playerModel,
+      float offsetX,
+      float offsetY,
+      LibgdxRenderContext ctx) {
+    super.render(batch, model, playerModel, offsetX, offsetY, ctx);
+    renderPlacementPreview(batch, model, offsetX, offsetY, ctx);
+  }
+
+  private void renderPlacementPreview(
+      SpriteBatch batch, Model model, float offsetX, float offsetY, LibgdxRenderContext ctx) {
+    Item item = ((PlayerModel) model).getHoldingItem();
+    if (!(item instanceof PlacableItem)) return;
+
+    PlacableItem placableItem = (PlacableItem) item;
+    Vector3D dim = GameContext.get().hitboxManager.getHitboxDimension(placableItem);
+    Model ghostModel = placableItem.createPlacedModel(model.position);
+    boolean valid = GameContext.get().hitboxManager.isValid(ghostModel, ghostModel.position);
+
+    float posX = (float) model.position.x / Config.WORLD_SCALE - offsetX;
+    float posY = (float) model.position.y / Config.WORLD_SCALE - offsetY;
+    float h = (float) dim.x / Config.WORLD_SCALE;
+    float w = (float) dim.y / Config.WORLD_SCALE;
+    float hw = (ctx.height + ctx.width) / 2f;
+    float isoOffsetX = UIConfig.CHAR_SIZE * hw / 2f;
+
+    // 4 corners of the ground footprint in isometric screen space
+    float tlsx = (posY - posX) * UIConfig.CHAR_SIZE / 2f + isoOffsetX;
+    float tlsy = ctx.virtualHeight / 2f + UIConfig.CHAR_SIZE / 4f * (hw - posX - posY);
+    float trsx = (posY + w - posX) * UIConfig.CHAR_SIZE / 2f + isoOffsetX;
+    float trsy = ctx.virtualHeight / 2f + UIConfig.CHAR_SIZE / 4f * (hw - posX - (posY + w));
+    float blsx = (posY - (posX + h)) * UIConfig.CHAR_SIZE / 2f + isoOffsetX;
+    float blsy = ctx.virtualHeight / 2f + UIConfig.CHAR_SIZE / 4f * (hw - (posX + h) - posY);
+    float brsx = (posY + w - (posX + h)) * UIConfig.CHAR_SIZE / 2f + isoOffsetX;
+    float brsy = ctx.virtualHeight / 2f + UIConfig.CHAR_SIZE / 4f * (hw - (posX + h) - (posY + w));
+
+    Color color = valid ? Color.GREEN : Color.RED;
+    ShapeRenderer sr = ctx.shapeRenderer;
+
+    batch.end();
+    sr.setProjectionMatrix(batch.getProjectionMatrix());
+    Gdx.gl.glEnable(GL20.GL_BLEND);
+    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+    sr.begin(ShapeRenderer.ShapeType.Filled);
+    sr.setColor(color.r, color.g, color.b, 0.3f);
+    sr.triangle(tlsx, tlsy, trsx, trsy, brsx, brsy);
+    sr.triangle(tlsx, tlsy, brsx, brsy, blsx, blsy);
+    sr.end();
+
+    sr.begin(ShapeRenderer.ShapeType.Line);
+    Gdx.gl.glLineWidth(2f);
+    sr.setColor(color.r, color.g, color.b, 0.8f);
+    sr.line(tlsx, tlsy, trsx, trsy);
+    sr.line(trsx, trsy, brsx, brsy);
+    sr.line(brsx, brsy, blsx, blsy);
+    sr.line(blsx, blsy, tlsx, tlsy);
+    sr.end();
+
+    Gdx.gl.glDisable(GL20.GL_BLEND);
+    batch.begin();
   }
 }
