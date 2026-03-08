@@ -9,6 +9,7 @@ import com.noiprocs.core.model.action.InteractAction;
 import com.noiprocs.core.model.item.ItemModel;
 import com.noiprocs.core.model.mob.character.PlayerModel;
 import com.noiprocs.gameplay.model.item.AxeItem;
+import com.noiprocs.gameplay.model.mob.GoblinModel;
 import com.noiprocs.gameplay.model.plant.TreeModel;
 import com.noiprocs.ui.libgdx.sprite.LibgdxSprite;
 import com.noiprocs.ui.libgdx.sprite.LibgdxTexture;
@@ -68,7 +69,7 @@ public class PlayerSprite extends LibgdxSprite {
     if (playerModel.getAction() instanceof InteractAction) {
       InteractAction action = (InteractAction) playerModel.getAction();
       Model target = GameContext.get().modelManager.getModel(action.targetId);
-      return target instanceof TreeModel;
+      return target instanceof TreeModel || target instanceof GoblinModel;
     }
     return false;
   }

@@ -5,10 +5,9 @@ import com.noiprocs.core.model.Model;
 import com.noiprocs.core.model.action.AnimatedAction;
 import com.noiprocs.core.model.mob.MobModel;
 import com.noiprocs.gameplay.model.mob.CotMobModel;
-import com.noiprocs.ui.libgdx.sprite.LibgdxSprite;
 import com.noiprocs.ui.libgdx.sprite.LibgdxTexture;
 
-public class CotMobSprite extends LibgdxSprite {
+public class CotMobSprite extends MobSprite {
   private static final String MODEL_CLASS = CotMobModel.class.getName();
 
   private static final LibgdxTexture STAND_SW_TEXTURE = loadTexture(MODEL_CLASS, "stand_sw");

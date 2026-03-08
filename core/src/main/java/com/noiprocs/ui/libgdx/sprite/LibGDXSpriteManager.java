@@ -9,18 +9,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LibGDXSpriteManager implements Disposable {
   private final Map<String, LibgdxSprite> spriteCache = new ConcurrentHashMap<>();
 
-  public boolean hasTexture(Model model) {
-    return getTexture(model) != null;
-  }
-
-  public LibgdxTexture getTexture(Model model) {
+  public LibgdxSprite getSprite(Model model) {
     if (model == null) return null;
     String className =
         (model instanceof ItemModel)
             ? ((ItemModel) model).itemClass.getName()
             : model.getClass().getName();
-    LibgdxSprite sprite = spriteCache.computeIfAbsent(className, LibGDXSpriteFactory::create);
-    return sprite != null ? sprite.getTexture(model) : null;
+    return spriteCache.computeIfAbsent(className, LibGDXSpriteFactory::create);
+  }
+
+  public boolean hasTexture(Model model) {
+    LibgdxSprite sprite = getSprite(model);
+    return sprite != null && sprite.getTexture(model) != null;
   }
 
   @Override

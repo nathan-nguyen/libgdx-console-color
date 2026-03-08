@@ -5,10 +5,10 @@ import com.noiprocs.core.model.Model;
 import com.noiprocs.core.model.action.AnimatedAction;
 import com.noiprocs.core.model.mob.MobModel;
 import com.noiprocs.gameplay.model.mob.character.GolemModel;
-import com.noiprocs.ui.libgdx.sprite.LibgdxSprite;
 import com.noiprocs.ui.libgdx.sprite.LibgdxTexture;
+import com.noiprocs.ui.libgdx.sprite.mob.MobSprite;
 
-public class GolemSprite extends LibgdxSprite {
+public class GolemSprite extends MobSprite {
   private static final String MODEL_CLASS = GolemModel.class.getName();
 
   private static final LibgdxTexture STAND_SW_TEXTURE = loadTexture(MODEL_CLASS, "stand_sw");
