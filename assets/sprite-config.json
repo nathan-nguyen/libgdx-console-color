@@ -229,7 +229,7 @@
       "modelClasses": ["com.noiprocs.core.model.building.ChestModel"],
       "images": {
         "default": {
-          "imagePath": "textures/chest.png",
+          "imagePath": "icons/chest.png",
           "offsetX": -45,
           "offsetY": -50,
           "scaleX": 0.08,
