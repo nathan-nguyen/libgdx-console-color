@@ -54,7 +54,10 @@ public class LibgdxSprite {
         ctx.alphaResolver.resolve(
             model, playerModel, screenX, screenX + imgW, screenY, screenY + imgH);
 
-    if (GameContext.get().modelManager.hasActiveEvent(model.id, EventType.HURT)) {
+    boolean isHurt = GameContext.get().modelManager.hasActiveEvent(model.id, EventType.HURT);
+    boolean isInteract =
+        GameContext.get().modelManager.hasActiveEvent(model.id, EventType.INTERACT);
+    if (isHurt || isInteract) {
       float blurAlpha = alpha * 0.35f;
       batch.setColor(1f, 1f, 1f, blurAlpha);
       for (float dx : new float[] {-3f, 3f, 0f, 0f}) {
@@ -63,7 +66,11 @@ public class LibgdxSprite {
         }
       }
     }
-    batch.setColor(1f, 1f, 1f, alpha);
+    if (isHurt) {
+      batch.setColor(1f, 0.6f, 0.6f, alpha);
+    } else {
+      batch.setColor(1f, 1f, 1f, alpha);
+    }
     batch.draw(tex.textureRegion, screenX, screenY, imgW, imgH);
   }
 }

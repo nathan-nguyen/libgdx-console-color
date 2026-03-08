@@ -7,6 +7,7 @@ import com.noiprocs.core.GameContext;
 import com.noiprocs.core.common.Config;
 import com.noiprocs.core.model.Model;
 import com.noiprocs.core.model.event.EventType;
+import com.noiprocs.core.model.manager.ModelManager;
 import com.noiprocs.resources.UIConfig;
 import com.noiprocs.ui.console.sprite.ConsoleSprite;
 import com.noiprocs.ui.console.sprite.ConsoleTexture;
@@ -64,8 +65,10 @@ public class ConsoleCharRenderer {
       posY = width / 2f - consoleTexture.offsetY;
     }
 
+    ModelManager modelManager = gameContext.modelManager;
     char overrideColor = 0;
-    if (gameContext.modelManager.hasActiveEvent(model.id, EventType.HURT)) {
+    if (modelManager.hasActiveEvent(model.id, EventType.HURT)
+        || modelManager.hasActiveEvent(model.id, EventType.INTERACT)) {
       overrideColor = 'r';
     }
 
