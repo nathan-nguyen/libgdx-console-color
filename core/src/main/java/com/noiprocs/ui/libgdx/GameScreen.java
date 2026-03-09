@@ -21,6 +21,7 @@ import com.noiprocs.settings.SettingsManager;
 import com.noiprocs.ui.console.hitbox.ConsoleHitboxManager;
 import com.noiprocs.ui.console.sprite.ConsoleSpriteManager;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
+import com.noiprocs.ui.libgdx.renderer.BackgroundRenderer;
 import com.noiprocs.ui.libgdx.renderer.ConsoleCharRenderer;
 import com.noiprocs.ui.libgdx.renderer.HitboxDebugRenderer;
 import com.noiprocs.ui.libgdx.renderer.IsometricRenderPolicy;
@@ -58,6 +59,7 @@ public class GameScreen implements Screen {
 
   private int screenHeight;
   private int screenWidth;
+  private BackgroundRenderer backgroundRenderer;
   private LibgdxTextureRenderer libgdxTextureRenderer;
   private ConsoleCharRenderer consoleCharRenderer;
   private HitboxDebugRenderer hitboxDebugRenderer;
@@ -101,6 +103,8 @@ public class GameScreen implements Screen {
     // screenHeight/screenWidth are in tile units (virtual pixels / CHAR_SIZE).
     screenHeight = Math.round(virtualHeight / UIConfig.CHAR_SIZE);
     screenWidth = Math.round(virtualWidth / UIConfig.CHAR_SIZE);
+    backgroundRenderer = new BackgroundRenderer(virtualWidth, virtualHeight);
+
     OcclusionAlphaResolver occlusionAlphaResolver = new OcclusionAlphaResolver(settingsManager);
     LibgdxRenderContext renderContext =
         new LibgdxRenderContext(
@@ -209,6 +213,7 @@ public class GameScreen implements Screen {
     List<Model> renderableModels = getRenderableModels(playerModel);
 
     batch.begin();
+    backgroundRenderer.render(batch, offsetX, offsetY);
     // Renderers may tint the batch color; restore it after the loop.
     Color originalColor = batch.getColor().cpy();
     for (Model model : renderableModels) {
@@ -277,6 +282,10 @@ public class GameScreen implements Screen {
       menuOverlay.dispose();
     }
 
+    if (backgroundRenderer != null) {
+      backgroundRenderer.dispose();
+      backgroundRenderer = null;
+    }
     gameContext = null;
     libgdxTextureRenderer = null;
   }

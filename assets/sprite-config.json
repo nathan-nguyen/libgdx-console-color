@@ -286,6 +286,26 @@
       }
     },
     {
+      "modelClasses": ["com.noiprocs.gameplay.model.environment.WallTrapModel"],
+      "spriteClass": "com.noiprocs.ui.libgdx.sprite.environment.WallTrapSprite",
+      "images": {
+        "waiting": {
+          "imagePath": "textures/maze_trap_waiting.png",
+          "offsetX": -120,
+          "offsetY": -190,
+          "scaleX": 0.23,
+          "scaleY": 0.23
+        },
+        "fire": {
+          "imagePath": "textures/maze_trap_fire.png",
+          "offsetX": -120,
+          "offsetY": -170,
+          "scaleX": 0.23,
+          "scaleY": 0.23
+        }
+      }
+    },
+    {
       "modelClasses": ["com.noiprocs.gameplay.model.environment.MazePartModel"],
       "images": {
         "default": {
