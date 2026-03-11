@@ -44,9 +44,7 @@ public class PlayerInfoHUD extends Table {
     setFillParent(true);
     top().left().pad(10);
     add(healthBar).size(HealthBarActor.BAR_WIDTH, HealthBarActor.BAR_HEIGHT).left();
-    add(debugLabel).padLeft(6).left();
     row();
-
     Table hotbarTable = new Table();
     for (int i = 0; i < HOTBAR_SIZE; i++) {
       final int slotIndex = i;
@@ -65,6 +63,8 @@ public class PlayerInfoHUD extends Table {
       hotbarTable.add(slot).size(48, 48).pad(2);
     }
     add(hotbarTable).left().colspan(2);
+    row();
+    add(debugLabel).left().colspan(2);
   }
 
   public void setOnSlotSelected(IntConsumer onSlotSelected) {
@@ -77,11 +77,13 @@ public class PlayerInfoHUD extends Table {
       debugLabel.setText(
           "["
               + playerModel.position
-              + "]  FPS: "
+              + "] - FPS: "
               + Gdx.graphics.getFramesPerSecond()
-              + "  Ping: "
+              + " - Ping: "
               + MetricCollector.pingMs.getLast()
-              + "ms");
+              + "ms - Payload: "
+              + MetricCollector.packageSizePerClientBytes.getAvg()
+              + "B");
     } else {
       debugLabel.setText("");
     }
