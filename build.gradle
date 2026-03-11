@@ -12,6 +12,15 @@ buildscript {
   }
 }
 
+// Directory containing all JSON config files (written by console-color build).
+// Must be set via JSON_EXTRA_OUTPUT_DIR env var (sourced from .env through Makefile,
+// or exported in your shell/IDE environment). Resolved to an absolute path so subprojects
+// can safely add it to their source sets regardless of their own project directory.
+def localProperties = new Properties()
+file('local.properties').withInputStream { localProperties.load(it) }
+def rawJsonOutputDir = localProperties.getProperty('jsonOutputDir')
+ext.jsonOutputDir = rawJsonOutputDir != null ? file(rawJsonOutputDir) : null
+
 allprojects {
   apply plugin: 'eclipse'
   apply plugin: 'idea'

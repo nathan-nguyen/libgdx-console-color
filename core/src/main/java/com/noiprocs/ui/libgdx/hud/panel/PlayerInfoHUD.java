@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.noiprocs.core.common.MetricCollector;
 import com.noiprocs.core.model.item.Inventory;
 import com.noiprocs.core.model.item.Item;
 import com.noiprocs.core.model.mob.character.PlayerModel;
@@ -74,7 +75,13 @@ public class PlayerInfoHUD extends Table {
     boolean debug = settingsManager != null && settingsManager.isDebugMode();
     if (debug) {
       debugLabel.setText(
-          "[" + playerModel.position + "]  FPS: " + Gdx.graphics.getFramesPerSecond());
+          "["
+              + playerModel.position
+              + "]  FPS: "
+              + Gdx.graphics.getFramesPerSecond()
+              + "  Ping: "
+              + MetricCollector.pingMs.getLast()
+              + "ms");
     } else {
       debugLabel.setText("");
     }

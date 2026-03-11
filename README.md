@@ -45,7 +45,15 @@ cd ../libgdx-console-color
 - `console-color-core`: Core game logic
 - `console-color`: Console UI components and sprite system
 
-### 2. Build the Project
+### 2. Configure `local.properties`
+
+`local.properties` is gitignored and must be created manually by each developer. Add the path to the shared JSON config directory (produced by the `console-color` build):
+
+```properties
+jsonOutputDir=../configs
+```
+
+### 3. Build the Project
 
 ```bash
 make build

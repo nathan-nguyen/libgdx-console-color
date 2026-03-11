@@ -20,6 +20,9 @@ android {
       res.setSrcDirs(['res'])
       assets.setSrcDirs(['../assets'])
       jniLibs.setSrcDirs(['libs'])
+      if (rootProject.ext.jsonOutputDir != null) {
+        resources.srcDirs += [rootProject.ext.jsonOutputDir]
+      }
     }
   }
   packagingOptions {

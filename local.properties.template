@@ -1,0 +1,5 @@
+# Location of the Android SDK:
+sdk.dir=/absolute/path/to/android/sdk
+
+# Directory containing all JSON config files (written by console-color build).
+jsonOutputDir=/absolute/path/to/configs

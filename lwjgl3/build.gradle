@@ -19,6 +19,9 @@ apply plugin: 'io.github.fourlastor.construo'
 import io.github.fourlastor.construo.Target
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
+if (rootProject.ext.jsonOutputDir != null) {
+  sourceSets.main.resources.srcDirs += [ rootProject.ext.jsonOutputDir ]
+}
 application.mainClass = 'com.noiprocs.lwjgl3.Lwjgl3Launcher'
 application.applicationName = appName
 eclipse.project.name = appName + '-lwjgl3'

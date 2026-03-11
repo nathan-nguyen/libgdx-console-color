@@ -291,17 +291,17 @@
       "images": {
         "waiting": {
           "imagePath": "textures/maze_trap_waiting.png",
-          "offsetX": -120,
-          "offsetY": -190,
+          "offsetX": -115,
+          "offsetY": -175,
           "scaleX": 0.23,
-          "scaleY": 0.23
+          "scaleY": 0.20
         },
         "fire": {
           "imagePath": "textures/maze_trap_fire.png",
-          "offsetX": -120,
-          "offsetY": -170,
+          "offsetX": -115,
+          "offsetY": -155,
           "scaleX": 0.23,
-          "scaleY": 0.23
+          "scaleY": 0.20
         }
       }
     },
