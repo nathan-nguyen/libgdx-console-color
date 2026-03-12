@@ -16,6 +16,8 @@ import com.noiprocs.ui.libgdx.hud.HUDManager;
  * including D-pad, action buttons, and HUD navigation.
  */
 public class TouchInputController implements InputController {
+  private static final boolean SNAP_TO_EIGHT_DIRECTIONS = false;
+
   private final TouchState touchState;
   private final Viewport viewport;
   private final Vector3 touchPoint; // Reusable vector for coordinate conversion
@@ -99,7 +101,7 @@ public class TouchInputController implements InputController {
 
       if (offset.x != 0 || offset.y != 0) {
         anyMovementActive = true;
-        offset = snapToEightDirections(offset);
+        if (SNAP_TO_EIGHT_DIRECTIONS) offset = snapToEightDirections(offset);
         // Isometric: screen-right = northeast, screen-up = northwest
         // game.x = -(offset.x + offset.y), game.y = (offset.x - offset.y)
         Vector3D direction =

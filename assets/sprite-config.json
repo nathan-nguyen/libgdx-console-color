@@ -115,6 +115,19 @@
       }
     },
     {
+      "modelClasses": ["com.noiprocs.gameplay.model.mob.projectile.FlyingWoodLogModel"],
+      "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.FlyingWoodLogSprite",
+      "images": {
+        "default": {
+          "imagePath": "icons/wood_log.png",
+          "offsetX": -25,
+          "offsetY": -40,
+          "scaleX": 0.05,
+          "scaleY": 0.05
+        }
+      }
+    },
+    {
       "modelClasses": ["com.noiprocs.gameplay.model.mob.GoblinModel"],
       "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.GoblinSprite",
       "images": {
@@ -372,6 +385,18 @@
           "imagePath": "icons/tree_branch.png",
           "offsetX": -35,
           "offsetY": -38,
+          "scaleX": 0.05,
+          "scaleY": 0.05
+        }
+      }
+    },
+    {
+      "modelClasses": ["com.noiprocs.gameplay.model.item.WaterBottleItem"],
+      "images": {
+        "default": {
+          "imagePath": "icons/water_bottle.png",
+          "offsetX": -25,
+          "offsetY": -40,
           "scaleX": 0.05,
           "scaleY": 0.05
         }

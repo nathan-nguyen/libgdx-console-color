@@ -14,5 +14,8 @@
   "com.noiprocs.gameplay.model.item.SummonCotMobItem": "icons/summon_cot_mob.png",
   "com.noiprocs.gameplay.model.item.SummonCotMobRecipe": "icons/recipe.png",
   "com.noiprocs.gameplay.model.item.SummonStoneGolemItem": "icons/summon_stone_golem.png",
-  "com.noiprocs.gameplay.model.item.SummonStoneGolemRecipe": "icons/recipe.png"
+  "com.noiprocs.gameplay.model.item.SummonStoneGolemRecipe": "icons/recipe.png",
+  "com.noiprocs.gameplay.model.item.WaterBottleItem": "icons/water_bottle.png",
+  "com.noiprocs.gameplay.model.item.CacaoFruitItem": "icons/cacao_fruit.png",
+  "com.noiprocs.gameplay.model.item.CacaoPotionItem": "icons/cacao_potion.png"
 }

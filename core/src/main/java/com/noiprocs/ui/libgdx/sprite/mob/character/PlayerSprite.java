@@ -15,6 +15,7 @@ import com.noiprocs.core.model.action.InteractAction;
 import com.noiprocs.core.model.item.Item;
 import com.noiprocs.core.model.item.ItemModel;
 import com.noiprocs.core.model.item.PlacableItem;
+import com.noiprocs.core.model.item.ThrowableItemInterface;
 import com.noiprocs.core.model.mob.character.PlayerModel;
 import com.noiprocs.gameplay.model.item.AxeItem;
 import com.noiprocs.gameplay.model.mob.GoblinModel;
@@ -26,6 +27,7 @@ import com.noiprocs.ui.libgdx.sprite.LibgdxTexture;
 
 public class PlayerSprite extends LibgdxSprite {
   private static final String MODEL_CLASS = PlayerModel.class.getName();
+  private static final float THROW_ARROW_LENGTH = 10.0f;
 
   // Texture arrays indexed as [SW=0, SE=1, NE=2, NW=3]
   private static final LibgdxTexture[] STAND;
@@ -98,15 +100,64 @@ public class PlayerSprite extends LibgdxSprite {
       float offsetY,
       LibgdxRenderContext ctx) {
     super.render(batch, model, playerModel, offsetX, offsetY, ctx);
-    renderPlacementPreview(batch, model, offsetX, offsetY, ctx);
+    Item item = ((PlayerModel) model).getHoldingItem();
+    if (item instanceof PlacableItem) renderPlacementPreview(batch, model, offsetX, offsetY, ctx);
+    else if (item instanceof ThrowableItemInterface)
+      renderThrowArrow(batch, model, offsetX, offsetY, ctx);
+  }
+
+  private void renderThrowArrow(
+      SpriteBatch batch, Model model, float offsetX, float offsetY, LibgdxRenderContext ctx) {
+    PlayerModel playerModel = (PlayerModel) model;
+    Vector3D movingDir = playerModel.getMovingDirection();
+    if (movingDir.equals(Vector3D.ZERO)) return;
+
+    Vector3D center = GameContext.get().hitboxManager.getHitboxCenter(model);
+    float cx = (float) center.x / Config.WORLD_SCALE - offsetX;
+    float cy = (float) center.y / Config.WORLD_SCALE - offsetY;
+    float dirLen = (float) Math.sqrt(movingDir.x * movingDir.x + movingDir.y * movingDir.y);
+    float ex = cx + (movingDir.x / dirLen) * THROW_ARROW_LENGTH;
+    float ey = cy + (movingDir.y / dirLen) * THROW_ARROW_LENGTH;
+
+    float startSX = isoScreenX(cx, cy, ctx);
+    float startSY = isoScreenY(cx, cy, ctx);
+    float endSX = isoScreenX(ex, ey, ctx);
+    float endSY = isoScreenY(ex, ey, ctx);
+
+    ShapeRenderer sr = ctx.shapeRenderer;
+    beginShapeRendering(batch, ctx);
+
+    sr.begin(ShapeRenderer.ShapeType.Line);
+    Gdx.gl.glLineWidth(2f);
+    sr.setColor(Color.CYAN);
+    sr.line(startSX, startSY, endSX, endSY);
+
+    float arrowDirSX = endSX - startSX;
+    float arrowDirSY = endSY - startSY;
+    float len = (float) Math.sqrt(arrowDirSX * arrowDirSX + arrowDirSY * arrowDirSY);
+    if (len > 0) {
+      float nx = arrowDirSX / len;
+      float ny = arrowDirSY / len;
+      float headLen = 0.4f * UIConfig.CHAR_SIZE;
+      sr.line(
+          endSX,
+          endSY,
+          endSX - nx * headLen + ny * headLen * 0.5f,
+          endSY - ny * headLen - nx * headLen * 0.5f);
+      sr.line(
+          endSX,
+          endSY,
+          endSX - nx * headLen - ny * headLen * 0.5f,
+          endSY - ny * headLen + nx * headLen * 0.5f);
+    }
+    sr.end();
+
+    endShapeRendering(batch);
   }
 
   private void renderPlacementPreview(
       SpriteBatch batch, Model model, float offsetX, float offsetY, LibgdxRenderContext ctx) {
-    Item item = ((PlayerModel) model).getHoldingItem();
-    if (!(item instanceof PlacableItem)) return;
-
-    PlacableItem placableItem = (PlacableItem) item;
+    PlacableItem placableItem = (PlacableItem) ((PlayerModel) model).getHoldingItem();
     Vector3D dim = GameContext.get().hitboxManager.getHitboxDimension(placableItem);
     Model ghostModel = placableItem.createPlacedModel(model.position);
     boolean valid = GameContext.get().hitboxManager.isValid(ghostModel, ghostModel.position);
@@ -115,26 +166,21 @@ public class PlayerSprite extends LibgdxSprite {
     float posY = (float) model.position.y / Config.WORLD_SCALE - offsetY;
     float h = (float) dim.x / Config.WORLD_SCALE;
     float w = (float) dim.y / Config.WORLD_SCALE;
-    float hw = (ctx.height + ctx.width) / 2f;
-    float isoOffsetX = UIConfig.CHAR_SIZE * hw / 2f;
 
     // 4 corners of the ground footprint in isometric screen space
-    float tlsx = (posY - posX) * UIConfig.CHAR_SIZE / 2f + isoOffsetX;
-    float tlsy = ctx.virtualHeight / 2f + UIConfig.CHAR_SIZE / 4f * (hw - posX - posY);
-    float trsx = (posY + w - posX) * UIConfig.CHAR_SIZE / 2f + isoOffsetX;
-    float trsy = ctx.virtualHeight / 2f + UIConfig.CHAR_SIZE / 4f * (hw - posX - (posY + w));
-    float blsx = (posY - (posX + h)) * UIConfig.CHAR_SIZE / 2f + isoOffsetX;
-    float blsy = ctx.virtualHeight / 2f + UIConfig.CHAR_SIZE / 4f * (hw - (posX + h) - posY);
-    float brsx = (posY + w - (posX + h)) * UIConfig.CHAR_SIZE / 2f + isoOffsetX;
-    float brsy = ctx.virtualHeight / 2f + UIConfig.CHAR_SIZE / 4f * (hw - (posX + h) - (posY + w));
+    float tlsx = isoScreenX(posX, posY, ctx);
+    float tlsy = isoScreenY(posX, posY, ctx);
+    float trsx = isoScreenX(posX, posY + w, ctx);
+    float trsy = isoScreenY(posX, posY + w, ctx);
+    float blsx = isoScreenX(posX + h, posY, ctx);
+    float blsy = isoScreenY(posX + h, posY, ctx);
+    float brsx = isoScreenX(posX + h, posY + w, ctx);
+    float brsy = isoScreenY(posX + h, posY + w, ctx);
 
     Color color = valid ? Color.GREEN : Color.RED;
     ShapeRenderer sr = ctx.shapeRenderer;
 
-    batch.end();
-    sr.setProjectionMatrix(batch.getProjectionMatrix());
-    Gdx.gl.glEnable(GL20.GL_BLEND);
-    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+    beginShapeRendering(batch, ctx);
 
     sr.begin(ShapeRenderer.ShapeType.Filled);
     sr.setColor(color.r, color.g, color.b, 0.3f);
@@ -151,6 +197,27 @@ public class PlayerSprite extends LibgdxSprite {
     sr.line(blsx, blsy, tlsx, tlsy);
     sr.end();
 
+    endShapeRendering(batch);
+  }
+
+  private static float isoScreenX(float gridX, float gridY, LibgdxRenderContext ctx) {
+    float hw = (ctx.height + ctx.width) / 2f;
+    return (gridY - gridX) * UIConfig.CHAR_SIZE / 2f + UIConfig.CHAR_SIZE * hw / 2f;
+  }
+
+  private static float isoScreenY(float gridX, float gridY, LibgdxRenderContext ctx) {
+    float hw = (ctx.height + ctx.width) / 2f;
+    return ctx.virtualHeight / 2f + UIConfig.CHAR_SIZE / 4f * (hw - gridX - gridY);
+  }
+
+  private static void beginShapeRendering(SpriteBatch batch, LibgdxRenderContext ctx) {
+    batch.end();
+    ctx.shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+    Gdx.gl.glEnable(GL20.GL_BLEND);
+    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+  }
+
+  private static void endShapeRendering(SpriteBatch batch) {
     Gdx.gl.glDisable(GL20.GL_BLEND);
     batch.begin();
   }
