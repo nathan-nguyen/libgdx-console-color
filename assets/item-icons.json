@@ -10,6 +10,7 @@
   "com.noiprocs.gameplay.model.item.EscapeScrollItem": "icons/escape_scroll.png",
   "com.noiprocs.gameplay.model.item.ChestItem": "icons/chest.png",
   "com.noiprocs.gameplay.model.item.FenceItem": "icons/fence.png",
+  "com.noiprocs.gameplay.model.item.MysteriousGemItem": "icons/mysterious_gem.png",
   "com.noiprocs.gameplay.model.item.SaplingItem": "icons/sapling.png",
   "com.noiprocs.gameplay.model.item.SummonCotMobItem": "icons/summon_cot_mob.png",
   "com.noiprocs.gameplay.model.item.SummonCotMobRecipe": "icons/recipe.png",

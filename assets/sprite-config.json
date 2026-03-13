@@ -331,6 +331,18 @@
       }
     },
     {
+      "modelClasses": ["com.noiprocs.gameplay.model.item.MysteriousGemItem"],
+      "images": {
+        "default": {
+          "imagePath": "icons/mysterious_gem.png",
+          "offsetX": -25,
+          "offsetY": -40,
+          "scaleX": 0.05,
+          "scaleY": 0.05
+        }
+      }
+    },
+    {
       "modelClasses": ["com.noiprocs.gameplay.model.item.WoodLogItem"],
       "images": {
         "default": {
