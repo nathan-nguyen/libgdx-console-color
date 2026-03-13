@@ -13,7 +13,6 @@ import com.noiprocs.core.GameContext;
 import com.noiprocs.core.common.Config;
 import com.noiprocs.core.graphic.GameScreenInterface;
 import com.noiprocs.core.model.Model;
-import com.noiprocs.core.model.manager.ClientModelManager;
 import com.noiprocs.input.InputController;
 import com.noiprocs.resources.RenderResources;
 import com.noiprocs.resources.UIConfig;
@@ -237,8 +236,9 @@ public class GameScreen implements Screen {
   // Returns visible models within RENDER_RANGE of the player, sorted front-to-back by isometric
   // depth so that closer objects are drawn on top of farther ones.
   private List<Model> getRenderableModels(Model playerModel) {
-    return ((ClientModelManager) GameContext.get().modelManager)
-        .getLocalChunk()
+    return GameContext.get()
+        .modelManager
+        .getSurroundedChunk(playerModel)
         .flatMap(modelChunk -> modelChunk.map.values().stream())
         .filter(
             model ->

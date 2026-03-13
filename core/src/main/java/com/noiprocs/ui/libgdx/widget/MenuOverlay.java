@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.noiprocs.core.GameContext;
+import com.noiprocs.core.GameMode;
 import com.noiprocs.core.control.command.DisconnectCommand;
 import com.noiprocs.settings.SettingsManager;
 import com.noiprocs.ui.libgdx.util.UIStyleHelper;
@@ -118,7 +119,7 @@ public class MenuOverlay extends Table {
         new ClickListener() {
           @Override
           public void clicked(InputEvent event, float x, float y) {
-            if (gameContext != null && !gameContext.isServer) {
+            if (gameContext != null && gameContext.gameMode == GameMode.CLIENT) {
               DisconnectCommand disconnectCommand = new DisconnectCommand(gameContext.username);
               gameContext.controlManager.processInput(disconnectCommand);
             }
