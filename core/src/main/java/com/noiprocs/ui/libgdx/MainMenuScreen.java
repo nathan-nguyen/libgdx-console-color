@@ -51,8 +51,20 @@ public class MainMenuScreen implements Screen {
     table.add(titleLabel).colspan(1).padBottom(30);
     table.row();
 
-    // Play button
-    TextButton playButton = new TextButton("Play", skin);
+    // Single Player button
+    TextButton singlePlayerButton = new TextButton("Single Player", skin);
+    singlePlayerButton.addListener(
+        new ClickListener() {
+          @Override
+          public void clicked(InputEvent event, float x, float y) {
+            app.showStandaloneGame();
+          }
+        });
+    table.add(singlePlayerButton).width(200).height(50).pad(10);
+    table.row();
+
+    // Multiplayer button
+    TextButton playButton = new TextButton("Multiplayer", skin);
     playButton.addListener(
         new ClickListener() {
           @Override

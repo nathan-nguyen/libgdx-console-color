@@ -125,6 +125,24 @@ public class LibGDXApp extends Game {
             platform));
   }
 
+  /** Navigate to game screen in standalone (single player) mode. */
+  public void showStandaloneGame() {
+    setScreen(
+        new GameScreen(
+            viewport,
+            camera,
+            renderResources,
+            getInputController(),
+            settingsManager,
+            virtualControlsStage,
+            this::showMainMenu,
+            settingsManager.getUsername(),
+            settingsManager.getHostname(),
+            settingsManager.getPort(),
+            "standalone",
+            platform));
+  }
+
   @Override
   public void dispose() {
     renderResources.dispose();
