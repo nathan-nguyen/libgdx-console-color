@@ -126,6 +126,7 @@ public class GameScreen implements Screen {
             type,
             hostname,
             port,
+            Gdx.files.getLocalStoragePath() + "world",
             new ConsoleHitboxManager(),
             new ConsoleSpriteManager(),
             // Rendering is driven by libgdx's render loop directly; these callbacks are unused.
