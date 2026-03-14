@@ -115,6 +115,19 @@
       }
     },
     {
+      "modelClasses": ["com.noiprocs.gameplay.model.mob.projectile.FlyingArrowModel"],
+      "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.FlyingArrowSprite",
+      "images": {
+        "default": {
+          "imagePath": "textures/arrow_sw.png",
+          "offsetX": -25,
+          "offsetY": -40,
+          "scaleX": 0.05,
+          "scaleY": 0.05
+        }
+      }
+    },
+    {
       "modelClasses": ["com.noiprocs.gameplay.model.mob.projectile.FlyingWoodLogModel"],
       "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.FlyingWoodLogSprite",
       "images": {
@@ -128,7 +141,7 @@
       }
     },
     {
-      "modelClasses": ["com.noiprocs.gameplay.model.mob.GoblinModel"],
+      "modelClasses": ["com.noiprocs.gameplay.model.mob.GoblinModel", "com.noiprocs.gameplay.model.mob.RangeGoblinModel"],
       "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.GoblinSprite",
       "images": {
         "stand_sw": {
