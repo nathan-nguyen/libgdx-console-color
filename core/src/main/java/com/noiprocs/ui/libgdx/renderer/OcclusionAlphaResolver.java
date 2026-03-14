@@ -1,26 +1,52 @@
 package com.noiprocs.ui.libgdx.renderer;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 import com.noiprocs.core.model.Model;
 import com.noiprocs.resources.UIConfig;
 import com.noiprocs.settings.SettingsManager;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Determines the render alpha for a model that may occlude the player. When occlude is enabled, any
- * model that is isometrically deeper (x+y greater) than the player may have reduced alpha. Alpha
- * fades smoothly from FULL_ALPHA to OCCLUDED_ALPHA as the player's screen position approaches and
- * enters the model's screen bounding box, avoiding the abrupt flash of a hard cutoff.
+ * Determines the render alpha for a model that may occlude the player. When occlude is enabled,
+ * only models listed in occludable-models.json that are isometrically deeper (x+y greater) than the
+ * player may have reduced alpha. Alpha fades smoothly from FULL_ALPHA to OCCLUDED_ALPHA as the
+ * player's screen position approaches and enters the model's screen bounding box, avoiding the
+ * abrupt flash of a hard cutoff.
  */
 public class OcclusionAlphaResolver {
+
+  private static final String OCCLUDABLE_MODELS_JSON = "occludable-models.json";
 
   public final float FULL_ALPHA = 1f;
   public final float OCCLUDED_ALPHA = 0.3f;
   private final SettingsManager settingsManager;
+  private final Set<String> occludableModels = new HashSet<>();
 
   /** Pixel radius around the bounding box over which the fade transition occurs. */
   private final float FADE_DISTANCE = 2f;
 
   public OcclusionAlphaResolver(SettingsManager settingsManager) {
     this.settingsManager = settingsManager;
+    loadOccludableModels();
+  }
+
+  private void loadOccludableModels() {
+    FileHandle jsonFile = Gdx.files.internal(OCCLUDABLE_MODELS_JSON);
+    if (!jsonFile.exists()) return;
+    JsonValue root = new JsonReader().parse(jsonFile);
+    JsonValue list = root.get("occludableModels");
+    if (list == null) return;
+    for (JsonValue entry = list.child; entry != null; entry = entry.next) {
+      occludableModels.add(entry.asString());
+    }
+  }
+
+  private boolean isOccludable(Model model) {
+    return occludableModels.contains(model.getClass().getName());
   }
 
   private boolean isDeeper(Model model, Model playerModel) {
@@ -44,7 +70,8 @@ public class OcclusionAlphaResolver {
       float maxX,
       float minY,
       float maxY) {
-    if (!settingsManager.isOcclude() || !isDeeper(model, playerModel)) return FULL_ALPHA;
+    if (!settingsManager.isOcclude() || !isOccludable(model) || !isDeeper(model, playerModel))
+      return FULL_ALPHA;
 
     float playerScreenX = playerScreenX(width);
     float playerScreenY = playerScreenY(virtualHeight);

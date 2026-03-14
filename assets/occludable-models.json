@@ -1,0 +1,5 @@
+{
+  "occludableModels": [
+    "com.noiprocs.gameplay.model.environment.MazePartModel"
+  ]
+}
