@@ -4,17 +4,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.noiprocs.core.common.Vector3D;
 import com.noiprocs.core.model.Model;
 import com.noiprocs.core.model.mob.MobModel;
-import com.noiprocs.gameplay.model.mob.projectile.FlyingArrowModel;
+import com.noiprocs.gameplay.model.mob.projectile.FlyingDartModel;
 import com.noiprocs.ui.libgdx.sprite.LibgdxRenderContext;
 import com.noiprocs.ui.libgdx.sprite.LibgdxSprite;
 import com.noiprocs.ui.libgdx.sprite.LibgdxTexture;
 
-public class FlyingArrowSprite extends LibgdxSprite {
-  private static final String MODEL_CLASS = FlyingArrowModel.class.getName();
+public class FlyingDartSprite extends LibgdxSprite {
+  private static final String MODEL_CLASS = FlyingDartModel.class.getName();
 
   private static final LibgdxTexture DEFAULT_TEXTURE = loadTexture(MODEL_CLASS, "default");
 
-  public FlyingArrowSprite() {
+  public FlyingDartSprite() {
     super(DEFAULT_TEXTURE);
   }
 
