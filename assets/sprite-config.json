@@ -312,6 +312,31 @@
       }
     },
     {
+      "modelClasses": ["com.noiprocs.gameplay.model.mob.projectile.BombModel"],
+      "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.projectile.BombSprite",
+      "images": {
+        "default": {
+          "imagePath": "textures/bomb.png",
+          "offsetX": -25,
+          "offsetY": -40,
+          "scaleX": 0.06,
+          "scaleY": 0.06
+        }
+      }
+    },
+    {
+      "modelClasses": ["com.noiprocs.gameplay.model.environment.BombTrapModel"],
+      "images": {
+        "default": {
+          "imagePath": "textures/bomb_trap.png",
+          "offsetX": -40,
+          "offsetY": -60,
+          "scaleX": 0.08,
+          "scaleY": 0.08
+        }
+      }
+    },
+    {
       "modelClasses": ["com.noiprocs.gameplay.model.environment.WallTrapModel"],
       "spriteClass": "com.noiprocs.ui.libgdx.sprite.environment.WallTrapSprite",
       "images": {
