@@ -141,7 +141,11 @@
       }
     },
     {
-      "modelClasses": ["com.noiprocs.gameplay.model.mob.GoblinModel", "com.noiprocs.gameplay.model.mob.RangeGoblinModel"],
+      "modelClasses": [
+        "com.noiprocs.gameplay.model.mob.BombGoblinModel",
+        "com.noiprocs.gameplay.model.mob.GoblinModel",
+        "com.noiprocs.gameplay.model.mob.RangeGoblinModel"
+      ],
       "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.GoblinSprite",
       "images": {
         "stand_sw": {
