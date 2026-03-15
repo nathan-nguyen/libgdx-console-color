@@ -2,6 +2,7 @@
   "com.noiprocs.gameplay.model.item.StoneAxeItem": "icons/stone_axe.png",
   "com.noiprocs.gameplay.model.item.AxeItem": "icons/axe.png",
   "com.noiprocs.gameplay.model.item.AppleItem": "icons/apple.png",
+  "com.noiprocs.gameplay.model.item.GoldCoinItem": "icons/gold_coin.png",
   "com.noiprocs.gameplay.model.item.TreeBranchItem": "icons/tree_branch.png",
   "com.noiprocs.gameplay.model.item.WoodLogItem": "icons/wood_log.png",
   "com.noiprocs.gameplay.model.item.PebbleItem": "icons/pebble.png",

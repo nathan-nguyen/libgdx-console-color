@@ -479,6 +479,42 @@
           "scaleY": 0.3
         }
       }
+    },
+    {
+      "modelClasses": ["com.noiprocs.gameplay.model.item.GoldCoinItem"],
+      "images": {
+        "default": {
+          "imagePath": "icons/gold_coin.png",
+          "offsetX": -25,
+          "offsetY": -40,
+          "scaleX": 0.05,
+          "scaleY": 0.05
+        }
+      }
+    },
+    {
+      "modelClasses": ["com.noiprocs.gameplay.model.environment.BoulderModel"],
+      "images": {
+        "default": {
+          "imagePath": "textures/boulder.png",
+          "offsetX": -130,
+          "offsetY": -145,
+          "scaleX": 0.25,
+          "scaleY": 0.25
+        }
+      }
+    },
+    {
+      "modelClasses": ["com.noiprocs.gameplay.model.environment.ThickVineModel"],
+      "images": {
+        "default": {
+          "imagePath": "textures/thick_vine.png",
+          "offsetX": -120,
+          "offsetY": -150,
+          "scaleX": 0.25,
+          "scaleY": 0.25
+        }
+      }
     }
   ]
 }

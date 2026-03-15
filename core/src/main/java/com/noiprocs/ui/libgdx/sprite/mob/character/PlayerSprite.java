@@ -17,8 +17,12 @@ import com.noiprocs.core.model.item.ItemModel;
 import com.noiprocs.core.model.item.PlacableItem;
 import com.noiprocs.core.model.item.ThrowableItemInterface;
 import com.noiprocs.core.model.mob.character.PlayerModel;
+import com.noiprocs.gameplay.model.environment.BoulderModel;
+import com.noiprocs.gameplay.model.environment.ThickVineModel;
 import com.noiprocs.gameplay.model.item.AxeItem;
+import com.noiprocs.gameplay.model.mob.BombGoblinModel;
 import com.noiprocs.gameplay.model.mob.GoblinModel;
+import com.noiprocs.gameplay.model.mob.RangeGoblinModel;
 import com.noiprocs.gameplay.model.plant.TreeModel;
 import com.noiprocs.resources.UIConfig;
 import com.noiprocs.ui.libgdx.sprite.LibgdxRenderContext;
@@ -81,7 +85,12 @@ public class PlayerSprite extends LibgdxSprite {
     if (playerModel.getAction() instanceof InteractAction) {
       InteractAction action = (InteractAction) playerModel.getAction();
       Model target = GameContext.get().modelManager.getModel(action.targetId);
-      return target instanceof TreeModel || target instanceof GoblinModel;
+      return target instanceof TreeModel
+          || target instanceof GoblinModel
+          || target instanceof RangeGoblinModel
+          || target instanceof BombGoblinModel
+          || target instanceof ThickVineModel
+          || target instanceof BoulderModel;
     }
     return false;
   }
