@@ -89,6 +89,18 @@
       }
     },
     {
+      "modelClasses": ["com.noiprocs.gameplay.model.plant.CoconutTreeModel"],
+      "images": {
+        "default": {
+          "imagePath": "textures/coconut_tree.png",
+          "offsetX": -120,
+          "offsetY": -80,
+          "scaleX": 0.3,
+          "scaleY": 0.3
+        }
+      }
+    },
+    {
       "modelClasses": ["com.noiprocs.gameplay.model.mob.CotMobModel"],
       "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.CotMobSprite",
       "images": {
