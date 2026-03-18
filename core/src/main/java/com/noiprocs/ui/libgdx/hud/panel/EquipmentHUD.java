@@ -61,6 +61,9 @@ public class EquipmentHUD {
   private final Map<String, Long> slotTypeToCategory;
   private static final String[] EQUIPMENT_SLOT_TYPES = {"HELMET", "CHEST PLATE", "LEGGING", "BOOT"};
 
+  // Trash slot for disposing items
+  private ItemSlotWidget trashSlot;
+
   // Inventory slots
   private ItemSlotWidget[] inventorySlots;
   private Label[] inventoryNameLabels;
@@ -280,6 +283,18 @@ public class EquipmentHUD {
       }
     }
 
+    // Trash slot
+    Label.LabelStyle trashLabelStyle = new Label.LabelStyle();
+    trashLabelStyle.font = font;
+    trashLabelStyle.fontColor = Color.RED;
+    Label trashLabel = new Label("Dispose", trashLabelStyle);
+    trashLabel.setFontScale(0.7f);
+    panel.add(trashLabel).colspan(INVENTORY_GRID_COLUMNS).padTop(6).padBottom(2);
+    panel.row();
+
+    trashSlot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+    panel.add(trashSlot).size(52, 52).colspan(INVENTORY_GRID_COLUMNS);
+
     return panel;
   }
 
@@ -497,6 +512,32 @@ public class EquipmentHUD {
             }
           });
     }
+
+    // Setup trash slot as a drop target for disposing inventory items
+    dragAndDrop.addTarget(
+        new Target(trashSlot) {
+          @Override
+          public boolean drag(Source source, Payload payload, float x, float y, int pointer) {
+            DragPayload dragPayload = (DragPayload) payload.getObject();
+            boolean accept = !dragPayload.isEquipmentSlot;
+            trashSlot.setHovered(accept);
+            return accept;
+          }
+
+          @Override
+          public void drop(Source source, Payload payload, float x, float y, int pointer) {
+            DragPayload dragPayload = (DragPayload) payload.getObject();
+            if (!dragPayload.isEquipmentSlot) {
+              dragDropManager.executeDispose(dragPayload.sourceInventoryIndex);
+              scheduleRefresh();
+            }
+          }
+
+          @Override
+          public void reset(Source source, Payload payload) {
+            trashSlot.setHovered(false);
+          }
+        });
   }
 
   /** Payload data for drag-drop operations. */

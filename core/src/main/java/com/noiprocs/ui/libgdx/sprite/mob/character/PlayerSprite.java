@@ -33,8 +33,11 @@ public class PlayerSprite extends LibgdxSprite {
   private static final String MODEL_CLASS = PlayerModel.class.getName();
   private static final float THROW_ARROW_LENGTH = 10.0f;
 
+  private static final long WALK_FRAME_MS = 300;
+
   // Texture arrays indexed as [SW=0, SE=1, NE=2, NW=3]
-  private static final LibgdxTexture[] STAND;
+  private static final LibgdxTexture[] WALK_0;
+  private static final LibgdxTexture[] WALK_1;
   private static final LibgdxTexture[] ACTION;
   private static final LibgdxTexture[] CHOP_TREE;
   private static final LibgdxTexture[] PICKUP;
@@ -42,7 +45,11 @@ public class PlayerSprite extends LibgdxSprite {
   static {
     LibgdxTexture standSw = loadTexture(MODEL_CLASS, "stand_sw");
     LibgdxTexture standNe = loadTexture(MODEL_CLASS, "stand_ne");
-    STAND = new LibgdxTexture[] {standSw, standSw.flipped(), standNe, standNe.flipped()};
+    WALK_0 = new LibgdxTexture[] {standSw, standSw.flipped(), standNe, standNe.flipped()};
+
+    LibgdxTexture walkSw1 = loadTexture(MODEL_CLASS, "walk_sw_1");
+    LibgdxTexture walkNe1 = loadTexture(MODEL_CLASS, "walk_ne_1");
+    WALK_1 = new LibgdxTexture[] {walkSw1, walkSw1.flipped(), walkNe1, walkNe1.flipped()};
 
     LibgdxTexture actionSw = loadTexture(MODEL_CLASS, "action_sw");
     LibgdxTexture actionNe = loadTexture(MODEL_CLASS, "action_ne");
@@ -58,7 +65,7 @@ public class PlayerSprite extends LibgdxSprite {
   }
 
   public PlayerSprite() {
-    super(STAND[0]);
+    super(WALK_0[0]);
   }
 
   @Override
@@ -69,7 +76,12 @@ public class PlayerSprite extends LibgdxSprite {
     if (isPickingUp(playerModel)) return selectByDirection(dir, PICKUP);
     if (isChoppingTree(playerModel)) return selectByDirection(dir, CHOP_TREE);
     if (playerModel.getAction() instanceof AnimatedAction) return selectByDirection(dir, ACTION);
-    return selectByDirection(dir, STAND);
+    Vector3D movingDir = playerModel.getMovingDirection();
+    if (!movingDir.equals(Vector3D.ZERO)) {
+      long frame = (System.currentTimeMillis() / WALK_FRAME_MS) % 2;
+      return selectByDirection(dir, frame == 0 ? WALK_0 : WALK_1);
+    }
+    return selectByDirection(dir, WALK_0);
   }
 
   private boolean isPickingUp(PlayerModel playerModel) {

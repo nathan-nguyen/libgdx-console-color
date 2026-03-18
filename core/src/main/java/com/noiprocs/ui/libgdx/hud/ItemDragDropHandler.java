@@ -197,6 +197,16 @@ public class ItemDragDropHandler {
   }
 
   /**
+   * Disposes (permanently deletes) an item from the player's inventory.
+   *
+   * @param slotIndex Inventory slot index of the item to dispose
+   */
+  public void executeDispose(int slotIndex) {
+    GameContext.get().controlManager.disposeItem(slotIndex);
+    logger.info("Disposing item at player inventory slot {}", slotIndex);
+  }
+
+  /**
    * Executes a crafting command.
    *
    * @param targetItemClassName Fully qualified class name of the item to craft

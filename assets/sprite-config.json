@@ -5,7 +5,7 @@
       "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.character.PlayerSprite",
       "images": {
         "stand_sw": {
-          "imagePath": "textures/player_stand_sw.png",
+          "imagePath": "textures/player_walk_sw_0.png",
           "offsetX": -60,
           "offsetY": -35,
           "flippedOffsetX": -55,
@@ -14,7 +14,23 @@
           "scaleY": 0.11
         },
         "stand_ne": {
-          "imagePath": "textures/player_stand_ne.png",
+          "imagePath": "textures/player_walk_ne_0.png",
+          "offsetX": -55,
+          "offsetY": -30,
+          "scaleX": 0.11,
+          "scaleY": 0.11
+        },
+        "walk_sw_1": {
+          "imagePath": "textures/player_walk_sw_1.png",
+          "offsetX": -60,
+          "offsetY": -35,
+          "flippedOffsetX": -55,
+          "flippedOffsetY": -35,
+          "scaleX": 0.11,
+          "scaleY": 0.11
+        },
+        "walk_ne_1": {
+          "imagePath": "textures/player_walk_ne_1.png",
           "offsetX": -55,
           "offsetY": -30,
           "scaleX": 0.11,
@@ -486,7 +502,7 @@
         "default": {
           "imagePath": "icons/gold_coin.png",
           "offsetX": -25,
-          "offsetY": -40,
+          "offsetY": -35,
           "scaleX": 0.05,
           "scaleY": 0.05
         }
