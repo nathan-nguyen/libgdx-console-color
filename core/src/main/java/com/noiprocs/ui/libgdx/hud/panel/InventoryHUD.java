@@ -64,7 +64,8 @@ public class InventoryHUD {
   // Container slots
   private ItemSlotWidget[] containerSlots;
   private Label[] containerNameLabels;
-  private static final int CONTAINER_SIZE = 9; // 3x3 grid (9 slots)
+  private static final int DEFAULT_CONTAINER_SIZE = 9;
+  private int containerSize = DEFAULT_CONTAINER_SIZE;
 
   // Equipment slots (for HumanoidModel)
   private ItemSlotWidget helmetSlot;
@@ -143,6 +144,16 @@ public class InventoryHUD {
 
     Model containerModel = GameContext.get().modelManager.getModel(containerModelId);
     if (containerModel == null) return;
+
+    // Determine actual container inventory size
+    if (isHumanoidButNotPlayer(containerModel)) {
+      containerSize = ((HumanoidModel) containerModel).getInventory().getMaxInventorySize();
+    } else if (containerModel instanceof InventoryContainerInterface) {
+      containerSize =
+          ((InventoryContainerInterface) containerModel).getInventory().getMaxInventorySize();
+    } else {
+      containerSize = DEFAULT_CONTAINER_SIZE;
+    }
 
     // Header with title and close button
     Table header = createHeader();
@@ -310,9 +321,9 @@ public class InventoryHUD {
     nameLabelStyle.fontColor = Color.WHITE;
 
     // Create container slots in a 3x3 grid (9 slots total)
-    containerSlots = new ItemSlotWidget[CONTAINER_SIZE];
-    containerNameLabels = new Label[CONTAINER_SIZE];
-    for (int i = 0; i < CONTAINER_SIZE; i++) {
+    containerSlots = new ItemSlotWidget[containerSize];
+    containerNameLabels = new Label[containerSize];
+    for (int i = 0; i < containerSize; i++) {
       ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
       containerSlots[i] = slot;
 
@@ -802,7 +813,7 @@ public class InventoryHUD {
 
         // Refresh humanoid's inventory
         Inventory humanoidInventory = humanoidModel.getInventory();
-        for (int i = 0; i < CONTAINER_SIZE && i < humanoidInventory.getMaxInventorySize(); i++) {
+        for (int i = 0; i < containerSize; i++) {
           Item item = humanoidInventory.getItem(i);
           if (item != null) {
             containerSlots[i].setItem(item, item.amount);
@@ -816,7 +827,7 @@ public class InventoryHUD {
         // Refresh regular container inventory
         Inventory containerInventory =
             ((InventoryContainerInterface) containerModel).getInventory();
-        for (int i = 0; i < CONTAINER_SIZE && i < containerInventory.getMaxInventorySize(); i++) {
+        for (int i = 0; i < containerSize; i++) {
           Item item = containerInventory.getItem(i);
           if (item != null) {
             containerSlots[i].setItem(item, item.amount);
