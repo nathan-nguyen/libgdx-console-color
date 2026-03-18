@@ -1,6 +1,30 @@
 {
   "sprites": [
     {
+      "modelClasses": ["com.noiprocs.gameplay.model.item.CoconutItem"],
+      "images": {
+        "default": {
+          "imagePath": "icons/coconut.png",
+          "offsetX": -25,
+          "offsetY": -40,
+          "scaleX": 0.05,
+          "scaleY": 0.05
+        }
+      }
+    },
+    {
+      "modelClasses": ["com.noiprocs.gameplay.model.item.GunPowderItem"],
+      "images": {
+        "default": {
+          "imagePath": "icons/gun_powder.png",
+          "offsetX": -25,
+          "offsetY": -40,
+          "scaleX": 0.05,
+          "scaleY": 0.05
+        }
+      }
+    },
+    {
       "modelClasses": ["com.noiprocs.core.model.mob.character.PlayerModel"],
       "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.character.PlayerSprite",
       "images": {
@@ -348,7 +372,7 @@
       "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.projectile.BombSprite",
       "images": {
         "default": {
-          "imagePath": "textures/bomb.png",
+          "imagePath": "icons/bomb.png",
           "offsetX": -25,
           "offsetY": -40,
           "scaleX": 0.06,
