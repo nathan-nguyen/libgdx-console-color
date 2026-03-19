@@ -125,6 +125,30 @@
       }
     },
     {
+      "modelClasses": ["com.noiprocs.gameplay.model.mob.RatModel"],
+      "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.RatSprite",
+      "images": {
+        "sw": {
+          "imagePath": "textures/rat_sw.png",
+          "offsetX": -45,
+          "offsetY": -45,
+          "flippedOffsetX": -35,
+          "flippedOffsetY": -45,
+          "scaleX": 0.08,
+          "scaleY": 0.08
+        },
+        "nw": {
+          "imagePath": "textures/rat_nw.png",
+          "offsetX": -45,
+          "offsetY": -45,
+          "flippedOffsetX": -35,
+          "flippedOffsetY": -45,
+          "scaleX": 0.08,
+          "scaleY": 0.08
+        }
+      }
+    },
+    {
       "modelClasses": ["com.noiprocs.gameplay.model.mob.CotMobModel"],
       "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.CotMobSprite",
       "images": {
