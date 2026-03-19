@@ -14,6 +14,7 @@
   "com.noiprocs.gameplay.model.item.GunPowderItem": "icons/gun_powder.png",
   "com.noiprocs.gameplay.model.item.MysteriousGemItem": "icons/mysterious_gem.png",
   "com.noiprocs.gameplay.model.item.PebbleItem": "icons/pebble.png",
+  "com.noiprocs.gameplay.model.item.PickAxeItem": "icons/pick_axe.png",
   "com.noiprocs.gameplay.model.item.SaplingItem": "icons/sapling.png",
   "com.noiprocs.gameplay.model.item.StoneAxeItem": "icons/stone_axe.png",
   "com.noiprocs.gameplay.model.item.SummonCotMobItem": "icons/summon_cot_mob.png",
