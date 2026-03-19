@@ -21,6 +21,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.noiprocs.core.GameContext;
 import com.noiprocs.core.GameMode;
 import com.noiprocs.core.control.command.DisconnectCommand;
+import com.noiprocs.settings.HotbarLocation;
 import com.noiprocs.settings.SettingsManager;
 import com.noiprocs.ui.libgdx.util.UIStyleHelper;
 
@@ -114,6 +115,21 @@ public class MenuOverlay extends Table {
     menuBox.add(occludeCheckbox).left().padBottom(20);
     menuBox.row();
 
+    CheckBox hotbarBottomCheckbox = new CheckBox(" Hotbar at Bottom", skin);
+    hotbarBottomCheckbox.setChecked(settingsManager.getHotbarLocation() == HotbarLocation.BOTTOM);
+    hotbarBottomCheckbox.addListener(
+        new ClickListener() {
+          @Override
+          public void clicked(InputEvent event, float x, float y) {
+            HotbarLocation location =
+                hotbarBottomCheckbox.isChecked() ? HotbarLocation.BOTTOM : HotbarLocation.TOP;
+            settingsManager.setHotbarLocation(location);
+            settingsManager.save();
+          }
+        });
+    menuBox.add(hotbarBottomCheckbox).left().padBottom(20);
+    menuBox.row();
+
     TextButton mainMenuButton = new TextButton("Main Menu", skin);
     mainMenuButton.addListener(
         new ClickListener() {
@@ -129,7 +145,7 @@ public class MenuOverlay extends Table {
     menuBox.add(mainMenuButton).width(300).height(60);
     menuBox.row();
 
-    add(menuBox).width(400).height(460);
+    add(menuBox).width(400).height(510);
 
     addCaptureListener(
         new InputListener() {

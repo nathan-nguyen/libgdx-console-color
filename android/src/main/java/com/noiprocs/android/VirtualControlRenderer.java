@@ -10,6 +10,8 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.noiprocs.resources.GameResource;
 import com.noiprocs.resources.ResourceLoader;
+import com.noiprocs.settings.HotbarLocation;
+import com.noiprocs.settings.SettingsManager;
 import java.util.Set;
 
 /**
@@ -22,11 +24,17 @@ public class VirtualControlRenderer {
   private final Texture interactIcon;
   private final Texture useItemIcon;
 
+  // Slot height (48) + pad(2) top/bottom (4) + cell padBottom (10)
+  private static final float HOTBAR_HEIGHT = 62f;
+
   // Colors for joystick states
   private static final Color COLOR_DPAD = new Color(0.3f, 0.6f, 1f, 0.5f);
   private static final Color COLOR_DPAD_ACTIVE = new Color(0.3f, 0.6f, 1f, 1.0f);
 
-  public VirtualControlRenderer() {
+  private final SettingsManager settingsManager;
+
+  public VirtualControlRenderer(SettingsManager settingsManager) {
+    this.settingsManager = settingsManager;
     this.shapeRenderer = new ShapeRenderer();
 
     attackIcon = ResourceLoader.loadTexture(GameResource.ICON_ATTACK_BUTTON);
@@ -72,15 +80,19 @@ public class VirtualControlRenderer {
   /** Render joystick (outer circle + inner knob). */
   private void renderJoystick(TouchState touchState) {
     Circle joystickCircle = (Circle) ControlZone.JOYSTICK.getShape();
+    float yOffset =
+        settingsManager.getHotbarLocation() == HotbarLocation.BOTTOM ? HOTBAR_HEIGHT : 0f;
+    float centerX = joystickCircle.x;
+    float centerY = joystickCircle.y + yOffset;
 
     // Draw outer circle (boundary)
     shapeRenderer.setColor(COLOR_DPAD);
-    shapeRenderer.circle(joystickCircle.x, joystickCircle.y, joystickCircle.radius, 32);
+    shapeRenderer.circle(centerX, centerY, joystickCircle.radius, 32);
 
     // Draw inner knob based on touch offset
     Vector2 offset = touchState.getJoystickOffset();
-    float knobX = joystickCircle.x + offset.x * joystickCircle.radius * 0.6f;
-    float knobY = joystickCircle.y + offset.y * joystickCircle.radius * 0.6f;
+    float knobX = centerX + offset.x * joystickCircle.radius * 0.6f;
+    float knobY = centerY + offset.y * joystickCircle.radius * 0.6f;
     float knobRadius = joystickCircle.radius * 0.25f;
 
     Color knobColor = touchState.isJoystickActive() ? COLOR_DPAD_ACTIVE : COLOR_DPAD;

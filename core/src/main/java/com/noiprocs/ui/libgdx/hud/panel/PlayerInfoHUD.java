@@ -17,6 +17,7 @@ import com.noiprocs.core.model.item.Inventory;
 import com.noiprocs.core.model.item.Item;
 import com.noiprocs.core.model.mob.character.PlayerModel;
 import com.noiprocs.resources.ItemTextureManager;
+import com.noiprocs.settings.HotbarLocation;
 import com.noiprocs.settings.SettingsManager;
 import com.noiprocs.ui.libgdx.hud.widget.ItemSlotStyle;
 import com.noiprocs.ui.libgdx.hud.widget.ItemSlotWidget;
@@ -30,8 +31,10 @@ public class PlayerInfoHUD extends Table {
   private final Label debugLabel;
   private final ItemSlotWidget[] hotbarSlots;
   private final ItemSlotStyle slotStyle;
+  private final Table hotbarTable;
 
   private IntConsumer onSlotSelected;
+  private HotbarLocation hotbarLocation = HotbarLocation.TOP;
 
   public PlayerInfoHUD(BitmapFont font, ItemTextureManager itemTextureManager) {
     this.healthBar = new HealthBarActor(font);
@@ -41,11 +44,7 @@ public class PlayerInfoHUD extends Table {
     Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
     this.debugLabel = new Label("", labelStyle);
 
-    setFillParent(true);
-    top().left().pad(10);
-    add(healthBar).size(HealthBarActor.BAR_WIDTH, HealthBarActor.BAR_HEIGHT).left();
-    row();
-    Table hotbarTable = new Table();
+    this.hotbarTable = new Table();
     for (int i = 0; i < HOTBAR_SIZE; i++) {
       final int slotIndex = i;
       ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
@@ -62,9 +61,27 @@ public class PlayerInfoHUD extends Table {
       hotbarSlots[i] = slot;
       hotbarTable.add(slot).size(48, 48).pad(2);
     }
-    add(hotbarTable).left().colspan(2);
-    row();
-    add(debugLabel).left().colspan(2);
+
+    setFillParent(true);
+    buildLayout(HotbarLocation.TOP);
+  }
+
+  private void buildLayout(HotbarLocation location) {
+    clearChildren();
+    top().left().pad(10);
+    if (location == HotbarLocation.TOP) {
+      add(healthBar).size(HealthBarActor.BAR_WIDTH, HealthBarActor.BAR_HEIGHT).left();
+      row();
+      add(hotbarTable).left();
+      row();
+      add(debugLabel).left();
+    } else {
+      add(healthBar).size(HealthBarActor.BAR_WIDTH, HealthBarActor.BAR_HEIGHT).left();
+      row();
+      add(debugLabel).left().expandY().top();
+      row();
+      add(hotbarTable).left().padBottom(10);
+    }
   }
 
   public void setOnSlotSelected(IntConsumer onSlotSelected) {
@@ -72,6 +89,14 @@ public class PlayerInfoHUD extends Table {
   }
 
   public void update(PlayerModel playerModel, SettingsManager settingsManager) {
+    if (settingsManager != null) {
+      HotbarLocation newLocation = settingsManager.getHotbarLocation();
+      if (newLocation != hotbarLocation) {
+        hotbarLocation = newLocation;
+        buildLayout(hotbarLocation);
+      }
+    }
+
     boolean debug = settingsManager != null && settingsManager.isDebugMode();
     if (debug) {
       debugLabel.setText(

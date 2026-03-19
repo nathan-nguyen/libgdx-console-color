@@ -67,7 +67,7 @@ class AndroidApp extends LibGDXApp {
     super.create();
 
     touchInputController = new TouchInputController(getViewport());
-    virtualControlRenderer = new VirtualControlRenderer();
+    virtualControlRenderer = new VirtualControlRenderer(getSettingsManager());
 
     virtualControlsStage = new Stage(getViewport(), renderResources.getBatch());
     virtualControlsStage.addActor(

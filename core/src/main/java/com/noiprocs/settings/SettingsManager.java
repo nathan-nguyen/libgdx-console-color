@@ -17,6 +17,7 @@ public class SettingsManager {
   private static final String KEY_DEBUG_MODE = "debugMode";
   private static final String KEY_SHOW_WALLS = "showWalls";
   private static final String KEY_OCCLUDE = "occlude";
+  private static final String KEY_HOTBAR_LOCATION = "hotbarLocation";
 
   // Default values
   private static final String DEFAULT_USERNAME = "player";
@@ -25,6 +26,7 @@ public class SettingsManager {
   private static final boolean DEFAULT_DEBUG_MODE = false;
   private static final boolean DEFAULT_SHOW_WALLS = true;
   private static final boolean DEFAULT_OCCLUDE = false;
+  private static final HotbarLocation DEFAULT_HOTBAR_LOCATION = HotbarLocation.TOP;
 
   private final Preferences prefs;
 
@@ -118,6 +120,19 @@ public class SettingsManager {
 
   public void setOcclude(boolean occlude) {
     prefs.putBoolean(KEY_OCCLUDE, occlude);
+  }
+
+  public HotbarLocation getHotbarLocation() {
+    String value = prefs.getString(KEY_HOTBAR_LOCATION, DEFAULT_HOTBAR_LOCATION.name());
+    try {
+      return HotbarLocation.valueOf(value);
+    } catch (IllegalArgumentException e) {
+      return DEFAULT_HOTBAR_LOCATION;
+    }
+  }
+
+  public void setHotbarLocation(HotbarLocation location) {
+    prefs.putString(KEY_HOTBAR_LOCATION, location.name());
   }
 
   /**
