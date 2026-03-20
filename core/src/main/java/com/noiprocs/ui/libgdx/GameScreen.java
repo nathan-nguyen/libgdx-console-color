@@ -10,7 +10,9 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.noiprocs.core.GameContext;
+import com.noiprocs.core.GameMode;
 import com.noiprocs.core.common.Config;
+import com.noiprocs.core.model.manager.ServerModelManager;
 import com.noiprocs.core.graphic.GameScreenInterface;
 import com.noiprocs.core.model.Model;
 import com.noiprocs.input.InputController;
@@ -273,6 +275,10 @@ public class GameScreen implements Screen {
         Thread.currentThread().interrupt();
       }
       gameThread = null;
+    }
+
+    if (gameContext != null && gameContext.gameMode == GameMode.STANDALONE) {
+      ((ServerModelManager) gameContext.modelManager).saveGameData();
     }
 
     if (hudManager != null) {
