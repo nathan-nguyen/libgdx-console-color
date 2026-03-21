@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -111,6 +112,37 @@ public class SettingsScreen implements Screen {
     buttonTable.add(backButton).width(150).height(50).pad(10);
 
     table.add(buttonTable).colspan(2);
+    table.row();
+
+    // Clean World Data button
+    TextButton cleanWorldButton = new TextButton("Clean World Data", skin);
+    cleanWorldButton.addListener(
+        new ClickListener() {
+          @Override
+          public void clicked(InputEvent event, float x, float y) {
+            Dialog dialog =
+                new Dialog("", skin) {
+                  @Override
+                  protected void result(Object object) {
+                    if (Boolean.TRUE.equals(object)) {
+                      Gdx.files.local("world").deleteDirectory();
+                    }
+                  }
+                };
+            Label confirmLabel = new Label("Delete all world save data?", skin);
+            dialog.getContentTable().pad(30);
+            dialog.text(confirmLabel);
+            dialog.button("Confirm", true);
+            dialog.button("Cancel", false);
+            dialog.getButtonTable().pad(10).padBottom(20);
+            dialog
+                .getButtonTable()
+                .getCells()
+                .forEach(cell -> cell.width(140).height(50).padLeft(10).padRight(10));
+            dialog.show(stage);
+          }
+        });
+    table.add(cleanWorldButton).colspan(2).width(310).height(50).padTop(20);
 
     // Add keyboard shortcuts
     stage.addListener(
