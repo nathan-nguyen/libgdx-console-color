@@ -24,6 +24,10 @@ import com.noiprocs.core.control.command.DisconnectCommand;
 import com.noiprocs.settings.HotbarLocation;
 import com.noiprocs.settings.SettingsManager;
 import com.noiprocs.ui.libgdx.util.UIStyleHelper;
+import java.lang.reflect.Field;
+import java.util.Map;
+import org.slf4j.ILoggerFactory;
+import org.slf4j.LoggerFactory;
 
 public class MenuOverlay extends Table {
   private final Table menuBox;
@@ -82,6 +86,7 @@ public class MenuOverlay extends Table {
             boolean isChecked = debugModeCheckbox.isChecked();
             settingsManager.setDebugMode(isChecked);
             settingsManager.save();
+            applyLogLevel(isChecked);
           }
         });
     menuBox.add(debugModeCheckbox).left().padBottom(20);
@@ -174,6 +179,31 @@ public class MenuOverlay extends Table {
   public void dispose() {
     stage.dispose();
     skin.dispose();
+  }
+
+  private static void applyLogLevel(boolean debug) {
+    // Try log4j2 first (desktop) — use reflection so ART doesn't reject missing classes
+    try {
+      Class<?> configurator = Class.forName("org.apache.logging.log4j.core.config.Configurator");
+      Class<?> levelClass = Class.forName("org.apache.logging.log4j.Level");
+      Object level = levelClass.getField(debug ? "DEBUG" : "INFO").get(null);
+      configurator.getMethod("setRootLevel", levelClass).invoke(null, level);
+      return;
+    } catch (Exception ignored) {
+    }
+    // Fallback: slf4j-simple (Android)
+    try {
+      ILoggerFactory factory = LoggerFactory.getILoggerFactory();
+      Field mapField = factory.getClass().getDeclaredField("loggerMap");
+      mapField.setAccessible(true);
+      int level = debug ? 10 : 20; // DEBUG_INT : INFO_INT
+      for (Object logger : ((Map<?, ?>) mapField.get(factory)).values()) {
+        Field f = logger.getClass().getDeclaredField("currentLogLevel");
+        f.setAccessible(true);
+        f.set(logger, level);
+      }
+    } catch (Exception ignored) {
+    }
   }
 
   public void setOnClose(Runnable onClose) {
