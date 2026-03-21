@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -21,6 +22,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.noiprocs.core.GameContext;
 import com.noiprocs.core.GameMode;
 import com.noiprocs.core.control.command.DisconnectCommand;
+import com.noiprocs.gameplay.control.command.ExitMazeCommand;
 import com.noiprocs.settings.HotbarLocation;
 import com.noiprocs.settings.SettingsManager;
 import com.noiprocs.ui.libgdx.util.UIStyleHelper;
@@ -135,6 +137,38 @@ public class MenuOverlay extends Table {
     menuBox.add(hotbarBottomCheckbox).left().padBottom(20);
     menuBox.row();
 
+    TextButton destroyMazeButton = new TextButton("Destroy Maze", skin);
+    destroyMazeButton.addListener(
+        new ClickListener() {
+          @Override
+          public void clicked(InputEvent event, float x, float y) {
+            Dialog dialog =
+                new Dialog("", skin) {
+                  @Override
+                  protected void result(Object object) {
+                    if (Boolean.TRUE.equals(object)) {
+                      gameContext.controlManager.processInput(
+                          new ExitMazeCommand(gameContext.username));
+                      close();
+                    }
+                  }
+                };
+            Label confirmLabel = new Label("Destroy the active maze?", skin);
+            dialog.getContentTable().pad(30);
+            dialog.text(confirmLabel);
+            dialog.button("Confirm", true);
+            dialog.button("Cancel", false);
+            dialog.getButtonTable().pad(10).padBottom(20);
+            dialog
+                .getButtonTable()
+                .getCells()
+                .forEach(cell -> cell.width(140).height(50).padLeft(10).padRight(10));
+            dialog.show(stage);
+          }
+        });
+    menuBox.add(destroyMazeButton).width(300).height(60).padBottom(10);
+    menuBox.row();
+
     TextButton mainMenuButton = new TextButton("Main Menu", skin);
     mainMenuButton.addListener(
         new ClickListener() {
@@ -150,7 +184,7 @@ public class MenuOverlay extends Table {
     menuBox.add(mainMenuButton).width(300).height(60);
     menuBox.row();
 
-    add(menuBox).width(400).height(510);
+    add(menuBox).width(400).height(590);
 
     addCaptureListener(
         new InputListener() {

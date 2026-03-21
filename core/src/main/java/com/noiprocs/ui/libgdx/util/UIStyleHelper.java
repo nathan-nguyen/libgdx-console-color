@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 /**
@@ -139,6 +140,19 @@ public class UIStyleHelper {
     checkBoxStyle.checkboxOn = new TextureRegionDrawable(checkboxOnTexture);
     checkBoxStyle.checkboxOff = new TextureRegionDrawable(checkboxOffTexture);
     skin.add("default", checkBoxStyle);
+
+    // Window style (required by Dialog)
+    Pixmap windowBgPixmap = new Pixmap(1, 1, Format.RGBA8888);
+    windowBgPixmap.setColor(0.15f, 0.15f, 0.15f, 0.97f);
+    windowBgPixmap.fill();
+    Texture windowBgTexture = new Texture(windowBgPixmap);
+    windowBgPixmap.dispose();
+    skin.add("window-bg", windowBgTexture);
+    WindowStyle windowStyle = new WindowStyle();
+    windowStyle.titleFont = font;
+    windowStyle.titleFontColor = Color.WHITE;
+    windowStyle.background = new TextureRegionDrawable(windowBgTexture);
+    skin.add("default", windowStyle);
 
     return skin;
   }
