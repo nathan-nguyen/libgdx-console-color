@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.noiprocs.core.GameContext;
 import com.noiprocs.core.common.Config;
 import com.noiprocs.core.common.Vector3D;
+import com.noiprocs.core.hitbox.HitboxManagerInterface.MovableDistanceResult;
 import com.noiprocs.core.model.Model;
 import com.noiprocs.core.model.action.AnimatedAction;
 import com.noiprocs.core.model.action.AttackAction;
@@ -31,7 +32,6 @@ import com.noiprocs.ui.libgdx.sprite.LibgdxTexture;
 
 public class PlayerSprite extends LibgdxSprite {
   private static final String MODEL_CLASS = PlayerModel.class.getName();
-  private static final float THROW_ARROW_LENGTH = 10.0f;
 
   private static final long WALK_FRAME_MS = 300;
 
@@ -124,52 +124,114 @@ public class PlayerSprite extends LibgdxSprite {
     Item item = ((PlayerModel) model).getHoldingItem();
     if (item instanceof PlacableItem) renderPlacementPreview(batch, model, offsetX, offsetY, ctx);
     else if (item instanceof ThrowableItemInterface)
-      renderThrowArrow(batch, model, offsetX, offsetY, ctx);
+      renderProjectilePath(batch, model, offsetX, offsetY, ctx);
   }
 
-  private void renderThrowArrow(
+  private void renderProjectilePath(
       SpriteBatch batch, Model model, float offsetX, float offsetY, LibgdxRenderContext ctx) {
     PlayerModel playerModel = (PlayerModel) model;
+    ThrowableItemInterface throwable = (ThrowableItemInterface) playerModel.getHoldingItem();
+
     Vector3D movingDir = playerModel.getMovingDirection();
-    if (movingDir.equals(Vector3D.ZERO)) return;
+    if (movingDir.equals(Vector3D.ZERO)) movingDir = playerModel.getFacingDirection();
 
     Vector3D center = GameContext.get().hitboxManager.getHitboxCenter(model);
     float cx = (float) center.x / Config.WORLD_SCALE - offsetX;
     float cy = (float) center.y / Config.WORLD_SCALE - offsetY;
-    float dirLen = (float) Math.sqrt(movingDir.x * movingDir.x + movingDir.y * movingDir.y);
-    float ex = cx + (movingDir.x / dirLen) * THROW_ARROW_LENGTH;
-    float ey = cy + (movingDir.y / dirLen) * THROW_ARROW_LENGTH;
 
-    float startSX = isoScreenX(cx, cy, ctx);
-    float startSY = isoScreenY(cx, cy, ctx);
-    float endSX = isoScreenX(ex, ey, ctx);
-    float endSY = isoScreenY(ex, ey, ctx);
+    float dirLen = (float) Math.sqrt(movingDir.x * movingDir.x + movingDir.y * movingDir.y);
+    int range = throwable.getProjectileRange();
+    Vector3D totalMovement =
+        new Vector3D((int) (movingDir.x * range / dirLen), (int) (movingDir.y * range / dirLen), 0);
+    MovableDistanceResult sweep =
+        GameContext.get()
+            .hitboxManager
+            .getMovableDistance(throwable.getProjectileModelClass(), center, totalMovement);
+    Vector3D actualEnd = center.add(sweep.distance);
+    float ex = (float) actualEnd.x / Config.WORLD_SCALE - offsetX;
+    float ey = (float) actualEnd.y / Config.WORLD_SCALE - offsetY;
+
+    Vector3D dim = GameContext.get().hitboxManager.getHitboxDimension(throwable);
+    float h = (float) dim.x / Config.WORLD_SCALE;
+    float w = (float) dim.y / Config.WORLD_SCALE;
+
+    // Start footprint corners (centered on spawn point)
+    float sPosX = cx - h / 2f;
+    float sPosY = cy - w / 2f;
+    float stlsx = isoScreenX(sPosX, sPosY, ctx);
+    float stlsy = isoScreenY(sPosX, sPosY, ctx);
+    float strsx = isoScreenX(sPosX, sPosY + w, ctx);
+    float strsy = isoScreenY(sPosX, sPosY + w, ctx);
+    float sblsx = isoScreenX(sPosX + h, sPosY, ctx);
+    float sblsy = isoScreenY(sPosX + h, sPosY, ctx);
+    float sbrsx = isoScreenX(sPosX + h, sPosY + w, ctx);
+    float sbrsy = isoScreenY(sPosX + h, sPosY + w, ctx);
+
+    // End footprint corners (centered on landing point)
+    float ePosX = ex - h / 2f;
+    float ePosY = ey - w / 2f;
+    float etlsx = isoScreenX(ePosX, ePosY, ctx);
+    float etlsy = isoScreenY(ePosX, ePosY, ctx);
+    float etrsx = isoScreenX(ePosX, ePosY + w, ctx);
+    float etrsy = isoScreenY(ePosX, ePosY + w, ctx);
+    float eblsx = isoScreenX(ePosX + h, ePosY, ctx);
+    float eblsy = isoScreenY(ePosX + h, ePosY, ctx);
+    float ebrsx = isoScreenX(ePosX + h, ePosY + w, ctx);
+    float ebrsy = isoScreenY(ePosX + h, ePosY + w, ctx);
 
     ShapeRenderer sr = ctx.shapeRenderer;
     beginShapeRendering(batch, ctx);
 
+    // Fill: start cap + end cap + 4 connecting strips
+    sr.begin(ShapeRenderer.ShapeType.Filled);
+    sr.setColor(Color.CYAN.r, Color.CYAN.g, Color.CYAN.b, 0.3f);
+    sr.triangle(stlsx, stlsy, strsx, strsy, sbrsx, sbrsy);
+    sr.triangle(stlsx, stlsy, sbrsx, sbrsy, sblsx, sblsy);
+    sr.triangle(etlsx, etlsy, etrsx, etrsy, ebrsx, ebrsy);
+    sr.triangle(etlsx, etlsy, ebrsx, ebrsy, eblsx, eblsy);
+    sr.triangle(stlsx, stlsy, strsx, strsy, etrsx, etrsy);
+    sr.triangle(stlsx, stlsy, etrsx, etrsy, etlsx, etlsy);
+    sr.triangle(strsx, strsy, sbrsx, sbrsy, ebrsx, ebrsy);
+    sr.triangle(strsx, strsy, ebrsx, ebrsy, etrsx, etrsy);
+    sr.triangle(sbrsx, sbrsy, sblsx, sblsy, eblsx, eblsy);
+    sr.triangle(sbrsx, sbrsy, eblsx, eblsy, ebrsx, ebrsy);
+    sr.triangle(sblsx, sblsy, stlsx, stlsy, etlsx, etlsy);
+    sr.triangle(sblsx, sblsy, etlsx, etlsy, eblsx, eblsy);
+    sr.end();
+
+    // Border: convex hull of swept path. Corners CW: [TL=0, TR=1, BR=2, BL=3].
+    // Hull visits sc[b]→sc[b+1]→ec[b+1]→ec[b+2]→ec[b+3]→sc[b+3] where b = back corner index.
+    float[] scx = {stlsx, strsx, sbrsx, sblsx};
+    float[] scy = {stlsy, strsy, sbrsy, sblsy};
+    float[] ecx = {etlsx, etrsx, ebrsx, eblsx};
+    float[] ecy = {etlsy, etrsy, ebrsy, eblsy};
+    int b;
+    if (movingDir.x >= 0 && movingDir.y >= 0) b = 0;
+    else if (movingDir.x >= 0) b = 1;
+    else if (movingDir.y >= 0) b = 3;
+    else b = 2;
+    float[] hx = {
+      scx[b],
+      scx[(b + 1) % 4],
+      ecx[(b + 1) % 4],
+      ecx[(b + 2) % 4],
+      ecx[(b + 3) % 4],
+      scx[(b + 3) % 4]
+    };
+    float[] hy = {
+      scy[b],
+      scy[(b + 1) % 4],
+      ecy[(b + 1) % 4],
+      ecy[(b + 2) % 4],
+      ecy[(b + 3) % 4],
+      scy[(b + 3) % 4]
+    };
     sr.begin(ShapeRenderer.ShapeType.Line);
     Gdx.gl.glLineWidth(2f);
-    sr.setColor(Color.CYAN);
-    sr.line(startSX, startSY, endSX, endSY);
-
-    float arrowDirSX = endSX - startSX;
-    float arrowDirSY = endSY - startSY;
-    float len = (float) Math.sqrt(arrowDirSX * arrowDirSX + arrowDirSY * arrowDirSY);
-    if (len > 0) {
-      float nx = arrowDirSX / len;
-      float ny = arrowDirSY / len;
-      float headLen = 0.4f * UIConfig.CHAR_SIZE;
-      sr.line(
-          endSX,
-          endSY,
-          endSX - nx * headLen + ny * headLen * 0.5f,
-          endSY - ny * headLen - nx * headLen * 0.5f);
-      sr.line(
-          endSX,
-          endSY,
-          endSX - nx * headLen - ny * headLen * 0.5f,
-          endSY - ny * headLen + nx * headLen * 0.5f);
+    sr.setColor(Color.CYAN.r, Color.CYAN.g, Color.CYAN.b, 0.8f);
+    for (int i = 0; i < 6; i++) {
+      int n = (i + 1) % 6;
+      sr.line(hx[i], hy[i], hx[n], hy[n]);
     }
     sr.end();
 
