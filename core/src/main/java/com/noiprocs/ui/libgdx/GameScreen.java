@@ -15,6 +15,7 @@ import com.noiprocs.core.common.Config;
 import com.noiprocs.core.graphic.GameScreenInterface;
 import com.noiprocs.core.model.Model;
 import com.noiprocs.core.model.manager.ServerModelManager;
+import com.noiprocs.gameplay.GameplaySetup;
 import com.noiprocs.input.InputController;
 import com.noiprocs.resources.RenderResources;
 import com.noiprocs.resources.UIConfig;
@@ -139,6 +140,8 @@ public class GameScreen implements Screen {
               @Override
               public void render(int i) {}
             });
+
+    new GameplaySetup(gameContext).registerCommandHandlers();
 
     gameThread = new Thread(gameContext::run);
     gameThread.start();
