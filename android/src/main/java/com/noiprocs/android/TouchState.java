@@ -27,7 +27,8 @@ public class TouchState {
   private Integer joystickPointerId = null; // Which pointer owns the joystick
 
   // Throw aim joystick state
-  private final Vector2 throwAimOffset = new Vector2(); // Normalized offset from ACTION_TOGGLE center
+  private final Vector2 throwAimOffset =
+      new Vector2(); // Normalized offset from ACTION_TOGGLE center
   private Integer throwAimPointerId = null; // Which pointer owns the throw aim joystick
 
   /**

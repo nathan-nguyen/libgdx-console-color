@@ -209,8 +209,7 @@ public class TouchInputController implements InputController {
 
     float clampedDistance = Math.min(distance, radius);
     return new Vector2(
-        (dx / distance) * (clampedDistance / radius),
-        (dy / distance) * (clampedDistance / radius));
+        (dx / distance) * (clampedDistance / radius), (dy / distance) * (clampedDistance / radius));
   }
 
   /** Sends a ThrowItemCommand using the current throw aim direction. */

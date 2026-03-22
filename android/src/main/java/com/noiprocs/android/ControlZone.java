@@ -193,5 +193,4 @@ public enum ControlZone {
   public static float getJoystickRadius() {
     return ((Circle) JOYSTICK.shape).radius;
   }
-
 }

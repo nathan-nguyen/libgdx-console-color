@@ -416,6 +416,26 @@
       }
     },
     {
+      "modelClasses": ["com.noiprocs.gameplay.model.building.ShrineModel"],
+      "spriteClass": "com.noiprocs.ui.libgdx.sprite.environment.ShrineSprite",
+      "images": {
+        "inactive": {
+          "imagePath": "textures/shrine_inactive.png",
+          "offsetX": -60,
+          "offsetY": -65,
+          "scaleX": 0.12,
+          "scaleY": 0.12
+        },
+        "active": {
+          "imagePath": "textures/shrine_active.png",
+          "offsetX": -60,
+          "offsetY": -65,
+          "scaleX": 0.12,
+          "scaleY": 0.12
+        }
+      }
+    },
+    {
       "modelClasses": ["com.noiprocs.gameplay.model.mob.projectile.BombModel"],
       "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.projectile.BombSprite",
       "images": {
