@@ -41,9 +41,9 @@ public enum ControlZone {
 
     // Action buttons (bottom right, circular)
     float actionScale = Math.min(scaleX, scaleY);
-    ACTION_SPACE.shape = new Circle(virtualWidth - 100, 75 * scaleY, 32 * actionScale);
-    ACTION_FIRE.shape = new Circle(virtualWidth - 45, 115 * scaleY, 28 * actionScale);
-    ACTION_TOGGLE.shape = new Circle(virtualWidth - 45, 35 * scaleY, 28 * actionScale);
+    ACTION_SPACE.shape = new Circle(virtualWidth - 100, 85 * scaleY, 32 * actionScale);
+    ACTION_FIRE.shape = new Circle(virtualWidth - 45, 130 * scaleY, 28 * actionScale);
+    ACTION_TOGGLE.shape = new Circle(virtualWidth - 155, 130 * scaleY, 28 * actionScale);
   }
 
   /**
