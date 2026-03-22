@@ -137,7 +137,7 @@ public class MenuOverlay extends Table {
     menuBox.add(hotbarBottomCheckbox).left().padBottom(20);
     menuBox.row();
 
-    TextButton destroyMazeButton = new TextButton("Destroy Maze", skin);
+    TextButton destroyMazeButton = new TextButton("Return Home", skin);
     destroyMazeButton.addListener(
         new ClickListener() {
           @Override

@@ -12,5 +12,8 @@ public enum HUDMode {
   CRAFTING,
 
   /** Inventory interaction HUD (chest/container) is open */
-  INVENTORY_INTERACTION
+  INVENTORY_INTERACTION,
+
+  /** Merchant shop HUD is open */
+  MERCHANT
 }

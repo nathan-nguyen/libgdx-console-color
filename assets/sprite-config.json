@@ -125,6 +125,18 @@
       }
     },
     {
+      "modelClasses": ["com.noiprocs.gameplay.model.mob.MerchantModel"],
+      "images": {
+        "default": {
+          "imagePath": "textures/merchant.png",
+          "offsetX": -70,
+          "offsetY": -45,
+          "scaleX": 0.15,
+          "scaleY": 0.15
+        }
+      }
+    },
+    {
       "modelClasses": ["com.noiprocs.gameplay.model.mob.RatModel"],
       "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.RatSprite",
       "images": {

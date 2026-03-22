@@ -22,6 +22,7 @@ import com.noiprocs.core.model.action.Action;
 import com.noiprocs.core.model.action.InteractAction;
 import com.noiprocs.core.model.mob.character.HumanoidModel;
 import com.noiprocs.core.model.mob.character.PlayerModel;
+import com.noiprocs.gameplay.model.mob.MerchantModel;
 import com.noiprocs.resources.GameResource;
 import com.noiprocs.resources.ItemTextureManager;
 import com.noiprocs.resources.ResourceLoader;
@@ -29,6 +30,7 @@ import com.noiprocs.settings.SettingsManager;
 import com.noiprocs.ui.libgdx.hud.panel.CraftingHUD;
 import com.noiprocs.ui.libgdx.hud.panel.EquipmentHUD;
 import com.noiprocs.ui.libgdx.hud.panel.InventoryHUD;
+import com.noiprocs.ui.libgdx.hud.panel.MerchantHUD;
 import com.noiprocs.ui.libgdx.hud.panel.PlayerInfoHUD;
 import com.noiprocs.ui.libgdx.hud.widget.ItemSlotStyle;
 import com.noiprocs.ui.libgdx.util.UIStyleHelper;
@@ -51,6 +53,7 @@ public class HUDManager {
   private EquipmentHUD equipmentHUD;
   private CraftingHUD craftingHUD;
   private InventoryHUD inventoryHUD;
+  private MerchantHUD merchantHUD;
 
   public HUDManager(
       Viewport viewport,
@@ -159,6 +162,22 @@ public class HUDManager {
     currentMode = HUDMode.CRAFTING;
   }
 
+  /** Opens the merchant shop HUD. */
+  public void openMerchantHUD(String merchantModelId) {
+    closeModal();
+
+    if (merchantHUD == null) {
+      merchantHUD =
+          new MerchantHUD(this, hudStage.getViewport(), font, sharedSlotStyle, itemTextureManager);
+    }
+
+    merchantHUD.setMerchant(merchantModelId);
+    merchantHUD.refresh();
+    currentModalActor = merchantHUD.getRoot();
+    hudStage.addActor(currentModalActor);
+    currentMode = HUDMode.MERCHANT;
+  }
+
   /**
    * Opens the inventory interaction HUD for a container (e.g., chest).
    *
@@ -217,7 +236,11 @@ public class HUDManager {
     if (playerAction instanceof InteractAction) {
       InteractAction interactAction = (InteractAction) playerAction;
       Model model = ctx.modelManager.getModel(interactAction.targetId);
-      if (model instanceof InventoryContainerInterface || isHumanoidButNotPlayer(model)) {
+      if (model instanceof MerchantModel) {
+        if (!isOpen()) {
+          openMerchantHUD(interactAction.targetId);
+        }
+      } else if (model instanceof InventoryContainerInterface || isHumanoidButNotPlayer(model)) {
         if (!isOpen()) {
           openInventoryHUD(interactAction.targetId);
         }
@@ -259,6 +282,9 @@ public class HUDManager {
     }
     if (inventoryHUD != null) {
       inventoryHUD.dispose();
+    }
+    if (merchantHUD != null) {
+      merchantHUD.dispose();
     }
 
     if (sharedSlotStyle != null) {
