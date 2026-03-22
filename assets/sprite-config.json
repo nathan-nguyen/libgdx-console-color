@@ -332,12 +332,24 @@
       }
     },
     {
-      "modelClasses": ["com.noiprocs.core.model.building.ChestModel"],
+      "modelClasses": ["com.noiprocs.gameplay.model.building.ChestModel"],
       "images": {
         "default": {
           "imagePath": "icons/chest.png",
           "offsetX": -45,
           "offsetY": -50,
+          "scaleX": 0.08,
+          "scaleY": 0.08
+        }
+      }
+    },
+    {
+      "modelClasses": ["com.noiprocs.core.model.building.InventoryBagModel"],
+      "images": {
+        "default": {
+          "imagePath": "textures/inventory_bag.png",
+          "offsetX": -40,
+          "offsetY": -55,
           "scaleX": 0.08,
           "scaleY": 0.08
         }
