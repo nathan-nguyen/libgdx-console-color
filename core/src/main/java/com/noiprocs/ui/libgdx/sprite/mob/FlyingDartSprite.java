@@ -12,10 +12,8 @@ import com.noiprocs.ui.libgdx.sprite.LibgdxTexture;
 public class FlyingDartSprite extends LibgdxSprite {
   private static final String MODEL_CLASS = FlyingDartModel.class.getName();
 
-  private static final LibgdxTexture DEFAULT_TEXTURE = loadTexture(MODEL_CLASS, "default");
-
   public FlyingDartSprite() {
-    super(DEFAULT_TEXTURE);
+    super(loadTexture(MODEL_CLASS, "default"));
   }
 
   @Override

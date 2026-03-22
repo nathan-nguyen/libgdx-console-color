@@ -10,17 +10,17 @@ import com.noiprocs.ui.libgdx.sprite.LibgdxTexture;
 public class CotMobSprite extends MobSprite {
   private static final String MODEL_CLASS = CotMobModel.class.getName();
 
-  private static final LibgdxTexture STAND_SW_TEXTURE = loadTexture(MODEL_CLASS, "stand_sw");
-  private static final LibgdxTexture STAND_SE_TEXTURE = STAND_SW_TEXTURE.flipped();
-  private static final LibgdxTexture STAND_NE_TEXTURE = loadTexture(MODEL_CLASS, "stand_ne");
-  private static final LibgdxTexture STAND_NW_TEXTURE = STAND_NE_TEXTURE.flipped();
-  private static final LibgdxTexture ACTION_SW_TEXTURE = loadTexture(MODEL_CLASS, "action_sw");
-  private static final LibgdxTexture ACTION_SE_TEXTURE = ACTION_SW_TEXTURE.flipped();
-  private static final LibgdxTexture ACTION_NE_TEXTURE = loadTexture(MODEL_CLASS, "action_ne");
-  private static final LibgdxTexture ACTION_NW_TEXTURE = ACTION_NE_TEXTURE.flipped();
+  // STAND_SW_TEXTURE is this.texture (set by super())
+  private final LibgdxTexture STAND_SE_TEXTURE = texture.flipped();
+  private final LibgdxTexture STAND_NE_TEXTURE = loadTexture(MODEL_CLASS, "stand_ne");
+  private final LibgdxTexture STAND_NW_TEXTURE = STAND_NE_TEXTURE.flipped();
+  private final LibgdxTexture ACTION_SW_TEXTURE = loadTexture(MODEL_CLASS, "action_sw");
+  private final LibgdxTexture ACTION_SE_TEXTURE = ACTION_SW_TEXTURE.flipped();
+  private final LibgdxTexture ACTION_NE_TEXTURE = loadTexture(MODEL_CLASS, "action_ne");
+  private final LibgdxTexture ACTION_NW_TEXTURE = ACTION_NE_TEXTURE.flipped();
 
   public CotMobSprite() {
-    super(STAND_SW_TEXTURE);
+    super(loadTexture(MODEL_CLASS, "stand_sw"));
   }
 
   @Override

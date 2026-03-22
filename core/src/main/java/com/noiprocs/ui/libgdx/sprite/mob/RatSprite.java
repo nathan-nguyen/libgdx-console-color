@@ -12,13 +12,13 @@ import com.noiprocs.ui.libgdx.sprite.LibgdxTexture;
 public class RatSprite extends MobSprite {
   private static final String MODEL_CLASS = RatModel.class.getName();
 
-  private static final LibgdxTexture SW_TEXTURE = loadTexture(MODEL_CLASS, "sw");
-  private static final LibgdxTexture SE_TEXTURE = SW_TEXTURE.flipped();
-  private static final LibgdxTexture NW_TEXTURE = loadTexture(MODEL_CLASS, "nw");
-  private static final LibgdxTexture NE_TEXTURE = NW_TEXTURE.flipped();
+  // SW_TEXTURE is this.texture (set by super())
+  private final LibgdxTexture SE_TEXTURE = texture.flipped();
+  private final LibgdxTexture NW_TEXTURE = loadTexture(MODEL_CLASS, "nw");
+  private final LibgdxTexture NE_TEXTURE = NW_TEXTURE.flipped();
 
   public RatSprite() {
-    super(SW_TEXTURE);
+    super(loadTexture(MODEL_CLASS, "sw"));
   }
 
   @Override
@@ -31,7 +31,7 @@ public class RatSprite extends MobSprite {
       return NE_TEXTURE;
     }
     if (facingDirection.y > 0) return SE_TEXTURE;
-    return SW_TEXTURE;
+    return super.getTexture(model);
   }
 
   @Override

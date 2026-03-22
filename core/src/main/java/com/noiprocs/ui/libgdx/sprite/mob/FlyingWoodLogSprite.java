@@ -11,10 +11,8 @@ import com.noiprocs.ui.libgdx.sprite.LibgdxTexture;
 public class FlyingWoodLogSprite extends LibgdxSprite {
   private static final String MODEL_CLASS = FlyingWoodLogModel.class.getName();
 
-  private static final LibgdxTexture DEFAULT_TEXTURE = loadTexture(MODEL_CLASS, "default");
-
   public FlyingWoodLogSprite() {
-    super(DEFAULT_TEXTURE);
+    super(loadTexture(MODEL_CLASS, "default"));
   }
 
   @Override

@@ -36,16 +36,16 @@ public class PlayerSprite extends LibgdxSprite {
   private static final long WALK_FRAME_MS = 300;
 
   // Texture arrays indexed as [SW=0, SE=1, NE=2, NW=3]
-  private static final LibgdxTexture[] WALK_0;
-  private static final LibgdxTexture[] WALK_1;
-  private static final LibgdxTexture[] ACTION;
-  private static final LibgdxTexture[] CHOP_TREE;
-  private static final LibgdxTexture[] PICKUP;
+  // WALK_0[0] (stand_sw) is this.texture (set by super())
+  private final LibgdxTexture[] WALK_0;
+  private final LibgdxTexture[] WALK_1;
+  private final LibgdxTexture[] ACTION;
+  private final LibgdxTexture[] CHOP_TREE;
+  private final LibgdxTexture[] PICKUP;
 
-  static {
-    LibgdxTexture standSw = loadTexture(MODEL_CLASS, "stand_sw");
+  {
     LibgdxTexture standNe = loadTexture(MODEL_CLASS, "stand_ne");
-    WALK_0 = new LibgdxTexture[] {standSw, standSw.flipped(), standNe, standNe.flipped()};
+    WALK_0 = new LibgdxTexture[] {texture, texture.flipped(), standNe, standNe.flipped()};
 
     LibgdxTexture walkSw1 = loadTexture(MODEL_CLASS, "walk_sw_1");
     LibgdxTexture walkNe1 = loadTexture(MODEL_CLASS, "walk_ne_1");
@@ -65,7 +65,7 @@ public class PlayerSprite extends LibgdxSprite {
   }
 
   public PlayerSprite() {
-    super(WALK_0[0]);
+    super(loadTexture(MODEL_CLASS, "stand_sw"));
   }
 
   @Override

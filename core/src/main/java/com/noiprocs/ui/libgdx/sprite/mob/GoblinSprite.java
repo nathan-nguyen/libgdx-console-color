@@ -10,17 +10,17 @@ import com.noiprocs.ui.libgdx.sprite.LibgdxTexture;
 public class GoblinSprite extends MobSprite {
   private static final String MODEL_CLASS = GoblinModel.class.getName();
 
-  private static final LibgdxTexture STAND_SW_TEXTURE = loadTexture(MODEL_CLASS, "stand_sw");
-  private static final LibgdxTexture STAND_SE_TEXTURE = STAND_SW_TEXTURE.flipped();
-  private static final LibgdxTexture STAND_NE_TEXTURE = loadTexture(MODEL_CLASS, "stand_ne");
-  private static final LibgdxTexture STAND_NW_TEXTURE = STAND_NE_TEXTURE.flipped();
-  private static final LibgdxTexture ATTACK_SW_TEXTURE = loadTexture(MODEL_CLASS, "attack_sw");
-  private static final LibgdxTexture ATTACK_SE_TEXTURE = ATTACK_SW_TEXTURE.flipped();
-  private static final LibgdxTexture ATTACK_NE_TEXTURE = loadTexture(MODEL_CLASS, "attack_ne");
-  private static final LibgdxTexture ATTACK_NW_TEXTURE = ATTACK_NE_TEXTURE.flipped();
+  // STAND_SW_TEXTURE is this.texture (set by super())
+  private final LibgdxTexture STAND_SE_TEXTURE = texture.flipped();
+  private final LibgdxTexture STAND_NE_TEXTURE = loadTexture(MODEL_CLASS, "stand_ne");
+  private final LibgdxTexture STAND_NW_TEXTURE = STAND_NE_TEXTURE.flipped();
+  private final LibgdxTexture ATTACK_SW_TEXTURE = loadTexture(MODEL_CLASS, "attack_sw");
+  private final LibgdxTexture ATTACK_SE_TEXTURE = ATTACK_SW_TEXTURE.flipped();
+  private final LibgdxTexture ATTACK_NE_TEXTURE = loadTexture(MODEL_CLASS, "attack_ne");
+  private final LibgdxTexture ATTACK_NW_TEXTURE = ATTACK_NE_TEXTURE.flipped();
 
   public GoblinSprite() {
-    super(STAND_SW_TEXTURE);
+    super(loadTexture(MODEL_CLASS, "stand_sw"));
   }
 
   @Override

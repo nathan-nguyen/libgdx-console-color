@@ -15,19 +15,18 @@ public class MobSprite extends LibgdxSprite {
   private static final float BAR_HEIGHT = 3f;
   private static final float BAR_GAP = 2f;
 
-  private static TextureRegion whitePixel;
+  private TextureRegion whitePixel;
 
   public MobSprite(LibgdxTexture texture) {
     super(texture);
   }
 
-  private static TextureRegion getWhitePixel() {
+  private TextureRegion getWhitePixel() {
     if (whitePixel == null) {
       Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
       pixmap.setColor(1f, 1f, 1f, 1f);
       pixmap.fill();
       whitePixel = new TextureRegion(new Texture(pixmap));
-      pixmap.dispose();
     }
     return whitePixel;
   }

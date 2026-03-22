@@ -13,11 +13,9 @@ import com.noiprocs.gameplay.model.mob.projectile.BombModel;
 import com.noiprocs.resources.UIConfig;
 import com.noiprocs.ui.libgdx.sprite.LibgdxRenderContext;
 import com.noiprocs.ui.libgdx.sprite.LibgdxSprite;
-import com.noiprocs.ui.libgdx.sprite.LibgdxTexture;
 
 public class BombSprite extends LibgdxSprite {
   private static final String MODEL_CLASS = BombModel.class.getName();
-  private static final LibgdxTexture DEFAULT_TEXTURE = loadTexture(MODEL_CLASS, "default");
 
   private static final Color FILL_COLOR = new Color(1f, 0.3f, 0f, 0.15f);
   private static final Color OUTLINE_COLOR = new Color(1f, 0.3f, 0f, 0.8f);
@@ -26,7 +24,7 @@ public class BombSprite extends LibgdxSprite {
   private static final int FLASH_THRESHOLD = 15;
 
   public BombSprite() {
-    super(DEFAULT_TEXTURE);
+    super(loadTexture(MODEL_CLASS, "default"));
   }
 
   @Override

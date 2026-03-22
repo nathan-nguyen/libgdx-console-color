@@ -8,16 +8,16 @@ import com.noiprocs.ui.libgdx.sprite.LibgdxTexture;
 public class WallTrapSprite extends LibgdxSprite {
   private static final String MODEL_CLASS = WallTrapModel.class.getName();
 
-  private static final LibgdxTexture WAITING_TEXTURE = loadTexture(MODEL_CLASS, "waiting");
-  private static final LibgdxTexture FIRE_TEXTURE = loadTexture(MODEL_CLASS, "fire");
+  // WAITING_TEXTURE is this.texture (set by super())
+  private final LibgdxTexture FIRE_TEXTURE = loadTexture(MODEL_CLASS, "fire");
 
   public WallTrapSprite() {
-    super(WAITING_TEXTURE);
+    super(loadTexture(MODEL_CLASS, "waiting"));
   }
 
   @Override
   public LibgdxTexture getTexture(Model model) {
     if (((WallTrapModel) model).isClosed()) return FIRE_TEXTURE;
-    return WAITING_TEXTURE;
+    return super.getTexture(model);
   }
 }

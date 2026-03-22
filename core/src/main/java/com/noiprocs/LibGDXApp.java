@@ -13,6 +13,7 @@ import com.noiprocs.ui.console.ConsoleUIConfig;
 import com.noiprocs.ui.libgdx.GameScreen;
 import com.noiprocs.ui.libgdx.MainMenuScreen;
 import com.noiprocs.ui.libgdx.SettingsScreen;
+import com.noiprocs.ui.libgdx.sprite.LibgdxSpriteConfigLoader;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class LibGDXApp extends Game {
@@ -73,6 +74,8 @@ public class LibGDXApp extends Game {
 
   @Override
   public void create() {
+    LibgdxSpriteConfigLoader.reset();
+
     // Initialize virtual dimensions (can be overridden by subclasses before calling super.create())
     initializeVirtualDimensions();
 

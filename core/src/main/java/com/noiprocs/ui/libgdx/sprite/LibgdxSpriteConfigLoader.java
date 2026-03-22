@@ -27,6 +27,13 @@ public class LibgdxSpriteConfigLoader implements Disposable {
     return instance;
   }
 
+  public static void reset() {
+    if (instance != null) {
+      instance.dispose();
+      instance = null;
+    }
+  }
+
   public static class SpriteEntry {
     public final Map<String, LibgdxTexture> namedConfigs;
     public final String spriteClass;
