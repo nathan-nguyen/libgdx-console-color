@@ -188,4 +188,10 @@ public enum ControlZone {
     }
     return new Vector2();
   }
+
+  /** Get the radius of the movement joystick circle. */
+  public static float getJoystickRadius() {
+    return ((Circle) JOYSTICK.shape).radius;
+  }
+
 }

@@ -26,6 +26,10 @@ public class TouchState {
   private boolean joystickActive = false; // Whether joystick is being touched
   private Integer joystickPointerId = null; // Which pointer owns the joystick
 
+  // Throw aim joystick state
+  private final Vector2 throwAimOffset = new Vector2(); // Normalized offset from ACTION_TOGGLE center
+  private Integer throwAimPointerId = null; // Which pointer owns the throw aim joystick
+
   /**
    * Update the touch state for a pointer.
    *
@@ -107,5 +111,43 @@ public class TouchState {
   /** Check if a pointer is the joystick pointer. */
   public boolean isJoystickPointer(int pointerId) {
     return joystickPointerId != null && joystickPointerId == pointerId;
+  }
+
+  // --- Throw aim joystick ---
+
+  /** Set which pointer owns the throw aim joystick. */
+  public void setThrowAimPointer(int pointerId) {
+    throwAimPointerId = pointerId;
+  }
+
+  /** Check if a pointer is the throw aim pointer. */
+  public boolean isThrowAimPointer(int pointerId) {
+    return throwAimPointerId != null && throwAimPointerId == pointerId;
+  }
+
+  /** Get the pointer ID that owns the throw aim joystick, or null if none. */
+  public Integer getThrowAimPointerId() {
+    return throwAimPointerId;
+  }
+
+  /** Returns true while the throw aim pointer is held down (even inside dead zone). */
+  public boolean isThrowAimPointerActive() {
+    return throwAimPointerId != null;
+  }
+
+  /** Get the current throw aim offset (normalized). */
+  public Vector2 getThrowAimOffset() {
+    return throwAimOffset;
+  }
+
+  /** Update throw aim state from current pointer position. */
+  public void updateThrowAim(Vector2 offset) {
+    throwAimOffset.set(offset);
+  }
+
+  /** Clear throw aim state (pointer released). */
+  public void clearThrowAim() {
+    throwAimOffset.set(0, 0);
+    throwAimPointerId = null;
   }
 }

@@ -2,6 +2,7 @@ package com.noiprocs.android;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -30,6 +31,7 @@ public class VirtualControlRenderer {
   // Colors for joystick states
   private static final Color COLOR_DPAD = new Color(0.3f, 0.6f, 1f, 0.5f);
   private static final Color COLOR_DPAD_ACTIVE = new Color(0.3f, 0.6f, 1f, 1.0f);
+  private static final Color COLOR_THROW_AIM = new Color(1f, 0.8f, 0.2f, 0.8f);
 
   private final SettingsManager settingsManager;
 
@@ -44,14 +46,22 @@ public class VirtualControlRenderer {
 
   /** Render joystick and shape-based controls via ShapeRenderer. */
   public void renderShapes(TouchState touchState) {
+    Gdx.gl.glEnable(GL20.GL_BLEND);
+    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
     shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
     Gdx.gl.glLineWidth(3.0f);
     renderJoystick(touchState);
+    if (touchState.isThrowAimPointerActive()) {
+      renderThrowJoystick(touchState);
+    }
     shapeRenderer.end();
+
+    Gdx.gl.glDisable(GL20.GL_BLEND);
   }
 
   /** Render button icons into an already-open Batch. */
-  public void renderIcons(Batch batch, Set<ControlZone> activeZones) {
+  public void renderIcons(Batch batch, Set<ControlZone> activeZones, boolean throwAimActive) {
     renderIcon(
         batch,
         interactIcon,
@@ -59,11 +69,13 @@ public class VirtualControlRenderer {
         activeZones.contains(ControlZone.ACTION_SPACE));
     renderIcon(
         batch, attackIcon, ControlZone.ACTION_FIRE, activeZones.contains(ControlZone.ACTION_FIRE));
-    renderIcon(
-        batch,
-        useItemIcon,
-        ControlZone.ACTION_TOGGLE,
-        activeZones.contains(ControlZone.ACTION_TOGGLE));
+    if (!throwAimActive) {
+      renderIcon(
+          batch,
+          useItemIcon,
+          ControlZone.ACTION_TOGGLE,
+          activeZones.contains(ControlZone.ACTION_TOGGLE));
+    }
   }
 
   /** Render a texture icon centered on a control zone. */
@@ -98,6 +110,20 @@ public class VirtualControlRenderer {
     Color knobColor = touchState.isJoystickActive() ? COLOR_DPAD_ACTIVE : COLOR_DPAD;
     shapeRenderer.setColor(knobColor);
     shapeRenderer.circle(knobX, knobY, knobRadius, 24);
+  }
+
+  /** Render throw aim joystick centered on the ACTION_TOGGLE button. */
+  private void renderThrowJoystick(TouchState touchState) {
+    float radius = ControlZone.getJoystickRadius();
+    Vector2 center = ControlZone.ACTION_TOGGLE.getCenter();
+
+    shapeRenderer.setColor(COLOR_THROW_AIM);
+    shapeRenderer.circle(center.x, center.y, radius, 32);
+
+    Vector2 offset = touchState.getThrowAimOffset();
+    float knobX = center.x + offset.x * radius * 0.6f;
+    float knobY = center.y + offset.y * radius * 0.6f;
+    shapeRenderer.circle(knobX, knobY, radius * 0.25f, 24);
   }
 
   /** Set the projection matrix for the shape renderer. */

@@ -24,6 +24,7 @@ class VirtualControlsActor extends Actor {
     virtualControlRenderer.renderShapes(touchState);
     batch.begin();
 
-    virtualControlRenderer.renderIcons(batch, touchState.getActiveZones());
+    virtualControlRenderer.renderIcons(
+        batch, touchState.getActiveZones(), touchState.isThrowAimPointerActive());
   }
 }

@@ -8,7 +8,12 @@ import com.noiprocs.core.GameContext;
 import com.noiprocs.core.common.Vector3D;
 import com.noiprocs.core.control.command.InputCommand;
 import com.noiprocs.core.control.command.SetMovingDirectionCommand;
+import com.noiprocs.core.control.command.ThrowItemCommand;
+import com.noiprocs.core.model.item.Item;
+import com.noiprocs.core.model.item.ThrowableItemInterface;
+import com.noiprocs.core.model.mob.character.PlayerModel;
 import com.noiprocs.input.InputController;
+import com.noiprocs.input.ThrowAimState;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
 
 /**
@@ -41,6 +46,9 @@ public class TouchInputController implements InputController {
     boolean[] zonesTouched = new boolean[ControlZone.values().length];
     float joystickTouchX = 0;
     float joystickTouchY = 0;
+    boolean throwAimPointerSeen = false;
+    float throwAimTouchX = 0;
+    float throwAimTouchY = 0;
 
     // Process all active touch pointers (up to 5 simultaneous touches)
     for (int i = 0; i < 5; i++) {
@@ -58,6 +66,26 @@ public class TouchInputController implements InputController {
         // If this pointer is the joystick pointer, keep it as joystick even if outside the zone
         if (touchState.isJoystickPointer(i)) {
           zone = ControlZone.JOYSTICK;
+        }
+
+        // If this pointer is the throw aim pointer, track it and suppress normal zone processing
+        if (touchState.isThrowAimPointer(i)) {
+          throwAimPointerSeen = true;
+          throwAimTouchX = x;
+          throwAimTouchY = y;
+          zone = null;
+        }
+
+        // On first touch of ACTION_TOGGLE: check if holding a throwable item
+        if (zone == ControlZone.ACTION_TOGGLE && touchState.getThrowAimPointerId() == null) {
+          Item holdingItem = getPlayerHoldingItem();
+          if (holdingItem instanceof ThrowableItemInterface) {
+            touchState.setThrowAimPointer(i);
+            throwAimPointerSeen = true;
+            throwAimTouchX = x;
+            throwAimTouchY = y;
+            zone = null;
+          }
         }
 
         if (zone != null) {
@@ -81,7 +109,26 @@ public class TouchInputController implements InputController {
         if (touchState.isJoystickPointer(i)) {
           touchState.clearJoystick();
         }
+        // If this was the throw aim pointer, fire the throw and clear
+        if (touchState.isThrowAimPointer(i)) {
+          fireThrowCommand();
+          touchState.clearThrowAim();
+          ThrowAimState.clearAimDirection();
+        }
         touchState.updatePointer(i, null);
+      }
+    }
+
+    // Update throw aim offset from current pointer position
+    if (throwAimPointerSeen) {
+      Vector2 offset = computeThrowAimOffset(throwAimTouchX, throwAimTouchY);
+      touchState.updateThrowAim(offset);
+      if (offset.len() > 0) {
+        ThrowAimState.setAimDirection(
+            new Vector3D(
+                (int) ((-offset.x - offset.y) * 100), (int) ((offset.x - offset.y) * 100), 0));
+      } else {
+        ThrowAimState.clearAimDirection();
       }
     }
 
@@ -146,6 +193,42 @@ public class TouchInputController implements InputController {
 
     // Update movement state for next frame
     touchState.updateMovementState(anyMovementActive);
+  }
+
+  /** Computes a normalized offset from the ACTION_TOGGLE center using joystick-radius dead zone. */
+  private Vector2 computeThrowAimOffset(float x, float y) {
+    Vector2 center = ControlZone.ACTION_TOGGLE.getCenter();
+    float radius = ControlZone.getJoystickRadius();
+    float dx = x - center.x;
+    float dy = y - center.y;
+    float distance = (float) Math.sqrt(dx * dx + dy * dy);
+
+    if (distance < radius * 0.2f) {
+      return new Vector2();
+    }
+
+    float clampedDistance = Math.min(distance, radius);
+    return new Vector2(
+        (dx / distance) * (clampedDistance / radius),
+        (dy / distance) * (clampedDistance / radius));
+  }
+
+  /** Sends a ThrowItemCommand using the current throw aim direction. */
+  private void fireThrowCommand() {
+    Vector3D throwDir = ThrowAimState.getAimDirection();
+    if (throwDir == null) return;
+
+    GameContext gameContext = GameContext.get();
+    gameContext.controlManager.processInput(new ThrowItemCommand(gameContext.username, throwDir));
+  }
+
+  /** Returns the item held by the local player, or null. */
+  private Item getPlayerHoldingItem() {
+    GameContext gameContext = GameContext.get();
+    if (gameContext == null) return null;
+    PlayerModel player = gameContext.modelManager.getPlayerModel(gameContext.username);
+    if (player == null) return null;
+    return player.getHoldingItem();
   }
 
   /** Snaps a joystick offset to the nearest of 8 directions (multiples of 45°). */

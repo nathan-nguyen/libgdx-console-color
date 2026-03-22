@@ -25,6 +25,7 @@ import com.noiprocs.gameplay.model.mob.BombGoblinModel;
 import com.noiprocs.gameplay.model.mob.GoblinModel;
 import com.noiprocs.gameplay.model.mob.RangeGoblinModel;
 import com.noiprocs.gameplay.model.plant.TreeModel;
+import com.noiprocs.input.ThrowAimState;
 import com.noiprocs.resources.UIConfig;
 import com.noiprocs.ui.libgdx.sprite.LibgdxRenderContext;
 import com.noiprocs.ui.libgdx.sprite.LibgdxSprite;
@@ -123,7 +124,7 @@ public class PlayerSprite extends LibgdxSprite {
     super.render(batch, model, playerModel, offsetX, offsetY, ctx);
     Item item = ((PlayerModel) model).getHoldingItem();
     if (item instanceof PlacableItem) renderPlacementPreview(batch, model, offsetX, offsetY, ctx);
-    else if (item instanceof ThrowableItemInterface)
+    else if (item instanceof ThrowableItemInterface && ThrowAimState.getAimDirection() != null)
       renderProjectilePath(batch, model, offsetX, offsetY, ctx);
   }
 
@@ -132,8 +133,7 @@ public class PlayerSprite extends LibgdxSprite {
     PlayerModel playerModel = (PlayerModel) model;
     ThrowableItemInterface throwable = (ThrowableItemInterface) playerModel.getHoldingItem();
 
-    Vector3D movingDir = playerModel.getMovingDirection();
-    if (movingDir.equals(Vector3D.ZERO)) movingDir = playerModel.getFacingDirection();
+    Vector3D movingDir = ThrowAimState.getAimDirection();
 
     Vector3D center = GameContext.get().hitboxManager.getHitboxCenter(model);
     float cx = (float) center.x / Config.WORLD_SCALE - offsetX;
