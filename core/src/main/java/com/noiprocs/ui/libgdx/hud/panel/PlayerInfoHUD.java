@@ -21,6 +21,7 @@ import com.noiprocs.settings.HotbarLocation;
 import com.noiprocs.settings.SettingsManager;
 import com.noiprocs.ui.libgdx.hud.widget.ItemSlotStyle;
 import com.noiprocs.ui.libgdx.hud.widget.ItemSlotWidget;
+import com.noiprocs.ui.libgdx.hud.widget.StatusEffectsWidget;
 import java.util.function.IntConsumer;
 
 public class PlayerInfoHUD extends Table {
@@ -28,6 +29,7 @@ public class PlayerInfoHUD extends Table {
   private static final int HOTBAR_SIZE = 4;
 
   private final HealthBarActor healthBar;
+  private final StatusEffectsWidget statusEffects;
   private final Label debugLabel;
   private final ItemSlotWidget[] hotbarSlots;
   private final ItemSlotStyle slotStyle;
@@ -38,6 +40,7 @@ public class PlayerInfoHUD extends Table {
 
   public PlayerInfoHUD(BitmapFont font, ItemTextureManager itemTextureManager) {
     this.healthBar = new HealthBarActor(font);
+    this.statusEffects = new StatusEffectsWidget();
     this.slotStyle = ItemSlotStyle.createDefault();
     this.hotbarSlots = new ItemSlotWidget[HOTBAR_SIZE];
 
@@ -72,11 +75,15 @@ public class PlayerInfoHUD extends Table {
     if (location == HotbarLocation.TOP) {
       add(healthBar).size(HealthBarActor.BAR_WIDTH, HealthBarActor.BAR_HEIGHT).left();
       row();
+      add(statusEffects).left();
+      row();
       add(hotbarTable).left();
       row();
       add(debugLabel).left();
     } else {
       add(healthBar).size(HealthBarActor.BAR_WIDTH, HealthBarActor.BAR_HEIGHT).left();
+      row();
+      add(statusEffects).left();
       row();
       add(debugLabel).left().expandY().top();
       row();
@@ -114,6 +121,7 @@ public class PlayerInfoHUD extends Table {
     }
 
     healthBar.setHealth(playerModel.getHealth(), playerModel.getMaxHealth());
+    statusEffects.update(playerModel);
 
     int currentSlot = playerModel.getCurrentInventorySlot();
     Inventory inventory = playerModel.getInventory();
@@ -130,6 +138,7 @@ public class PlayerInfoHUD extends Table {
 
   public void dispose() {
     healthBar.dispose();
+    statusEffects.dispose();
     slotStyle.dispose();
   }
 

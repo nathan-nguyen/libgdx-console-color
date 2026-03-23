@@ -16,7 +16,7 @@ public class ShrineSprite extends LibgdxSprite {
 
   @Override
   public LibgdxTexture getTexture(Model model) {
-    if (((ShrineModel) model).isActivated()) return ACTIVE_TEXTURE;
+    if (((ShrineModel) model).isActive()) return ACTIVE_TEXTURE;
     return super.getTexture(model);
   }
 }
