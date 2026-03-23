@@ -8,7 +8,10 @@ public enum GameResource {
   ICON_EQUIPMENT_BUTTON("icons/equipment_button.png"),
   ICON_ATTACK_BUTTON("icons/attack_button.png"),
   ICON_INTERACT_BUTTON("icons/interact_button.png"),
-  ICON_USE_ITEM_BUTTON("icons/use_item_button.png");
+  ICON_USE_ITEM_BUTTON("icons/use_item_button.png"),
+  ICON_EFFECT_DAMAGE("icons/damage_enhance_effect.png"),
+  ICON_EFFECT_HEALTH("icons/health_ehance_effect.png"),
+  ICON_EFFECT_SPEED("icons/speed_enhance_effect.png");
 
   private final String path;
 

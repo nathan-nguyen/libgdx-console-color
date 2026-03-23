@@ -40,7 +40,7 @@ public class PlayerInfoHUD extends Table {
 
   public PlayerInfoHUD(BitmapFont font, ItemTextureManager itemTextureManager) {
     this.healthBar = new HealthBarActor(font);
-    this.statusEffects = new StatusEffectsWidget();
+    this.statusEffects = new StatusEffectsWidget(itemTextureManager.getStatusEffectTextures());
     this.slotStyle = ItemSlotStyle.createDefault();
     this.hotbarSlots = new ItemSlotWidget[HOTBAR_SIZE];
 
@@ -138,7 +138,6 @@ public class PlayerInfoHUD extends Table {
 
   public void dispose() {
     healthBar.dispose();
-    statusEffects.dispose();
     slotStyle.dispose();
   }
 

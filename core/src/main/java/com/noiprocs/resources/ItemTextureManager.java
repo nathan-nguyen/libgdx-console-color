@@ -7,7 +7,13 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.noiprocs.core.model.effect.EffectInterface;
+import com.noiprocs.gameplay.model.effect.DamageBoostEffect;
+import com.noiprocs.gameplay.model.effect.MaxHealthBoostEffect;
+import com.noiprocs.gameplay.model.effect.SpeedBoostEffect;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -29,6 +35,8 @@ public class ItemTextureManager implements Disposable {
 
   private final Map<String, TextureRegion> textures = new HashMap<>();
   private final Map<String, TextureRegion> slotTextures = new HashMap<>();
+  private final LinkedHashMap<Class<? extends EffectInterface>, Texture> effectTextures =
+      new LinkedHashMap<>();
 
   public ItemTextureManager() {
     FileHandle jsonFile = Gdx.files.internal(ITEM_ICONS_JSON);
@@ -54,6 +62,14 @@ public class ItemTextureManager implements Disposable {
         slotTextures.put(entry.getKey(), new TextureRegion(tex));
       }
     }
+
+    effectTextures.put(DamageBoostEffect.class, ResourceLoader.loadTexture(GameResource.ICON_EFFECT_DAMAGE));
+    effectTextures.put(MaxHealthBoostEffect.class, ResourceLoader.loadTexture(GameResource.ICON_EFFECT_HEALTH));
+    effectTextures.put(SpeedBoostEffect.class, ResourceLoader.loadTexture(GameResource.ICON_EFFECT_SPEED));
+  }
+
+  public Map<Class<? extends EffectInterface>, Texture> getStatusEffectTextures() {
+    return Collections.unmodifiableMap(effectTextures);
   }
 
   /** Returns the icon texture for the given item, or null if no icon is mapped. */
@@ -83,5 +99,9 @@ public class ItemTextureManager implements Disposable {
       region.getTexture().dispose();
     }
     slotTextures.clear();
+    for (Texture texture : effectTextures.values()) {
+      texture.dispose();
+    }
+    effectTextures.clear();
   }
 }
