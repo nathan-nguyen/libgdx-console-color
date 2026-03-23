@@ -64,6 +64,12 @@ public class EquipmentHUD {
   // Trash slot for disposing items
   private ItemSlotWidget trashSlot;
 
+  // Stats labels
+  private Label healthLabel;
+  private Label speedLabel;
+  private Label baseDamageLabel;
+  private Label itemDamageLabel;
+
   // Inventory slots
   private ItemSlotWidget[] inventorySlots;
   private Label[] inventoryNameLabels;
@@ -117,10 +123,14 @@ public class EquipmentHUD {
     // Content area: Equipment slots on left, Inventory on right
     Table content = new Table();
 
-    // Equipment panel
-    // UI Components
+    // Equipment panel + stats stacked vertically
+    Table leftColumn = new Table();
     Table equipmentPanel = createEquipmentPanel();
-    content.add(equipmentPanel).pad(10).top();
+    leftColumn.add(equipmentPanel).top();
+    leftColumn.row();
+    Table statsPanel = createStatsPanel();
+    leftColumn.add(statsPanel).padTop(10).top();
+    content.add(leftColumn).pad(10).top();
 
     // Inventory panel
     Table inventoryPanel = createInventoryPanel();
@@ -238,6 +248,47 @@ public class EquipmentHUD {
     return panel;
   }
 
+  private Table createStatsPanel() {
+    Table panel = new Table();
+
+    Label.LabelStyle titleStyle = new Label.LabelStyle();
+    titleStyle.font = font;
+    titleStyle.fontColor = Color.WHITE;
+    Label title = new Label("Stats", titleStyle);
+    panel.add(title).colspan(2).padBottom(6);
+    panel.row();
+
+    Label.LabelStyle valueStyle = new Label.LabelStyle();
+    valueStyle.font = font;
+    valueStyle.fontColor = Color.LIGHT_GRAY;
+
+    Label.LabelStyle keyStyle = new Label.LabelStyle();
+    keyStyle.font = font;
+    keyStyle.fontColor = Color.WHITE;
+
+    healthLabel = new Label("", valueStyle);
+    healthLabel.setFontScale(0.7f);
+    speedLabel = new Label("", valueStyle);
+    speedLabel.setFontScale(0.7f);
+    baseDamageLabel = new Label("", valueStyle);
+    baseDamageLabel.setFontScale(0.7f);
+    itemDamageLabel = new Label("", valueStyle);
+    itemDamageLabel.setFontScale(0.7f);
+
+    String[] keys = {"HP:", "SPD:", "DMG:", "Item DMG:"};
+    Label[] valueLabels = {healthLabel, speedLabel, baseDamageLabel, itemDamageLabel};
+
+    for (int i = 0; i < keys.length; i++) {
+      Label key = new Label(keys[i], keyStyle);
+      key.setFontScale(0.7f);
+      panel.add(key).left().padRight(4);
+      panel.add(valueLabels[i]).left();
+      panel.row().padBottom(2);
+    }
+
+    return panel;
+  }
+
   private Table createInventoryPanel() {
     Table panel = new Table();
 
@@ -333,6 +384,14 @@ public class EquipmentHUD {
         }
       }
     }
+
+    // Refresh stats
+    healthLabel.setText(player.getHealth() + " / " + player.getMaxHealth());
+    speedLabel.setText(String.valueOf(player.getSpeed()));
+    Item holdingItem = player.getHoldingItem();
+    int holdingItemDamage = holdingItem == null ? 0 : holdingItem.getDamage();
+    baseDamageLabel.setText(String.valueOf(player.getAttackDamage() - holdingItemDamage));
+    itemDamageLabel.setText(holdingItem == null ? "-" : String.valueOf(holdingItemDamage));
 
     // Get current selected slot
     int currentSlot = player.getCurrentInventorySlot();

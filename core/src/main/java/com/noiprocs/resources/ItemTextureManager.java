@@ -63,9 +63,12 @@ public class ItemTextureManager implements Disposable {
       }
     }
 
-    effectTextures.put(DamageBoostEffect.class, ResourceLoader.loadTexture(GameResource.ICON_EFFECT_DAMAGE));
-    effectTextures.put(MaxHealthBoostEffect.class, ResourceLoader.loadTexture(GameResource.ICON_EFFECT_HEALTH));
-    effectTextures.put(SpeedBoostEffect.class, ResourceLoader.loadTexture(GameResource.ICON_EFFECT_SPEED));
+    effectTextures.put(
+        DamageBoostEffect.class, ResourceLoader.loadTexture(GameResource.ICON_EFFECT_DAMAGE));
+    effectTextures.put(
+        MaxHealthBoostEffect.class, ResourceLoader.loadTexture(GameResource.ICON_EFFECT_HEALTH));
+    effectTextures.put(
+        SpeedBoostEffect.class, ResourceLoader.loadTexture(GameResource.ICON_EFFECT_SPEED));
   }
 
   public Map<Class<? extends EffectInterface>, Texture> getStatusEffectTextures() {
