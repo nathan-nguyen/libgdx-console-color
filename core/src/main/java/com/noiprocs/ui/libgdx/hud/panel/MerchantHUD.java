@@ -12,10 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
-import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Payload;
-import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Source;
-import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Target;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
@@ -36,13 +32,14 @@ import com.noiprocs.ui.libgdx.hud.widget.ItemSlotStyle;
 import com.noiprocs.ui.libgdx.hud.widget.ItemSlotWidget;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.IntConsumer;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Merchant shop HUD. Displays the merchant's stock on the right and the player's inventory on the
- * left. Click a shop item to buy; click a player item to sell. Drag player items onto the shop
- * panel to sell, or drag shop items onto a player slot to buy.
+ * left. Click a shop item to buy; click a player item to sell.
  */
 public class MerchantHUD {
   private static final Logger logger = LoggerFactory.getLogger(MerchantHUD.class);
@@ -55,10 +52,11 @@ public class MerchantHUD {
   private final ItemSlotStyle slotStyle;
   private final Viewport viewport;
   private final ItemTextureManager itemTextureManager;
-  private final DragAndDrop dragAndDrop;
   private final Table mainContainer;
 
   private String merchantModelId;
+
+  private Table confirmDialog;
 
   private ItemSlotWidget[] playerInventorySlots;
   private Label[] playerInventoryNameLabels;
@@ -85,7 +83,6 @@ public class MerchantHUD {
     this.font = font;
     this.slotStyle = slotStyle;
     this.itemTextureManager = itemTextureManager;
-    this.dragAndDrop = new DragAndDrop();
     this.mainContainer = new Table();
     this.rootTable = new Table();
     this.rootTable.setFillParent(true);
@@ -121,7 +118,6 @@ public class MerchantHUD {
 
   private void rebuildUI() {
     mainContainer.clear();
-    dragAndDrop.clear();
 
     // Header
     Table header = buildHeader();
@@ -154,7 +150,7 @@ public class MerchantHUD {
     float maxHeight = Math.min(viewport.getWorldHeight() * 0.9f, 560);
     rootTable.getCell(mainContainer).width(maxWidth).height(maxHeight);
 
-    setupDragAndDrop();
+    setupClickListeners();
   }
 
   private Table buildHeader() {
@@ -214,9 +210,6 @@ public class MerchantHUD {
     Label nameHeader = new Label("Item", makeLabelStyle(Color.LIGHT_GRAY));
     nameHeader.setFontScale(0.75f);
     colHeader.add(nameHeader).width(110).padRight(4);
-    Label stockHeader = new Label("Stock", makeLabelStyle(Color.LIGHT_GRAY));
-    stockHeader.setFontScale(0.75f);
-    colHeader.add(stockHeader).width(40).padRight(4);
     Label priceHeader = new Label("Buy", makeLabelStyle(Color.LIGHT_GRAY));
     priceHeader.setFontScale(0.75f);
     colHeader.add(priceHeader).width(40);
@@ -227,10 +220,13 @@ public class MerchantHUD {
     shopListTable = new Table();
     shopListTable.top().left();
 
-    List<ItemEntry> items = getShopItems(getMerchant());
+    MerchantModel merchant = getMerchant();
+    List<ItemEntry> items =
+        getShopItems(merchant).stream()
+            .filter(e -> merchant == null || merchant.getStock(e.itemClass) > 0)
+            .collect(Collectors.toList());
     shopSlots = new ItemSlotWidget[items.size()];
 
-    MerchantModel merchant = getMerchant();
     for (int i = 0; i < items.size(); i++) {
       ItemEntry entry = items.get(i);
       int stock = merchant != null ? merchant.getStock(entry.itemClass) : 0;
@@ -272,10 +268,6 @@ public class MerchantHUD {
     nameLabel.setFontScale(0.75f);
     row.add(nameLabel).width(110).left().padRight(4);
 
-    Label stockLabel = new Label(String.valueOf(stock), makeLabelStyle(Color.LIGHT_GRAY));
-    stockLabel.setFontScale(0.75f);
-    row.add(stockLabel).width(40).right().padRight(4);
-
     Label priceLabel =
         new Label(entry.buyPrice + "g", makeLabelStyle(new Color(0.4f, 1f, 0.4f, 1f)));
     priceLabel.setFontScale(0.75f);
@@ -284,146 +276,211 @@ public class MerchantHUD {
     return row;
   }
 
-  // ── Drag and drop ────────────────────────────────────────────────────────
+  // ── Click listeners ──────────────────────────────────────────────────────
 
-  private void setupDragAndDrop() {
-    List<ItemEntry> items = getShopItems(getMerchant());
-
-    // Player inventory slots as drag sources (sell) and drop targets (receive bought items)
+  private void setupClickListeners() {
     for (int i = 0; i < playerInventorySlots.length; i++) {
       final int slotIndex = i;
       ItemSlotWidget slot = playerInventorySlots[i];
-
-      // Drag source: player item → merchant = SELL
-      dragAndDrop.addSource(
-          new Source(slot) {
-            @Override
-            public Payload dragStart(InputEvent event, float x, float y, int pointer) {
-              if (slot.isEmpty()) return null;
-              Payload payload = new Payload();
-              payload.setObject(new DragPayload("PLAYER", slotIndex, null));
-              slot.setDragging(true);
-              payload.setDragActor(
-                  ItemSlotWidget.createDragActor(slot.getItem(), font, itemTextureManager));
-              return payload;
-            }
-
-            @Override
-            public void dragStop(
-                InputEvent event, float x, float y, int pointer, Payload payload, Target target) {
-              slot.setDragging(false);
-            }
-          });
-
-      // Drop target: shop item dragged onto player slot = BUY
-      dragAndDrop.addTarget(
-          new Target(slot) {
-            @Override
-            public boolean drag(Source source, Payload payload, float x, float y, int pointer) {
-              DragPayload dp = (DragPayload) payload.getObject();
-              if ("SHOP".equals(dp.sourceContainer)) {
-                slot.setHovered(true);
-                return true;
-              }
-              return false;
-            }
-
-            @Override
-            public void drop(Source source, Payload payload, float x, float y, int pointer) {
-              DragPayload dp = (DragPayload) payload.getObject();
-              if ("SHOP".equals(dp.sourceContainer)) {
-                executeBuy(dp.itemClass);
-              }
-            }
-
-            @Override
-            public void reset(Source source, Payload payload) {
-              slot.setHovered(false);
-            }
-          });
-
-      // Click: sell the item in this slot
-      slot.clearListeners();
       slot.addListener(
           new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
               if (slot.isEmpty()) return;
-              executeSell(slotIndex);
+              showSellDialog(slotIndex);
             }
           });
     }
 
-    // Shop item slots as drag sources (buy) with the shop list as sell drop target
-    for (int i = 0; i < items.size(); i++) {
+    MerchantModel merchant = getMerchant();
+    List<ItemEntry> items =
+        getShopItems(merchant).stream()
+            .filter(e -> merchant == null || merchant.getStock(e.itemClass) > 0)
+            .collect(Collectors.toList());
+    for (int i = 0; i < items.size() && i < shopSlots.length; i++) {
       final ItemEntry entry = items.get(i);
       final ItemSlotWidget shopSlot = shopSlots[i];
-
-      // Drag source: merchant item → player slot = BUY
-      dragAndDrop.addSource(
-          new Source(shopSlot) {
-            @Override
-            public Payload dragStart(InputEvent event, float x, float y, int pointer) {
-              MerchantModel m = getMerchant();
-              if (m == null || m.getStock(entry.itemClass) <= 0) return null;
-              Payload payload = new Payload();
-              payload.setObject(new DragPayload("SHOP", -1, entry.itemClass));
-              shopSlot.setDragging(true);
-              payload.setDragActor(
-                  ItemSlotWidget.createDragActor(shopSlot.getItem(), font, itemTextureManager));
-              return payload;
-            }
-
-            @Override
-            public void dragStop(
-                InputEvent event, float x, float y, int pointer, Payload payload, Target target) {
-              shopSlot.setDragging(false);
-            }
-          });
-
-      // Click: buy this item
-      shopSlot.clearListeners();
       shopSlot.addListener(
           new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-              executeBuy(entry.itemClass);
+              showBuyDialog(entry, simpleItemName(entry.itemClass));
             }
           });
     }
+  }
 
-    // The shop list table accepts player items dropped on it = SELL
-    dragAndDrop.addTarget(
-        new Target(shopListTable) {
-          @Override
-          public boolean drag(Source source, Payload payload, float x, float y, int pointer) {
-            DragPayload dp = (DragPayload) payload.getObject();
-            return "PLAYER".equals(dp.sourceContainer);
-          }
+  // ── Dialogs ──────────────────────────────────────────────────────────────
 
+  private void showBuyDialog(ItemEntry entry, String displayName) {
+    MerchantModel merchant = getMerchant();
+    if (merchant == null) return;
+    int maxAmount = merchant.getStock(entry.itemClass);
+    if (maxAmount <= 0) return;
+    showConfirmDialog(
+        "Buy " + displayName,
+        entry.buyPrice,
+        maxAmount,
+        true,
+        amount -> executeBuy(entry.itemClass, amount));
+  }
+
+  private void showSellDialog(int slotIndex) {
+    GameContext ctx = GameContext.get();
+    PlayerModel player = (PlayerModel) ctx.modelManager.getModel(ctx.username);
+    if (player == null) return;
+    Item item = player.getInventory().getItem(slotIndex);
+    if (item == null) return;
+    String itemClass = item.getClass().getName();
+    int sellPrice = MerchantConfigLoader.get().getSellPrice(itemClass);
+    showConfirmDialog(
+        "Sell " + simpleItemName(itemClass),
+        sellPrice,
+        item.amount,
+        false,
+        amount -> executeSell(slotIndex, amount));
+  }
+
+  private void showConfirmDialog(
+      String title, int pricePerUnit, int maxAmount, boolean isBuy, IntConsumer onConfirm) {
+    if (confirmDialog != null) confirmDialog.remove();
+
+    int[] amount = {1};
+
+    Color previewColor = isBuy ? new Color(1f, 0.4f, 0.4f, 1f) : new Color(0.4f, 1f, 0.4f, 1f);
+    String prefix = isBuy ? "-" : "+";
+
+    // Dim overlay
+    Table overlay = new Table();
+    overlay.setFillParent(true);
+    Pixmap dimPixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+    dimPixmap.setColor(0f, 0f, 0f, 0.55f);
+    dimPixmap.fill();
+    Texture dimTexture = new Texture(dimPixmap);
+    dimPixmap.dispose();
+    overlay.setBackground(new TextureRegionDrawable(dimTexture));
+    overlay.setTouchable(Touchable.enabled);
+
+    // Dialog box
+    Table dialog = new Table();
+    Pixmap boxPixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+    boxPixmap.setColor(0.15f, 0.15f, 0.15f, 0.97f);
+    boxPixmap.fill();
+    Texture boxTexture = new Texture(boxPixmap);
+    boxPixmap.dispose();
+    dialog.setBackground(new TextureRegionDrawable(boxTexture));
+    dialog.pad(32);
+
+    // Title
+    Label titleLabel = new Label(title, makeLabelStyle(Color.WHITE));
+    titleLabel.setFontScale(1.0f);
+    dialog.add(titleLabel).colspan(3).center().padBottom(12);
+    dialog.row();
+
+    // Gold preview
+    Label goldPreview =
+        new Label(prefix + (pricePerUnit * amount[0]) + "g", makeLabelStyle(previewColor));
+    goldPreview.setFontScale(0.9f);
+    dialog.add(goldPreview).colspan(3).center().padBottom(24);
+    dialog.row();
+
+    // Amount row
+    Label minusBtn = new Label("  -  ", makeLabelStyle(Color.YELLOW));
+    minusBtn.setFontScale(1.1f);
+    Label amountLabel = new Label(String.valueOf(amount[0]), makeLabelStyle(Color.WHITE));
+    amountLabel.setFontScale(0.9f);
+    amountLabel.setAlignment(Align.center);
+    Label plusBtn = new Label("  +  ", makeLabelStyle(Color.YELLOW));
+    plusBtn.setFontScale(1.1f);
+
+    minusBtn.addListener(
+        new ClickListener() {
           @Override
-          public void drop(Source source, Payload payload, float x, float y, int pointer) {
-            DragPayload dp = (DragPayload) payload.getObject();
-            if ("PLAYER".equals(dp.sourceContainer)) {
-              executeSell(dp.sourceSlotIndex);
+          public void clicked(InputEvent event, float x, float y) {
+            if (amount[0] > 1) {
+              amount[0]--;
+              amountLabel.setText(String.valueOf(amount[0]));
+              goldPreview.setText(prefix + (pricePerUnit * amount[0]) + "g");
             }
           }
         });
+    plusBtn.addListener(
+        new ClickListener() {
+          @Override
+          public void clicked(InputEvent event, float x, float y) {
+            if (amount[0] < maxAmount) {
+              amount[0]++;
+              amountLabel.setText(String.valueOf(amount[0]));
+              goldPreview.setText(prefix + (pricePerUnit * amount[0]) + "g");
+            }
+          }
+        });
+
+    dialog.add(minusBtn).padRight(16);
+    dialog.add(amountLabel).width(60).center();
+    dialog.add(plusBtn).padLeft(16);
+    dialog.row();
+
+    // Cancel / Confirm buttons
+    Table btnRow = new Table();
+    Label cancelBtn = new Label("  Cancel  ", makeLabelStyle(Color.LIGHT_GRAY));
+    cancelBtn.setFontScale(0.85f);
+    cancelBtn.addListener(
+        new ClickListener() {
+          @Override
+          public void clicked(InputEvent event, float x, float y) {
+            overlay.remove();
+            confirmDialog = null;
+          }
+        });
+    Label confirmBtn = new Label("  Confirm  ", makeLabelStyle(new Color(0.4f, 1f, 0.4f, 1f)));
+    confirmBtn.setFontScale(0.85f);
+    confirmBtn.addListener(
+        new ClickListener() {
+          @Override
+          public void clicked(InputEvent event, float x, float y) {
+            onConfirm.accept(amount[0]);
+            overlay.remove();
+            confirmDialog = null;
+          }
+        });
+    btnRow.add(cancelBtn).padRight(16);
+    btnRow.add(confirmBtn);
+    dialog.add(btnRow).colspan(3).center().padTop(40);
+
+    overlay.add(dialog);
+    overlay.addCaptureListener(
+        new InputListener() {
+          @Override
+          public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+            Actor target = event.getTarget();
+            if (target != dialog && !isDescendantOf(target, dialog)) {
+              overlay.remove();
+              confirmDialog = null;
+              event.stop();
+              return true;
+            }
+            return false;
+          }
+        });
+
+    confirmDialog = overlay;
+    rootTable.getStage().addActor(overlay);
   }
 
   // ── Commands ─────────────────────────────────────────────────────────────
 
-  private void executeBuy(String itemClass) {
+  private void executeBuy(String itemClass, int amount) {
     GameContext ctx = GameContext.get();
     ctx.controlManager.processInput(
-        new BuyItemCommand(ctx.username, merchantModelId, itemClass, 1));
+        new BuyItemCommand(ctx.username, merchantModelId, itemClass, amount));
     scheduleRefresh();
   }
 
-  private void executeSell(int inventorySlot) {
+  private void executeSell(int inventorySlot, int amount) {
     GameContext ctx = GameContext.get();
     ctx.controlManager.processInput(
-        new SellItemCommand(ctx.username, merchantModelId, inventorySlot, 1));
+        new SellItemCommand(ctx.username, merchantModelId, inventorySlot, amount));
     scheduleRefresh();
   }
 
@@ -450,32 +507,6 @@ public class MerchantHUD {
       } else {
         playerInventorySlots[i].clear();
         playerInventoryNameLabels[i].setText("");
-      }
-    }
-
-    // Shop stock
-    MerchantModel merchant = getMerchant();
-    List<ItemEntry> items = getShopItems(merchant);
-    for (int i = 0; i < items.size() && i < shopSlots.length; i++) {
-      ItemEntry entry = items.get(i);
-      int stock = merchant != null ? merchant.getStock(entry.itemClass) : 0;
-      try {
-        Class<?> cls = Class.forName(entry.itemClass);
-        shopSlots[i].setItem(cls, simpleItemName(entry.itemClass), stock);
-      } catch (ClassNotFoundException ignored) {
-      }
-
-      // Refresh stock label inside the row (second add in shopListTable = row actor)
-      Actor rowActor = shopListTable.getChildren().get(i);
-      if (rowActor instanceof Table) {
-        Table row = (Table) rowActor;
-        // Stock label is the 3rd cell (index 2)
-        if (row.getCells().size > 2) {
-          Actor stockActor = row.getCells().get(2).getActor();
-          if (stockActor instanceof Label) {
-            ((Label) stockActor).setText(String.valueOf(stock));
-          }
-        }
       }
     }
   }
@@ -568,6 +599,7 @@ public class MerchantHUD {
               } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
               }
+              rebuildUI();
               refresh();
             })
         .start();
@@ -580,17 +612,5 @@ public class MerchantHUD {
       current = current.getParent();
     }
     return false;
-  }
-
-  private static class DragPayload {
-    final String sourceContainer; // "PLAYER" or "SHOP"
-    final int sourceSlotIndex; // for PLAYER payloads
-    final String itemClass; // for SHOP payloads
-
-    DragPayload(String sourceContainer, int sourceSlotIndex, String itemClass) {
-      this.sourceContainer = sourceContainer;
-      this.sourceSlotIndex = sourceSlotIndex;
-      this.itemClass = itemClass;
-    }
   }
 }
