@@ -36,26 +36,16 @@ public class ItemDragDropHandler {
    * @return true if the item can be equipped in the slot
    */
   public boolean canEquip(Object item, String targetSlotType) {
-    if (item == null || targetSlotType == null) {
+    if (!(item instanceof Item) || targetSlotType == null) {
       return false;
     }
 
-    String itemStr = item.toString().toUpperCase();
-
-    switch (targetSlotType) {
-      case "HELMET":
-        return itemStr.contains("HELMET") || itemStr.contains("HAT") || itemStr.contains("HOOD");
-      case "CHEST PLATE":
-        return itemStr.contains("CHEST")
-            || itemStr.contains("CHESTPLATE")
-            || itemStr.contains("ARMOR");
-      case "LEGGING":
-        return itemStr.contains("LEGS") || itemStr.contains("PANTS") || itemStr.contains("LEGGING");
-      case "BOOT":
-        return itemStr.contains("BOOT") || itemStr.contains("SHOE") || itemStr.contains("FEET");
-      default:
-        return false;
+    Long categoryId = slotTypeToCategory.get(targetSlotType);
+    if (categoryId == null) {
+      return false;
     }
+
+    return ((Item) item).hasCategory(categoryId);
   }
 
   /**

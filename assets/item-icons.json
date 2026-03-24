@@ -1,6 +1,7 @@
 {
   "com.noiprocs.gameplay.model.item.AppleItem": "icons/apple.png",
   "com.noiprocs.gameplay.model.item.AxeItem": "icons/axe.png",
+  "com.noiprocs.gameplay.model.item.BlastStridersItem": "icons/legging/legging_blast_striders.png",
   "com.noiprocs.gameplay.model.item.BombItem": "icons/bomb.png",
   "com.noiprocs.gameplay.model.item.BootOfSpeedItem": "icons/boot_of_speed.png",
   "com.noiprocs.gameplay.model.item.BootOfTravelItem": "icons/boot_of_travel.png",
