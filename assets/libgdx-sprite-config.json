@@ -25,6 +25,18 @@
       }
     },
     {
+      "modelClasses": ["com.noiprocs.gameplay.model.mob.BlackSmithModel"],
+      "images": {
+        "default": {
+          "imagePath": "textures/blacksmith.png",
+          "offsetX": -50,
+          "offsetY": -35,
+          "scaleX": 0.1,
+          "scaleY": 0.1
+        }
+      }
+    },
+    {
       "modelClasses": ["com.noiprocs.core.model.mob.character.PlayerModel"],
       "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.character.PlayerSprite",
       "images": {
