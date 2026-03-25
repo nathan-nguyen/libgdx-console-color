@@ -3,7 +3,10 @@ package com.noiprocs.lwjgl3;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.noiprocs.core.GameContext;
+import com.noiprocs.core.common.Direction;
+import com.noiprocs.core.common.Vector3D;
 import com.noiprocs.core.control.command.InputCommand;
+import com.noiprocs.core.control.command.SetMovingDirectionCommand;
 import com.noiprocs.input.InputController;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
 import java.util.HashSet;
@@ -12,21 +15,19 @@ import java.util.Set;
 /** Desktop keyboard input controller for LWJGL3 platform. */
 public class DesktopKeyboardInputController implements InputController {
   private final Set<Character> keyPressedSet = new HashSet<>();
+  private Vector3D lastMovingDirection = Vector3D.ZERO;
 
   @Override
   public void handleInput(HUDManager hudManager) {
     GameContext gameContext = GameContext.get();
 
     if (hudManager != null && hudManager.isOpen()) {
-      // Graphical HUD handles input via Scene2D
-      // ESC key closes the HUD
       if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
         hudManager.close();
       }
-      return; // Don't process game input when graphical HUD is open
+      return;
     }
 
-    // Check for 'E' key to open equipment HUD (graphical version)
     if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
       if (hudManager != null) {
         hudManager.openEquipmentHUD();
@@ -34,7 +35,6 @@ public class DesktopKeyboardInputController implements InputController {
       }
     }
 
-    // Check for 'C' key to open crafting HUD (graphical version)
     if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
       if (hudManager != null) {
         hudManager.openCraftingHUD();
@@ -42,61 +42,57 @@ public class DesktopKeyboardInputController implements InputController {
       }
     }
 
-    // Handle all game input keys
-    boolean anyKeyPressed = false;
-    if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-      processKey(gameContext, 'w');
-      anyKeyPressed = true;
+    // Compute 8-directional movement from currently held WASD keys
+    Vector3D movingDirection = Vector3D.ZERO;
+    if (Gdx.input.isKeyPressed(Input.Keys.W))
+      movingDirection = movingDirection.add(Direction.NORTH);
+    if (Gdx.input.isKeyPressed(Input.Keys.A)) movingDirection = movingDirection.add(Direction.WEST);
+    if (Gdx.input.isKeyPressed(Input.Keys.S))
+      movingDirection = movingDirection.add(Direction.SOUTH);
+    if (Gdx.input.isKeyPressed(Input.Keys.D)) movingDirection = movingDirection.add(Direction.EAST);
+    if (!movingDirection.equals(lastMovingDirection)) {
+      lastMovingDirection = movingDirection;
+      gameContext.controlManager.processInput(
+          new SetMovingDirectionCommand(gameContext.username, movingDirection));
     }
-    if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-      processKey(gameContext, 'a');
-      anyKeyPressed = true;
-    }
-    if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-      processKey(gameContext, 's');
-      anyKeyPressed = true;
-    }
-    if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-      processKey(gameContext, 'd');
-      anyKeyPressed = true;
-    }
+
+    // Handle action keys (fire once per press)
+    boolean anyActionKeyPressed = false;
     if (Gdx.input.isKeyPressed(Input.Keys.F)) {
       processKey(gameContext, 'f');
-      anyKeyPressed = true;
+      anyActionKeyPressed = true;
     }
     if (Gdx.input.isKeyPressed(Input.Keys.H)) {
       processKey(gameContext, 'h');
-      anyKeyPressed = true;
+      anyActionKeyPressed = true;
     }
     if (Gdx.input.isKeyPressed(Input.Keys.T)) {
       processKey(gameContext, 't');
-      anyKeyPressed = true;
+      anyActionKeyPressed = true;
     }
     if (Gdx.input.isKeyPressed(Input.Keys.NUM_1)) {
       processKey(gameContext, '1');
-      anyKeyPressed = true;
+      anyActionKeyPressed = true;
     }
     if (Gdx.input.isKeyPressed(Input.Keys.NUM_2)) {
       processKey(gameContext, '2');
-      anyKeyPressed = true;
+      anyActionKeyPressed = true;
     }
     if (Gdx.input.isKeyPressed(Input.Keys.NUM_3)) {
       processKey(gameContext, '3');
-      anyKeyPressed = true;
+      anyActionKeyPressed = true;
     }
     if (Gdx.input.isKeyPressed(Input.Keys.NUM_4)) {
       processKey(gameContext, '4');
-      anyKeyPressed = true;
+      anyActionKeyPressed = true;
     }
     if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
       processKey(gameContext, ' ');
-      anyKeyPressed = true;
+      anyActionKeyPressed = true;
     }
 
-    // If no keys pressed, send halt command
-    if (!anyKeyPressed && !keyPressedSet.isEmpty()) {
+    if (!anyActionKeyPressed && !keyPressedSet.isEmpty()) {
       keyPressedSet.clear();
-      gameContext.controlManager.processInput(new InputCommand(gameContext.username, "h"));
     }
   }
 
