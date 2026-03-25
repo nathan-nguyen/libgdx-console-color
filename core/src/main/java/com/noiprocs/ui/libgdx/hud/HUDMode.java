@@ -15,5 +15,8 @@ public enum HUDMode {
   INVENTORY_INTERACTION,
 
   /** Merchant shop HUD is open */
-  MERCHANT
+  MERCHANT,
+
+  /** Blacksmith upgrade HUD is open */
+  BLACKSMITH
 }

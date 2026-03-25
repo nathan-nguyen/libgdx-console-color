@@ -29,10 +29,10 @@
       "images": {
         "default": {
           "imagePath": "textures/blacksmith.png",
-          "offsetX": -50,
-          "offsetY": -35,
-          "scaleX": 0.1,
-          "scaleY": 0.1
+          "offsetX": -55,
+          "offsetY": -45,
+          "scaleX": 0.12,
+          "scaleY": 0.12
         }
       }
     },

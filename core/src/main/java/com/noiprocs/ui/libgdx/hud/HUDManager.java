@@ -22,11 +22,13 @@ import com.noiprocs.core.model.action.Action;
 import com.noiprocs.core.model.action.InteractAction;
 import com.noiprocs.core.model.mob.character.HumanoidModel;
 import com.noiprocs.core.model.mob.character.PlayerModel;
+import com.noiprocs.gameplay.model.mob.BlackSmithModel;
 import com.noiprocs.gameplay.model.mob.MerchantModel;
 import com.noiprocs.resources.GameResource;
 import com.noiprocs.resources.ItemTextureManager;
 import com.noiprocs.resources.ResourceLoader;
 import com.noiprocs.settings.SettingsManager;
+import com.noiprocs.ui.libgdx.hud.panel.BlackSmithHUD;
 import com.noiprocs.ui.libgdx.hud.panel.CraftingHUD;
 import com.noiprocs.ui.libgdx.hud.panel.EquipmentHUD;
 import com.noiprocs.ui.libgdx.hud.panel.InventoryHUD;
@@ -54,6 +56,7 @@ public class HUDManager {
   private CraftingHUD craftingHUD;
   private InventoryHUD inventoryHUD;
   private MerchantHUD merchantHUD;
+  private BlackSmithHUD blackSmithHUD;
 
   public HUDManager(
       Viewport viewport,
@@ -178,6 +181,23 @@ public class HUDManager {
     currentMode = HUDMode.MERCHANT;
   }
 
+  /** Opens the blacksmith upgrade HUD. */
+  public void openBlackSmithHUD(String blacksmithModelId) {
+    closeModal();
+
+    if (blackSmithHUD == null) {
+      blackSmithHUD =
+          new BlackSmithHUD(
+              this, hudStage.getViewport(), font, sharedSlotStyle, itemTextureManager);
+    }
+
+    blackSmithHUD.setBlacksmith(blacksmithModelId);
+    blackSmithHUD.refresh();
+    currentModalActor = blackSmithHUD.getRoot();
+    hudStage.addActor(currentModalActor);
+    currentMode = HUDMode.BLACKSMITH;
+  }
+
   /**
    * Opens the inventory interaction HUD for a container (e.g., chest).
    *
@@ -236,7 +256,11 @@ public class HUDManager {
     if (playerAction instanceof InteractAction) {
       InteractAction interactAction = (InteractAction) playerAction;
       Model model = ctx.modelManager.getModel(interactAction.targetId);
-      if (model instanceof MerchantModel) {
+      if (model instanceof BlackSmithModel) {
+        if (!isOpen()) {
+          openBlackSmithHUD(interactAction.targetId);
+        }
+      } else if (model instanceof MerchantModel) {
         if (!isOpen()) {
           openMerchantHUD(interactAction.targetId);
         }
@@ -285,6 +309,9 @@ public class HUDManager {
     }
     if (merchantHUD != null) {
       merchantHUD.dispose();
+    }
+    if (blackSmithHUD != null) {
+      blackSmithHUD.dispose();
     }
 
     if (sharedSlotStyle != null) {
