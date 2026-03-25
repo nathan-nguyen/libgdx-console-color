@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.noiprocs.core.GameContext;
+import com.noiprocs.core.model.effect.EffectInterface;
 import com.noiprocs.core.model.item.Equipment;
 import com.noiprocs.core.model.item.Inventory;
 import com.noiprocs.core.model.item.Item;
@@ -35,6 +36,7 @@ import com.noiprocs.ui.libgdx.hud.widget.ItemSlotStyle;
 import com.noiprocs.ui.libgdx.hud.widget.ItemSlotWidget;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +68,7 @@ public class EquipmentHUD {
 
   // Stats labels
   private Label healthLabel;
+  private Label activeEffectsLabel;
   private Label speedLabel;
   private Label baseDamageLabel;
   private Label itemDamageLabel;
@@ -268,6 +271,8 @@ public class EquipmentHUD {
 
     healthLabel = new Label("", valueStyle);
     healthLabel.setFontScale(0.7f);
+    activeEffectsLabel = new Label("", valueStyle);
+    activeEffectsLabel.setFontScale(0.7f);
     speedLabel = new Label("", valueStyle);
     speedLabel.setFontScale(0.7f);
     baseDamageLabel = new Label("", valueStyle);
@@ -275,8 +280,10 @@ public class EquipmentHUD {
     itemDamageLabel = new Label("", valueStyle);
     itemDamageLabel.setFontScale(0.7f);
 
-    String[] keys = {"HP:", "SPD:", "DMG:", "Item DMG:"};
-    Label[] valueLabels = {healthLabel, speedLabel, baseDamageLabel, itemDamageLabel};
+    String[] keys = {"HP:", "Active Effects", "Speed:", "Base Damage:", "Item Damage:"};
+    Label[] valueLabels = {
+      healthLabel, activeEffectsLabel, speedLabel, baseDamageLabel, itemDamageLabel
+    };
 
     for (int i = 0; i < keys.length; i++) {
       Label key = new Label(keys[i], keyStyle);
@@ -387,6 +394,10 @@ public class EquipmentHUD {
 
     // Refresh stats
     healthLabel.setText(player.getHealth() + " / " + player.getMaxHealth());
+    activeEffectsLabel.setText(
+        player.getEffects().stream()
+            .map(EffectInterface::getName)
+            .collect(Collectors.joining(" - ")));
     speedLabel.setText(String.valueOf(player.getSpeed()));
     Item holdingItem = player.getHoldingItem();
     int holdingItemDamage = holdingItem == null ? 0 : holdingItem.getDamage();
