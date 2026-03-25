@@ -8,6 +8,7 @@
   "com.noiprocs.gameplay.model.item.CacaoFruitItem": "icons/cacao_fruit.png",
   "com.noiprocs.gameplay.model.item.CacaoPotionItem": "icons/cacao_potion.png",
   "com.noiprocs.gameplay.model.item.ChestItem": "icons/chest.png",
+  "com.noiprocs.gameplay.model.item.MimicChestItem": "icons/chest.png",
   "com.noiprocs.gameplay.model.item.CoconutItem": "icons/coconut.png",
   "com.noiprocs.gameplay.model.item.EscapeScrollItem": "icons/escape_scroll.png",
   "com.noiprocs.gameplay.model.item.FenceItem": "icons/fence.png",

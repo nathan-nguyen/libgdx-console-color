@@ -356,6 +356,55 @@
       }
     },
     {
+      "modelClasses": ["com.noiprocs.gameplay.model.mob.MimicModel"],
+      "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.MimicSprite",
+      "images": {
+        "hidden": {
+          "imagePath": "icons/chest.png",
+          "offsetX": -45,
+          "offsetY": -50,
+          "scaleX": 0.08,
+          "scaleY": 0.08
+        },
+        "stand_sw": {
+          "imagePath": "textures/chest_mimic_stand_sw.png",
+          "offsetX": -45,
+          "offsetY": -50,
+          "flippedOffsetX": -40,
+          "flippedOffsetY": -45,
+          "scaleX": 0.08,
+          "scaleY": 0.08
+        },
+        "stand_ne": {
+          "imagePath": "textures/chest_mimic_stand_ne.png",
+          "offsetX": -45,
+          "offsetY": -50,
+          "flippedOffsetX": -40,
+          "flippedOffsetY": -45,
+          "scaleX": 0.08,
+          "scaleY": 0.08
+        },
+        "attack_sw": {
+          "imagePath": "textures/chest_mimic_attack_sw.png",
+          "offsetX": -45,
+          "offsetY": -50,
+          "flippedOffsetX": -40,
+          "flippedOffsetY": -45,
+          "scaleX": 0.08,
+          "scaleY": 0.08
+        },
+        "attack_ne": {
+          "imagePath": "textures/chest_mimic_attack_ne.png",
+          "offsetX": -45,
+          "offsetY": -50,
+          "flippedOffsetX": -40,
+          "flippedOffsetY": -45,
+          "scaleX": 0.08,
+          "scaleY": 0.08
+        }
+      }
+    },
+    {
       "modelClasses": ["com.noiprocs.core.model.building.InventoryBagModel"],
       "images": {
         "default": {
