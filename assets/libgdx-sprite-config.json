@@ -541,6 +541,18 @@
       }
     },
     {
+      "modelClasses": ["com.noiprocs.gameplay.model.item.CacaoFruitItem"],
+      "images": {
+        "default": {
+          "imagePath": "icons/cacao_fruit.png",
+          "offsetX": -25,
+          "offsetY": -40,
+          "scaleX": 0.05,
+          "scaleY": 0.05
+        }
+      }
+    },
+    {
       "modelClasses": ["com.noiprocs.gameplay.model.item.PebbleItem"],
       "images": {
         "default": {

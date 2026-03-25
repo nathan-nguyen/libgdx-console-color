@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class LibgdxSpriteConfigLoader implements Disposable {
 
-  private static final String SPRITE_CONFIG_JSON = "sprite-config.json";
+  private static final String SPRITE_CONFIG_JSON = "libgdx-sprite-config.json";
   private static LibgdxSpriteConfigLoader instance;
 
   public static LibgdxSpriteConfigLoader get() {
