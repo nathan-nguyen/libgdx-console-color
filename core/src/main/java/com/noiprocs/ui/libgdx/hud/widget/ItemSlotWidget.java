@@ -15,37 +15,28 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.noiprocs.resources.ItemTextureManager;
 
-/**
- * Reusable draggable slot widget for inventory items, equipment slots, and crafting materials.
- * Displays item using character-based icon with color coding and quantity.
- */
 public class ItemSlotWidget extends Table {
-
+  public static final int DIMENSION = 36;
+  public static final int ITEM_NAME_HEIGHT = 21;
+  public static final float ITEM_NAME_FONT_SCALE = 0.45f;
   private final ItemSlotStyle style;
   private final BitmapFont font;
   private final ItemTextureManager itemTextureManager;
 
-  private Object item; // Item object (from console-color-core dependency)
-  private Class<?> itemClass; // Explicit item class for texture lookup (used when item is a String)
+  private Object item;
+  private Class<?> itemClass;
   private int quantity;
-  private final boolean showItemName; // Whether to show full item name instead of icon character
-  private boolean isHotbarSlot; // Whether this is a hotbar slot (first 4 inventory slots)
-  private boolean isSelected; // Whether this is the currently selected slot
+  private final boolean showItemName;
+  private boolean isHotbarSlot;
+  private boolean isSelected;
 
-  private TextureRegion emptySlotTexture; // Shown blurry when slot is empty
+  private TextureRegion emptySlotTexture;
   private Image iconImage;
   private Label iconLabel;
   private Label quantityLabel;
   private boolean isHovered;
   private boolean isDragging;
 
-  /**
-   * Creates an empty item slot widget.
-   *
-   * @param style Visual style for the slot
-   * @param font Font for rendering text
-   * @param showItemName Whether to show full item name below the slot
-   */
   public ItemSlotWidget(
       ItemSlotStyle style,
       BitmapFont font,
@@ -64,20 +55,15 @@ public class ItemSlotWidget extends Table {
   }
 
   private void setupUI() {
-    // Set fixed size for slot (48x48 minimum for touch targets)
-    this.setSize(52, 52);
+    this.setSize(DIMENSION, DIMENSION);
     this.pad(2);
-    this.setTouchable(Touchable.enabled); // Enable touch for entire slot
+    this.setTouchable(Touchable.enabled);
 
-    // Create icon image (shown when a texture is available for the item)
     iconImage = new Image();
     iconImage.setScaling(Scaling.fit);
     iconImage.setVisible(false);
 
-    // Create icon/name label (shown when no texture or in name mode)
-    Label.LabelStyle iconStyle = new Label.LabelStyle();
-    iconStyle.font = font;
-    iconStyle.fontColor = Color.WHITE;
+    Label.LabelStyle iconStyle = new Label.LabelStyle(font, Color.WHITE);
     iconLabel = new Label("", iconStyle);
     iconLabel.setAlignment(Align.center);
     iconLabel.setFontScale(showItemName ? 0.5f : 1.5f);
@@ -85,20 +71,13 @@ public class ItemSlotWidget extends Table {
       iconLabel.setWrap(true);
     }
 
-    // Create quantity label (bottom-right corner)
-    Label.LabelStyle qtyStyle = new Label.LabelStyle();
-    qtyStyle.font = font;
-    qtyStyle.fontColor = Color.WHITE;
+    Label.LabelStyle qtyStyle = new Label.LabelStyle(font, Color.WHITE);
     quantityLabel = new Label("", qtyStyle);
-    // Scale relative to font's data scale so that quantity text renders at a consistent world
-    // size regardless of whether the font was rasterized at physical or virtual resolution.
-    quantityLabel.setFontScale(font.getData().scaleX * 0.7f);
+    quantityLabel.setFontScale(font.getData().scaleX * 0.45f);
 
-    // Quantity overlaid in bottom-right corner
     Table quantityOverlay = new Table();
     quantityOverlay.add(quantityLabel).expand().right().bottom().pad(1);
 
-    // Single Stack: icon fills the whole slot, quantity overlays on top
     Stack contentStack = new Stack();
     contentStack.setTouchable(Touchable.enabled);
     contentStack.add(iconImage);
@@ -107,16 +86,9 @@ public class ItemSlotWidget extends Table {
 
     this.add(contentStack).expand().fill();
 
-    // Set initial background
     updateBackground();
   }
 
-  /**
-   * Sets the item displayed in this slot.
-   *
-   * @param item Item object or null for empty slot
-   * @param quantity Item quantity (for stackable items)
-   */
   public void setItem(Object item, int quantity) {
     this.item = item;
     this.itemClass = null;
@@ -124,13 +96,6 @@ public class ItemSlotWidget extends Table {
     updateDisplay();
   }
 
-  /**
-   * Sets the item displayed in this slot using an explicit class for texture lookup.
-   *
-   * @param itemClass The item's class (used for texture lookup)
-   * @param displayName The name to display in the slot
-   * @param quantity Item quantity
-   */
   public void setItem(Class<?> itemClass, String displayName, int quantity) {
     this.item = displayName;
     this.itemClass = itemClass;
@@ -138,74 +103,38 @@ public class ItemSlotWidget extends Table {
     updateDisplay();
   }
 
-  /**
-   * Gets the item currently in this slot.
-   *
-   * @return Item object or null if empty
-   */
   public Object getItem() {
     return item;
   }
 
-  /**
-   * Sets whether this is a hotbar slot (first 4 inventory slots).
-   *
-   * @param isHotbarSlot true if this is a hotbar slot
-   */
   public void setHotbarSlot(boolean isHotbarSlot) {
     this.isHotbarSlot = isHotbarSlot;
     updateBackground();
   }
 
-  /**
-   * Sets whether this is the currently selected slot.
-   *
-   * @param isSelected true if this is the selected slot
-   */
   public void setSelected(boolean isSelected) {
     this.isSelected = isSelected;
     updateBackground();
   }
 
-  /**
-   * Checks if this slot is empty.
-   *
-   * @return true if no item in slot
-   */
   public boolean isEmpty() {
     return item == null;
   }
 
-  /** Clears the item from this slot. */
   public void clear() {
     setItem(null, 0);
   }
 
-  /**
-   * Sets a placeholder texture displayed blurrily when the slot is empty.
-   *
-   * @param texture Texture region to show, or null to show nothing when empty
-   */
   public void setEmptySlotTexture(TextureRegion texture) {
     this.emptySlotTexture = texture;
     if (item == null) updateDisplay();
   }
 
-  /**
-   * Sets the hover state for visual feedback.
-   *
-   * @param hovered true if mouse/touch is hovering over slot
-   */
   public void setHovered(boolean hovered) {
     this.isHovered = hovered;
     updateBackground();
   }
 
-  /**
-   * Sets the dragging state for visual feedback.
-   *
-   * @param dragging true if item is being dragged
-   */
   public void setDragging(boolean dragging) {
     this.isDragging = dragging;
     updateBackground();
@@ -267,12 +196,10 @@ public class ItemSlotWidget extends Table {
     if (isDragging) {
       background = style.draggingBackground;
     } else if (isSelected) {
-      // Selected slot gets bright highlight
       background = style.selectedBackground;
     } else if (isHovered) {
       background = style.hoverBackground;
     } else if (isHotbarSlot) {
-      // Hotbar slots use special background
       background = item != null ? style.hotbarFilledBackground : style.hotbarEmptyBackground;
     } else if (item != null) {
       background = style.filledBackground;
@@ -283,9 +210,6 @@ public class ItemSlotWidget extends Table {
     this.setBackground(background);
   }
 
-  /**
-   * Creates a drag actor for the given item: an Image if a texture is loaded, otherwise a Label.
-   */
   public static Actor createDragActor(
       Object item, BitmapFont font, ItemTextureManager itemTextureManager) {
     ItemIconRenderer.ItemIcon icon = ItemIconRenderer.renderIcon(item);
@@ -294,15 +218,21 @@ public class ItemSlotWidget extends Table {
       if (region != null) {
         Image dragImage = new Image(new TextureRegionDrawable(region));
         dragImage.setScaling(Scaling.fit);
-        dragImage.setSize(52, 52);
+        dragImage.setSize(DIMENSION, DIMENSION);
         return dragImage;
       }
     }
-    Label.LabelStyle dragStyle = new Label.LabelStyle();
-    dragStyle.font = font;
-    dragStyle.fontColor = Color.WHITE;
+    Label.LabelStyle dragStyle = new Label.LabelStyle(font, Color.WHITE);
     Label dragLabel = new Label(String.valueOf(item), dragStyle);
     dragLabel.setFontScale(1.5f);
     return dragLabel;
+  }
+
+  public static Label generateNameLabel(Label.LabelStyle nameLabelStyle) {
+    Label nameLabel = new Label("", nameLabelStyle);
+    nameLabel.setFontScale(ITEM_NAME_FONT_SCALE);
+    nameLabel.setAlignment(Align.center);
+    nameLabel.setWrap(true);
+    return nameLabel;
   }
 }

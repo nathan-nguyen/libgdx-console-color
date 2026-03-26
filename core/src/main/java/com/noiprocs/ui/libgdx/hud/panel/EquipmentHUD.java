@@ -19,7 +19,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Source;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Target;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.noiprocs.core.GameContext;
 import com.noiprocs.core.model.effect.EffectInterface;
@@ -176,9 +175,7 @@ public class EquipmentHUD {
     Table header = new Table();
 
     // Title
-    Label.LabelStyle labelStyle = new Label.LabelStyle();
-    labelStyle.font = font;
-    labelStyle.fontColor = Color.WHITE;
+    Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
     Label titleLabel = new Label("EQUIPMENT", labelStyle);
     titleLabel.setFontScale(1.2f);
 
@@ -214,16 +211,12 @@ public class EquipmentHUD {
     Table panel = new Table();
 
     // Label
-    Label.LabelStyle labelStyle = new Label.LabelStyle();
-    labelStyle.font = font;
-    labelStyle.fontColor = Color.WHITE;
+    Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
     Label label = new Label("Armor Slots", labelStyle);
     panel.add(label).colspan(2).padBottom(10);
     panel.row();
 
-    Label.LabelStyle nameLabelStyle = new Label.LabelStyle();
-    nameLabelStyle.font = font;
-    nameLabelStyle.fontColor = Color.WHITE;
+    Label.LabelStyle nameLabelStyle = new Label.LabelStyle(font, Color.WHITE);
 
     // Create equipment slots for each armor piece
     for (String slotType : EQUIPMENT_SLOT_TYPES) {
@@ -234,16 +227,16 @@ public class EquipmentHUD {
       }
       equipmentSlots.put(slotType, slot);
 
-      Label nameLabel = new Label("", nameLabelStyle);
-      nameLabel.setFontScale(0.6f);
-      nameLabel.setAlignment(Align.center);
-      nameLabel.setWrap(true);
+      Label nameLabel = ItemSlotWidget.generateNameLabel(nameLabelStyle);
       equipmentNameLabels.put(slotType, nameLabel);
 
       Table slotEntry = new Table();
-      slotEntry.add(slot).size(52, 52);
+      slotEntry.add(slot).size(ItemSlotWidget.DIMENSION, ItemSlotWidget.DIMENSION);
       slotEntry.row();
-      slotEntry.add(nameLabel).width(52).height(28).padTop(2);
+      slotEntry
+          .add(nameLabel)
+          .width(ItemSlotWidget.DIMENSION)
+          .height(ItemSlotWidget.ITEM_NAME_HEIGHT);
       panel.add(slotEntry);
       panel.row().padBottom(5);
     }
@@ -254,20 +247,13 @@ public class EquipmentHUD {
   private Table createStatsPanel() {
     Table panel = new Table();
 
-    Label.LabelStyle titleStyle = new Label.LabelStyle();
-    titleStyle.font = font;
-    titleStyle.fontColor = Color.WHITE;
+    Label.LabelStyle titleStyle = new Label.LabelStyle(font, Color.WHITE);
     Label title = new Label("Stats", titleStyle);
     panel.add(title).colspan(2).padBottom(6);
     panel.row();
 
-    Label.LabelStyle valueStyle = new Label.LabelStyle();
-    valueStyle.font = font;
-    valueStyle.fontColor = Color.LIGHT_GRAY;
-
-    Label.LabelStyle keyStyle = new Label.LabelStyle();
-    keyStyle.font = font;
-    keyStyle.fontColor = Color.WHITE;
+    Label.LabelStyle valueStyle = new Label.LabelStyle(font, Color.LIGHT_GRAY);
+    Label.LabelStyle keyStyle = new Label.LabelStyle(font, Color.WHITE);
 
     healthLabel = new Label("", valueStyle);
     healthLabel.setFontScale(0.7f);
@@ -300,16 +286,12 @@ public class EquipmentHUD {
     Table panel = new Table();
 
     // Label
-    Label.LabelStyle labelStyle = new Label.LabelStyle();
-    labelStyle.font = font;
-    labelStyle.fontColor = Color.WHITE;
+    Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
     Label label = new Label("Inventory", labelStyle);
     panel.add(label).colspan(INVENTORY_GRID_COLUMNS).padBottom(10);
     panel.row();
 
-    Label.LabelStyle nameLabelStyle = new Label.LabelStyle();
-    nameLabelStyle.font = font;
-    nameLabelStyle.fontColor = Color.WHITE;
+    Label.LabelStyle nameLabelStyle = new Label.LabelStyle(font, Color.WHITE);
 
     // Create inventory slots in a 3x3 grid (9 slots total)
     inventorySlots = new ItemSlotWidget[INVENTORY_SIZE];
@@ -323,17 +305,16 @@ public class EquipmentHUD {
         slot.setHotbarSlot(true);
       }
 
-      Label nameLabel = new Label("", nameLabelStyle);
-      nameLabel.setFontScale(0.6f);
-      nameLabel.setAlignment(Align.center);
-      nameLabel.setWrap(true);
-      inventoryNameLabels[i] = nameLabel;
+      inventoryNameLabels[i] = ItemSlotWidget.generateNameLabel(nameLabelStyle);
 
       Table slotEntry = new Table();
-      slotEntry.add(slot).size(52, 52);
+      slotEntry.add(slot).size(ItemSlotWidget.DIMENSION, ItemSlotWidget.DIMENSION);
       slotEntry.row();
-      slotEntry.add(nameLabel).width(52).height(28).padTop(2);
-      panel.add(slotEntry).pad(2);
+      slotEntry
+          .add(inventoryNameLabels[i])
+          .width(ItemSlotWidget.DIMENSION)
+          .height(ItemSlotWidget.ITEM_NAME_HEIGHT);
+      panel.add(slotEntry).pad(1);
 
       // New row every 3 slots (3x3 grid)
       if ((i + 1) % INVENTORY_GRID_COLUMNS == 0) {
@@ -342,16 +323,17 @@ public class EquipmentHUD {
     }
 
     // Trash slot
-    Label.LabelStyle trashLabelStyle = new Label.LabelStyle();
-    trashLabelStyle.font = font;
-    trashLabelStyle.fontColor = Color.RED;
+    Label.LabelStyle trashLabelStyle = new Label.LabelStyle(font, Color.RED);
     Label trashLabel = new Label("Dispose", trashLabelStyle);
-    trashLabel.setFontScale(0.7f);
+    trashLabel.setFontScale(0.45f);
     panel.add(trashLabel).colspan(INVENTORY_GRID_COLUMNS).padTop(6).padBottom(2);
     panel.row();
 
     trashSlot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
-    panel.add(trashSlot).size(52, 52).colspan(INVENTORY_GRID_COLUMNS);
+    panel
+        .add(trashSlot)
+        .size(ItemSlotWidget.DIMENSION, ItemSlotWidget.DIMENSION)
+        .colspan(INVENTORY_GRID_COLUMNS);
 
     return panel;
   }

@@ -25,7 +25,6 @@ import com.noiprocs.ui.libgdx.hud.widget.StatusEffectsWidget;
 import java.util.function.IntConsumer;
 
 public class PlayerInfoHUD extends Table {
-
   private static final int HOTBAR_SIZE = 4;
 
   private final HealthBarActor healthBar;
@@ -50,9 +49,9 @@ public class PlayerInfoHUD extends Table {
     this.hotbarTable = new Table();
     for (int i = 0; i < HOTBAR_SIZE; i++) {
       final int slotIndex = i;
-      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
-      slot.setHotbarSlot(true);
-      slot.addListener(
+      hotbarSlots[i] = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+      hotbarSlots[i].setHotbarSlot(true);
+      hotbarSlots[i].addListener(
           new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -61,8 +60,10 @@ public class PlayerInfoHUD extends Table {
               }
             }
           });
-      hotbarSlots[i] = slot;
-      hotbarTable.add(slot).size(48, 48).pad(2);
+      hotbarTable
+          .add(hotbarSlots[i])
+          .size(ItemSlotWidget.DIMENSION, ItemSlotWidget.DIMENSION)
+          .pad(1);
     }
 
     setFillParent(true);

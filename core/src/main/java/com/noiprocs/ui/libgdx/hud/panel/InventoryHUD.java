@@ -19,7 +19,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Source;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Target;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.noiprocs.core.GameContext;
 import com.noiprocs.core.model.InventoryContainerInterface;
@@ -186,9 +185,7 @@ public class InventoryHUD {
       rightPanel.row();
 
       // Add humanoid inventory
-      Label.LabelStyle labelStyle = new Label.LabelStyle();
-      labelStyle.font = font;
-      labelStyle.fontColor = Color.WHITE;
+      Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
       Label inventoryLabel = new Label("Humanoid Inventory", labelStyle);
       inventoryLabel.setFontScale(0.9f);
       rightPanel.add(inventoryLabel).padBottom(5);
@@ -213,9 +210,7 @@ public class InventoryHUD {
       Table chestColumn = new Table();
       chestColumn.top();
 
-      Label.LabelStyle labelStyle = new Label.LabelStyle();
-      labelStyle.font = font;
-      labelStyle.fontColor = Color.WHITE;
+      Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
       Label chestLabel = new Label("Chest", labelStyle);
       chestLabel.setFontScale(0.9f);
       chestColumn.add(chestLabel).padBottom(5);
@@ -248,10 +243,7 @@ public class InventoryHUD {
     Table header = new Table();
 
     // Title
-    Label.LabelStyle labelStyle = new Label.LabelStyle();
-    labelStyle.font = font;
-    labelStyle.fontColor = Color.WHITE;
-
+    Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
     String title = "CONTAINER";
     if (containerModelId != null) {
       Model containerModel = GameContext.get().modelManager.getModel(containerModelId);
@@ -273,17 +265,13 @@ public class InventoryHUD {
     panel.top();
 
     // Label
-    Label.LabelStyle labelStyle = new Label.LabelStyle();
-    labelStyle.font = font;
-    labelStyle.fontColor = Color.WHITE;
+    Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
     Label label = new Label("Player Inventory", labelStyle);
     label.setFontScale(0.9f);
     panel.add(label).colspan(3).padBottom(5);
     panel.row();
 
-    Label.LabelStyle nameLabelStyle = new Label.LabelStyle();
-    nameLabelStyle.font = font;
-    nameLabelStyle.fontColor = Color.WHITE;
+    Label.LabelStyle nameLabelStyle = new Label.LabelStyle(font, Color.WHITE);
 
     // Create inventory slots in a 3x3 grid (9 slots total)
     playerInventorySlots = new ItemSlotWidget[PLAYER_INVENTORY_SIZE];
@@ -291,17 +279,15 @@ public class InventoryHUD {
     for (int i = 0; i < PLAYER_INVENTORY_SIZE; i++) {
       ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
       playerInventorySlots[i] = slot;
-
-      Label nameLabel = new Label("", nameLabelStyle);
-      nameLabel.setFontScale(0.6f);
-      nameLabel.setAlignment(Align.center);
-      nameLabel.setWrap(true);
-      playerInventoryNameLabels[i] = nameLabel;
+      playerInventoryNameLabels[i] = ItemSlotWidget.generateNameLabel(nameLabelStyle);
 
       Table slotEntry = new Table();
-      slotEntry.add(slot).size(48, 48);
+      slotEntry.add(slot).size(ItemSlotWidget.DIMENSION, ItemSlotWidget.DIMENSION);
       slotEntry.row();
-      slotEntry.add(nameLabel).width(48).height(28).padTop(2);
+      slotEntry
+          .add(playerInventoryNameLabels[i])
+          .width(ItemSlotWidget.DIMENSION)
+          .height(ItemSlotWidget.ITEM_NAME_HEIGHT);
       panel.add(slotEntry).pad(1);
 
       // New row every 3 slots
@@ -316,9 +302,7 @@ public class InventoryHUD {
   private Table createContainerPanel() {
     Table panel = new Table();
 
-    Label.LabelStyle nameLabelStyle = new Label.LabelStyle();
-    nameLabelStyle.font = font;
-    nameLabelStyle.fontColor = Color.WHITE;
+    Label.LabelStyle nameLabelStyle = new Label.LabelStyle(font, Color.WHITE);
 
     // Create container slots in a 3x3 grid (9 slots total)
     containerSlots = new ItemSlotWidget[containerSize];
@@ -326,17 +310,15 @@ public class InventoryHUD {
     for (int i = 0; i < containerSize; i++) {
       ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
       containerSlots[i] = slot;
-
-      Label nameLabel = new Label("", nameLabelStyle);
-      nameLabel.setFontScale(0.6f);
-      nameLabel.setAlignment(Align.center);
-      nameLabel.setWrap(true);
-      containerNameLabels[i] = nameLabel;
+      containerNameLabels[i] = ItemSlotWidget.generateNameLabel(nameLabelStyle);
 
       Table slotEntry = new Table();
-      slotEntry.add(slot).size(48, 48);
+      slotEntry.add(slot).size(ItemSlotWidget.DIMENSION, ItemSlotWidget.DIMENSION);
       slotEntry.row();
-      slotEntry.add(nameLabel).width(48).height(28).padTop(2);
+      slotEntry
+          .add(containerNameLabels[i])
+          .width(ItemSlotWidget.DIMENSION)
+          .height(ItemSlotWidget.ITEM_NAME_HEIGHT);
       panel.add(slotEntry).pad(1);
 
       // New row every 3 slots
@@ -352,9 +334,7 @@ public class InventoryHUD {
     Table panel = new Table();
 
     // Label
-    Label.LabelStyle labelStyle = new Label.LabelStyle();
-    labelStyle.font = font;
-    labelStyle.fontColor = Color.WHITE;
+    Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
     Label label = new Label("Equipment", labelStyle);
     label.setFontScale(0.9f);
     panel.add(label).colspan(4).padBottom(5);
@@ -376,53 +356,47 @@ public class InventoryHUD {
     TextureRegion bootRegion = itemTextureManager.getEquipmentSlotTexture("BOOT");
     if (bootRegion != null) bootSlot.setEmptySlotTexture(bootRegion);
 
-    Label.LabelStyle nameLabelStyle = new Label.LabelStyle();
-    nameLabelStyle.font = font;
-    nameLabelStyle.fontColor = Color.WHITE;
-
-    helmetNameLabel = new Label("", nameLabelStyle);
-    helmetNameLabel.setFontScale(0.6f);
-    helmetNameLabel.setAlignment(Align.center);
-    helmetNameLabel.setWrap(true);
-
-    chestPlateNameLabel = new Label("", nameLabelStyle);
-    chestPlateNameLabel.setFontScale(0.6f);
-    chestPlateNameLabel.setAlignment(Align.center);
-    chestPlateNameLabel.setWrap(true);
-
-    leggingNameLabel = new Label("", nameLabelStyle);
-    leggingNameLabel.setFontScale(0.6f);
-    leggingNameLabel.setAlignment(Align.center);
-    leggingNameLabel.setWrap(true);
-
-    bootNameLabel = new Label("", nameLabelStyle);
-    bootNameLabel.setFontScale(0.6f);
-    bootNameLabel.setAlignment(Align.center);
-    bootNameLabel.setWrap(true);
+    Label.LabelStyle nameLabelStyle = new Label.LabelStyle(font, Color.WHITE);
+    helmetNameLabel = ItemSlotWidget.generateNameLabel(nameLabelStyle);
+    chestPlateNameLabel = ItemSlotWidget.generateNameLabel(nameLabelStyle);
+    leggingNameLabel = ItemSlotWidget.generateNameLabel(nameLabelStyle);
+    bootNameLabel = ItemSlotWidget.generateNameLabel(nameLabelStyle);
 
     // Horizontal layout: all 4 slots in a row with icons as placeholders
     Table helmetEntry = new Table();
-    helmetEntry.add(helmetSlot).size(48, 48);
+    helmetEntry.add(helmetSlot).size(ItemSlotWidget.DIMENSION, ItemSlotWidget.DIMENSION);
     helmetEntry.row();
-    helmetEntry.add(helmetNameLabel).width(48).height(28).padTop(2);
+    helmetEntry
+        .add(helmetNameLabel)
+        .width(ItemSlotWidget.DIMENSION)
+        .height(ItemSlotWidget.ITEM_NAME_HEIGHT);
     panel.add(helmetEntry).pad(1);
 
     Table chestEntry = new Table();
-    chestEntry.add(chestPlateSlot).size(48, 48);
+    chestEntry.add(chestPlateSlot).size(ItemSlotWidget.DIMENSION, ItemSlotWidget.DIMENSION);
     chestEntry.row();
-    chestEntry.add(chestPlateNameLabel).width(48).height(28).padTop(2);
+    chestEntry
+        .add(chestPlateNameLabel)
+        .width(ItemSlotWidget.DIMENSION)
+        .height(ItemSlotWidget.ITEM_NAME_HEIGHT);
     panel.add(chestEntry).pad(1);
 
     Table leggingEntry = new Table();
-    leggingEntry.add(leggingSlot).size(48, 48);
+    leggingEntry.add(leggingSlot).size(ItemSlotWidget.DIMENSION, ItemSlotWidget.DIMENSION);
     leggingEntry.row();
-    leggingEntry.add(leggingNameLabel).width(48).height(28).padTop(2);
+    leggingEntry
+        .add(leggingNameLabel)
+        .width(ItemSlotWidget.DIMENSION)
+        .height(ItemSlotWidget.ITEM_NAME_HEIGHT);
     panel.add(leggingEntry).pad(1);
 
     Table bootEntry = new Table();
-    bootEntry.add(bootSlot).size(48, 48);
+    bootEntry.add(bootSlot).size(ItemSlotWidget.DIMENSION, ItemSlotWidget.DIMENSION);
     bootEntry.row();
-    bootEntry.add(bootNameLabel).width(48).height(28).padTop(2);
+    bootEntry
+        .add(bootNameLabel)
+        .width(ItemSlotWidget.DIMENSION)
+        .height(ItemSlotWidget.ITEM_NAME_HEIGHT);
     panel.add(bootEntry).pad(1);
 
     return panel;
@@ -431,13 +405,8 @@ public class InventoryHUD {
   private Table createStatsPanel(HumanoidModel humanoidModel) {
     Table panel = new Table();
 
-    Label.LabelStyle labelStyle = new Label.LabelStyle();
-    labelStyle.font = font;
-    labelStyle.fontColor = Color.WHITE;
-
-    Label.LabelStyle valueLabelStyle = new Label.LabelStyle();
-    valueLabelStyle.font = font;
-    valueLabelStyle.fontColor = Color.YELLOW;
+    Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
+    Label.LabelStyle valueLabelStyle = new Label.LabelStyle(font, Color.YELLOW);
 
     // Health stat
     Label healthLabel = new Label("Health: ", labelStyle);
