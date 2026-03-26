@@ -698,6 +698,48 @@
       }
     },
     {
+      "modelClasses": ["com.noiprocs.gameplay.model.mob.SpiderQueenModel"],
+      "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.SpiderQueenSprite",
+      "images": {
+        "stand_sw": {
+          "imagePath": "textures/spider_stand_sw.png",
+          "offsetX": -50,
+          "offsetY": -80,
+          "flippedOffsetX": -50,
+          "flippedOffsetY": -80,
+          "scaleX": 0.10,
+          "scaleY": 0.10
+        },
+        "stand_ne": {
+          "imagePath": "textures/spider_stand_ne.png",
+          "offsetX": -50,
+          "offsetY": -80,
+          "flippedOffsetX": -50,
+          "flippedOffsetY": -80,
+          "scaleX": 0.10,
+          "scaleY": 0.10
+        },
+        "attack_sw": {
+          "imagePath": "textures/spider_attack_sw.png",
+          "offsetX": -50,
+          "offsetY": -80,
+          "flippedOffsetX": -50,
+          "flippedOffsetY": -80,
+          "scaleX": 0.10,
+          "scaleY": 0.10
+        },
+        "attack_ne": {
+          "imagePath": "textures/spider_attack_ne.png",
+          "offsetX": -50,
+          "offsetY": -80,
+          "flippedOffsetX": -50,
+          "flippedOffsetY": -80,
+          "scaleX": 0.10,
+          "scaleY": 0.10
+        }
+      }
+    },
+    {
       "modelClasses": ["com.noiprocs.gameplay.model.mob.SpiderModel"],
       "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.SpiderSprite",
       "images": {
