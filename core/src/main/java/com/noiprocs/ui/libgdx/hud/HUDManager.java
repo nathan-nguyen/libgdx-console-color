@@ -15,7 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.noiprocs.core.GameContext;
-import com.noiprocs.core.control.command.InputCommand;
 import com.noiprocs.core.model.InventoryContainerInterface;
 import com.noiprocs.core.model.Model;
 import com.noiprocs.core.model.action.Action;
@@ -73,16 +72,7 @@ public class HUDManager {
     this.settingsManager = settingsManager;
     this.skin = UIStyleHelper.createSkin(hudFont);
 
-    this.playerInfoHUD = new PlayerInfoHUD(hudFont, itemTextureManager);
-    this.playerInfoHUD.setOnSlotSelected(
-        slotIndex -> {
-          GameContext ctx = GameContext.get();
-          if (ctx != null) {
-            ctx.controlManager.processInput(
-                new InputCommand(ctx.username, String.valueOf(slotIndex + 1)));
-          }
-        });
-
+    this.playerInfoHUD = new PlayerInfoHUD(hudFont, itemTextureManager, settingsManager);
     this.buttonTable = buildButtonTable(onMenuToggle);
 
     hudStage.addActor(playerInfoHUD);
@@ -242,7 +232,7 @@ public class HUDManager {
       Model playerModel = ctx.modelManager.getModel(ctx.username);
       if (playerModel instanceof PlayerModel) {
         PlayerModel player = (PlayerModel) playerModel;
-        playerInfoHUD.update(player, settingsManager);
+        playerInfoHUD.update(player);
         syncInventoryHUD(ctx, player);
       }
     }

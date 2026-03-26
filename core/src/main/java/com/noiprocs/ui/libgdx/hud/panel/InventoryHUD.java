@@ -277,12 +277,13 @@ public class InventoryHUD {
     playerInventorySlots = new ItemSlotWidget[PLAYER_INVENTORY_SIZE];
     playerInventoryNameLabels = new Label[PLAYER_INVENTORY_SIZE];
     for (int i = 0; i < PLAYER_INVENTORY_SIZE; i++) {
-      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
-      playerInventorySlots[i] = slot;
+      playerInventorySlots[i] = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
       playerInventoryNameLabels[i] = ItemSlotWidget.generateNameLabel(nameLabelStyle);
 
       Table slotEntry = new Table();
-      slotEntry.add(slot).size(ItemSlotWidget.DIMENSION, ItemSlotWidget.DIMENSION);
+      slotEntry
+          .add(playerInventorySlots[i])
+          .size(ItemSlotWidget.DIMENSION, ItemSlotWidget.DIMENSION);
       slotEntry.row();
       slotEntry
           .add(playerInventoryNameLabels[i])

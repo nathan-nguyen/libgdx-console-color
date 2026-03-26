@@ -2,6 +2,8 @@ package com.noiprocs.settings;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Manages persistent game settings using LibGDX Preferences. Stores username, hostname, and port
@@ -29,6 +31,7 @@ public class SettingsManager {
   private static final HotbarLocation DEFAULT_HOTBAR_LOCATION = HotbarLocation.TOP;
 
   private final Preferences prefs;
+  private final List<Runnable> subscribers = new LinkedList<>();
 
   public SettingsManager() {
     this.prefs = Gdx.app.getPreferences(PREFS_NAME);
@@ -140,5 +143,16 @@ public class SettingsManager {
    */
   public void save() {
     prefs.flush();
+    notifySubscribers();
+  }
+
+  public void subscribe(Runnable subscriber) {
+    subscribers.add(subscriber);
+  }
+
+  public void notifySubscribers() {
+    for (Runnable subscriber : subscribers) {
+      subscriber.run();
+    }
   }
 }

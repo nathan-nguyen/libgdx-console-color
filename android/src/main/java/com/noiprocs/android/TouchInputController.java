@@ -77,7 +77,7 @@ public class TouchInputController implements InputController {
         }
 
         // On first touch of ACTION_TOGGLE: check if holding a throwable item
-        if (zone == ControlZone.ACTION_TOGGLE && touchState.getThrowAimPointerId() == null) {
+        if (zone == ControlZone.ACTION_USE_ITEM && touchState.getThrowAimPointerId() == null) {
           Item holdingItem = getPlayerHoldingItem();
           if (holdingItem instanceof ThrowableItemInterface) {
             touchState.setThrowAimPointer(i);
@@ -197,7 +197,7 @@ public class TouchInputController implements InputController {
 
   /** Computes a normalized offset from the ACTION_TOGGLE center using joystick-radius dead zone. */
   private Vector2 computeThrowAimOffset(float x, float y) {
-    Vector2 center = ControlZone.ACTION_TOGGLE.getCenter();
+    Vector2 center = ControlZone.ACTION_USE_ITEM.getCenter();
     float radius = ControlZone.getJoystickRadius();
     float dx = x - center.x;
     float dy = y - center.y;

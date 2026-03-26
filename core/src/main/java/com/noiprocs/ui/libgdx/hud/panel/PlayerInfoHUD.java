@@ -12,17 +12,22 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Disposable;
+import com.noiprocs.core.GameContext;
 import com.noiprocs.core.common.MetricCollector;
+import com.noiprocs.core.control.command.InputCommand;
 import com.noiprocs.core.model.item.Inventory;
 import com.noiprocs.core.model.item.Item;
 import com.noiprocs.core.model.mob.character.PlayerModel;
 import com.noiprocs.resources.ItemTextureManager;
 import com.noiprocs.settings.HotbarLocation;
 import com.noiprocs.settings.SettingsManager;
+import com.noiprocs.ui.libgdx.hud.widget.DebugWidget;
 import com.noiprocs.ui.libgdx.hud.widget.ItemSlotStyle;
 import com.noiprocs.ui.libgdx.hud.widget.ItemSlotWidget;
 import com.noiprocs.ui.libgdx.hud.widget.StatusEffectsWidget;
-import java.util.function.IntConsumer;
+import java.util.LinkedList;
+import java.util.List;
 
 public class PlayerInfoHUD extends Table {
   private static final int HOTBAR_SIZE = 4;
@@ -31,22 +36,43 @@ public class PlayerInfoHUD extends Table {
   private final StatusEffectsWidget statusEffects;
   private final Label debugLabel;
   private final ItemSlotWidget[] hotbarSlots;
-  private final ItemSlotStyle slotStyle;
+  private final List<Disposable> disposableList = new LinkedList<>();
   private final Table hotbarTable;
 
-  private IntConsumer onSlotSelected;
   private HotbarLocation hotbarLocation = HotbarLocation.TOP;
 
-  public PlayerInfoHUD(BitmapFont font, ItemTextureManager itemTextureManager) {
+  public PlayerInfoHUD(
+      BitmapFont font, ItemTextureManager itemTextureManager, SettingsManager settingsManager) {
     this.healthBar = new HealthBarActor(font);
     this.statusEffects = new StatusEffectsWidget(itemTextureManager.getStatusEffectTextures());
-    this.slotStyle = ItemSlotStyle.createDefault();
     this.hotbarSlots = new ItemSlotWidget[HOTBAR_SIZE];
 
     Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
+    this.hotbarTable = createHotBarPanel(font, itemTextureManager);
     this.debugLabel = new Label("", labelStyle);
 
-    this.hotbarTable = new Table();
+    settingsManager.subscribe(
+        () -> {
+          HotbarLocation newLocation = settingsManager.getHotbarLocation();
+          if (newLocation != hotbarLocation) {
+            hotbarLocation = newLocation;
+            buildLayout(hotbarLocation);
+          }
+          debugLabel.setVisible(settingsManager.isDebugMode());
+        });
+
+    setFillParent(true);
+    buildLayout(HotbarLocation.TOP);
+  }
+
+  private Table createHotBarPanel(BitmapFont font, ItemTextureManager itemTextureManager) {
+    ItemSlotStyle slotStyle = ItemSlotStyle.createDefault();
+    disposableList.add(slotStyle);
+
+    Table panel = new Table();
+    // TODO (gnik): Remove after force quantity label position to be correct
+    panel.setBackground(DebugWidget.getDrawableBackground());
+
     for (int i = 0; i < HOTBAR_SIZE; i++) {
       final int slotIndex = i;
       hotbarSlots[i] = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
@@ -55,72 +81,35 @@ public class PlayerInfoHUD extends Table {
           new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-              if (onSlotSelected != null) {
-                onSlotSelected.accept(slotIndex);
-              }
+              GameContext ctx = GameContext.get();
+              ctx.controlManager.processInput(
+                  new InputCommand(ctx.username, String.valueOf(slotIndex + 1)));
             }
           });
-      hotbarTable
-          .add(hotbarSlots[i])
-          .size(ItemSlotWidget.DIMENSION, ItemSlotWidget.DIMENSION)
-          .pad(1);
+      panel.add(hotbarSlots[i]).size(ItemSlotWidget.DIMENSION, ItemSlotWidget.DIMENSION).pad(1);
     }
-
-    setFillParent(true);
-    buildLayout(HotbarLocation.TOP);
+    return panel;
   }
 
   private void buildLayout(HotbarLocation location) {
     clearChildren();
     top().left().pad(10);
+    add(healthBar).size(HealthBarActor.BAR_WIDTH, HealthBarActor.BAR_HEIGHT).left();
+    row();
+    add(statusEffects).left();
+    row();
     if (location == HotbarLocation.TOP) {
-      add(healthBar).size(HealthBarActor.BAR_WIDTH, HealthBarActor.BAR_HEIGHT).left();
-      row();
-      add(statusEffects).left();
-      row();
       add(hotbarTable).left();
       row();
       add(debugLabel).left();
     } else {
-      add(healthBar).size(HealthBarActor.BAR_WIDTH, HealthBarActor.BAR_HEIGHT).left();
-      row();
-      add(statusEffects).left();
-      row();
       add(debugLabel).left().expandY().top();
       row();
       add(hotbarTable).left().padBottom(10);
     }
   }
 
-  public void setOnSlotSelected(IntConsumer onSlotSelected) {
-    this.onSlotSelected = onSlotSelected;
-  }
-
-  public void update(PlayerModel playerModel, SettingsManager settingsManager) {
-    if (settingsManager != null) {
-      HotbarLocation newLocation = settingsManager.getHotbarLocation();
-      if (newLocation != hotbarLocation) {
-        hotbarLocation = newLocation;
-        buildLayout(hotbarLocation);
-      }
-    }
-
-    boolean debug = settingsManager != null && settingsManager.isDebugMode();
-    if (debug) {
-      debugLabel.setText(
-          "["
-              + playerModel.position
-              + "] - FPS: "
-              + Gdx.graphics.getFramesPerSecond()
-              + " - Ping: "
-              + MetricCollector.pingMs.getLast()
-              + "ms - Payload: "
-              + MetricCollector.packageSizePerClientBytes.getAvg()
-              + "B");
-    } else {
-      debugLabel.setText("");
-    }
-
+  public void update(PlayerModel playerModel) {
     healthBar.setHealth(playerModel.getHealth(), playerModel.getMaxHealth());
     statusEffects.update(playerModel);
 
@@ -135,11 +124,23 @@ public class PlayerInfoHUD extends Table {
       }
       hotbarSlots[i].setSelected(i == currentSlot);
     }
+
+    if (debugLabel.isVisible()) {
+      debugLabel.setText(
+          String.format(
+              "Position: %s\nFPS: %d\nPing: %d ms\nPayload: %d Bytes",
+              playerModel.position,
+              Gdx.graphics.getFramesPerSecond(),
+              MetricCollector.pingMs.getLast(),
+              MetricCollector.packageSizePerClientBytes.getAvg()));
+    }
   }
 
   public void dispose() {
     healthBar.dispose();
-    slotStyle.dispose();
+    for (Disposable object : disposableList) {
+      object.dispose();
+    }
   }
 
   private static class HealthBarActor extends Widget {

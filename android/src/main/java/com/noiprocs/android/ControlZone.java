@@ -13,9 +13,9 @@ public enum ControlZone {
   JOYSTICK('\0'),
 
   // Action buttons (bottom right, circular)
-  ACTION_SPACE(' '),
-  ACTION_FIRE('f'),
-  ACTION_TOGGLE('t');
+  ACTION_INTERACT(' '),
+  ACTION_ATTACK('f'),
+  ACTION_USE_ITEM('t');
 
   private Object shape; // Circle (calculated dynamically)
   private final char command;
@@ -41,9 +41,9 @@ public enum ControlZone {
 
     // Action buttons (bottom right, circular)
     float actionScale = Math.min(scaleX, scaleY);
-    ACTION_SPACE.shape = new Circle(virtualWidth - 100, 85 * scaleY, 32 * actionScale);
-    ACTION_FIRE.shape = new Circle(virtualWidth - 45, 130 * scaleY, 28 * actionScale);
-    ACTION_TOGGLE.shape = new Circle(virtualWidth - 155, 130 * scaleY, 28 * actionScale);
+    ACTION_USE_ITEM.shape = new Circle(virtualWidth - 110, 120 * scaleY, 28 * actionScale);
+    ACTION_ATTACK.shape = new Circle(virtualWidth - 45, 90 * scaleY, 28 * actionScale);
+    ACTION_INTERACT.shape = new Circle(virtualWidth - 100, 45 * scaleY, 32 * actionScale);
   }
 
   /**

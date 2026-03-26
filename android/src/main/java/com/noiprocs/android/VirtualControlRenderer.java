@@ -65,16 +65,19 @@ public class VirtualControlRenderer {
     renderIcon(
         batch,
         interactIcon,
-        ControlZone.ACTION_SPACE,
-        activeZones.contains(ControlZone.ACTION_SPACE));
+        ControlZone.ACTION_INTERACT,
+        activeZones.contains(ControlZone.ACTION_INTERACT));
     renderIcon(
-        batch, attackIcon, ControlZone.ACTION_FIRE, activeZones.contains(ControlZone.ACTION_FIRE));
+        batch,
+        attackIcon,
+        ControlZone.ACTION_ATTACK,
+        activeZones.contains(ControlZone.ACTION_ATTACK));
     if (!throwAimActive) {
       renderIcon(
           batch,
           useItemIcon,
-          ControlZone.ACTION_TOGGLE,
-          activeZones.contains(ControlZone.ACTION_TOGGLE));
+          ControlZone.ACTION_USE_ITEM,
+          activeZones.contains(ControlZone.ACTION_USE_ITEM));
     }
   }
 
@@ -115,7 +118,7 @@ public class VirtualControlRenderer {
   /** Render throw aim joystick centered on the ACTION_TOGGLE button. */
   private void renderThrowJoystick(TouchState touchState) {
     float radius = ControlZone.getJoystickRadius();
-    Vector2 center = ControlZone.ACTION_TOGGLE.getCenter();
+    Vector2 center = ControlZone.ACTION_USE_ITEM.getCenter();
 
     shapeRenderer.setColor(COLOR_THROW_AIM);
     shapeRenderer.circle(center.x, center.y, radius, 32);

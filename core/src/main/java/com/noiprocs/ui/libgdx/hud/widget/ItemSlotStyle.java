@@ -5,11 +5,12 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Disposable;
 
 /**
  * Visual styling for item slot widgets. Creates programmatic textures for different slot states.
  */
-public class ItemSlotStyle {
+public class ItemSlotStyle implements Disposable {
   public Drawable emptyBackground;
   public Drawable filledBackground;
   public Drawable hoverBackground;
