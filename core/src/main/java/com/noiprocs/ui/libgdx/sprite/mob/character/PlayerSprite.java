@@ -9,6 +9,7 @@ import com.noiprocs.core.GameContext;
 import com.noiprocs.core.common.Config;
 import com.noiprocs.core.common.Vector3D;
 import com.noiprocs.core.hitbox.HitboxManagerInterface.MovableDistanceResult;
+import com.noiprocs.core.model.DurableModel;
 import com.noiprocs.core.model.Model;
 import com.noiprocs.core.model.action.AnimatedAction;
 import com.noiprocs.core.model.action.AttackAction;
@@ -17,14 +18,10 @@ import com.noiprocs.core.model.item.Item;
 import com.noiprocs.core.model.item.ItemModel;
 import com.noiprocs.core.model.item.PlacableItem;
 import com.noiprocs.core.model.item.ThrowableItemInterface;
-import com.noiprocs.core.model.mob.MobModel;
 import com.noiprocs.core.model.mob.character.PlayerModel;
-import com.noiprocs.gameplay.model.environment.BoulderModel;
-import com.noiprocs.gameplay.model.environment.ThickVineModel;
 import com.noiprocs.gameplay.model.item.AxeItem;
 import com.noiprocs.gameplay.model.mob.BlackSmithModel;
 import com.noiprocs.gameplay.model.mob.MerchantModel;
-import com.noiprocs.gameplay.model.plant.TreeModel;
 import com.noiprocs.input.ThrowAimState;
 import com.noiprocs.resources.UIConfig;
 import com.noiprocs.ui.libgdx.sprite.LibgdxRenderContext;
@@ -99,12 +96,9 @@ public class PlayerSprite extends LibgdxSprite {
       InteractAction action = (InteractAction) playerModel.getAction();
       if (action == null) return false;
       Model target = GameContext.get().modelManager.getModel(action.targetId);
-      return target instanceof TreeModel
-          || (target instanceof MobModel
-              && !(target instanceof MerchantModel)
-              && !(target instanceof BlackSmithModel))
-          || target instanceof ThickVineModel
-          || target instanceof BoulderModel;
+      return target instanceof DurableModel
+          && !(target instanceof MerchantModel)
+          && !(target instanceof BlackSmithModel);
     }
     return false;
   }

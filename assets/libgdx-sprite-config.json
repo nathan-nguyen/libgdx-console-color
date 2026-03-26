@@ -740,6 +740,18 @@
       }
     },
     {
+      "modelClasses": ["com.noiprocs.gameplay.model.building.SpiderNetModel"],
+      "images": {
+        "default": {
+          "imagePath": "textures/spider_net.png",
+          "offsetX": -50,
+          "offsetY": -80,
+          "scaleX": 0.1,
+          "scaleY": 0.1
+        }
+      }
+    },
+    {
       "modelClasses": ["com.noiprocs.gameplay.model.mob.projectile.SpiderWebProjectileModel"],
       "images": {
         "default": {
