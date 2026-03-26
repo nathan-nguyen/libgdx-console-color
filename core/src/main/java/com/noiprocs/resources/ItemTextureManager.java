@@ -11,6 +11,7 @@ import com.noiprocs.core.model.effect.EffectInterface;
 import com.noiprocs.gameplay.model.effect.DamageBoostEffect;
 import com.noiprocs.gameplay.model.effect.MaxHealthBoostEffect;
 import com.noiprocs.gameplay.model.effect.SpeedBoostEffect;
+import com.noiprocs.gameplay.model.effect.SpeedSlowEffect;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -69,6 +70,8 @@ public class ItemTextureManager implements Disposable {
         MaxHealthBoostEffect.class, ResourceLoader.loadTexture(GameResource.ICON_EFFECT_HEALTH));
     effectTextures.put(
         SpeedBoostEffect.class, ResourceLoader.loadTexture(GameResource.ICON_EFFECT_SPEED));
+    effectTextures.put(
+        SpeedSlowEffect.class, ResourceLoader.loadTexture(GameResource.ICON_EFFECT_WEB_SLOW));
   }
 
   public Map<Class<? extends EffectInterface>, Texture> getStatusEffectTextures() {

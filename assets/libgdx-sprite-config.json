@@ -698,6 +698,60 @@
       }
     },
     {
+      "modelClasses": ["com.noiprocs.gameplay.model.mob.SpiderModel"],
+      "spriteClass": "com.noiprocs.ui.libgdx.sprite.mob.SpiderSprite",
+      "images": {
+        "stand_sw": {
+          "imagePath": "textures/spider_stand_sw.png",
+          "offsetX": -25,
+          "offsetY": -40,
+          "flippedOffsetX": -25,
+          "flippedOffsetY": -40,
+          "scaleX": 0.05,
+          "scaleY": 0.05
+        },
+        "stand_ne": {
+          "imagePath": "textures/spider_stand_ne.png",
+          "offsetX": -25,
+          "offsetY": -40,
+          "flippedOffsetX": -25,
+          "flippedOffsetY": -40,
+          "scaleX": 0.05,
+          "scaleY": 0.05
+        },
+        "attack_sw": {
+          "imagePath": "textures/spider_attack_sw.png",
+          "offsetX": -25,
+          "offsetY": -40,
+          "flippedOffsetX": -25,
+          "flippedOffsetY": -40,
+          "scaleX": 0.05,
+          "scaleY": 0.05
+        },
+        "attack_ne": {
+          "imagePath": "textures/spider_attack_ne.png",
+          "offsetX": -25,
+          "offsetY": -40,
+          "flippedOffsetX": -25,
+          "flippedOffsetY": -40,
+          "scaleX": 0.05,
+          "scaleY": 0.05
+        }
+      }
+    },
+    {
+      "modelClasses": ["com.noiprocs.gameplay.model.mob.projectile.SpiderWebProjectileModel"],
+      "images": {
+        "default": {
+          "imagePath": "icons/spider_web.png",
+          "offsetX": -25,
+          "offsetY": -40,
+          "scaleX": 0.05,
+          "scaleY": 0.05
+        }
+      }
+    },
+    {
       "modelClasses": ["com.noiprocs.gameplay.model.environment.ThickVineModel"],
       "images": {
         "default": {

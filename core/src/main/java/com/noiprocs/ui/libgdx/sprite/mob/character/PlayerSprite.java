@@ -17,13 +17,13 @@ import com.noiprocs.core.model.item.Item;
 import com.noiprocs.core.model.item.ItemModel;
 import com.noiprocs.core.model.item.PlacableItem;
 import com.noiprocs.core.model.item.ThrowableItemInterface;
+import com.noiprocs.core.model.mob.MobModel;
 import com.noiprocs.core.model.mob.character.PlayerModel;
 import com.noiprocs.gameplay.model.environment.BoulderModel;
 import com.noiprocs.gameplay.model.environment.ThickVineModel;
 import com.noiprocs.gameplay.model.item.AxeItem;
-import com.noiprocs.gameplay.model.mob.BombGoblinModel;
-import com.noiprocs.gameplay.model.mob.GoblinModel;
-import com.noiprocs.gameplay.model.mob.RangeGoblinModel;
+import com.noiprocs.gameplay.model.mob.BlackSmithModel;
+import com.noiprocs.gameplay.model.mob.MerchantModel;
 import com.noiprocs.gameplay.model.plant.TreeModel;
 import com.noiprocs.input.ThrowAimState;
 import com.noiprocs.resources.UIConfig;
@@ -97,11 +97,12 @@ public class PlayerSprite extends LibgdxSprite {
     if (playerModel.getAction() instanceof AttackAction) return true;
     if (playerModel.getAction() instanceof InteractAction) {
       InteractAction action = (InteractAction) playerModel.getAction();
+      if (action == null) return false;
       Model target = GameContext.get().modelManager.getModel(action.targetId);
       return target instanceof TreeModel
-          || target instanceof GoblinModel
-          || target instanceof RangeGoblinModel
-          || target instanceof BombGoblinModel
+          || (target instanceof MobModel
+              && !(target instanceof MerchantModel)
+              && !(target instanceof BlackSmithModel))
           || target instanceof ThickVineModel
           || target instanceof BoulderModel;
     }
