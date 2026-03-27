@@ -10,6 +10,7 @@ import com.noiprocs.core.common.Config;
 import com.noiprocs.core.common.Vector3D;
 import com.noiprocs.core.model.Model;
 import com.noiprocs.gameplay.model.mob.projectile.BombModel;
+import com.noiprocs.resources.RenderResources;
 import com.noiprocs.resources.UIConfig;
 import com.noiprocs.ui.libgdx.sprite.LibgdxRenderContext;
 import com.noiprocs.ui.libgdx.sprite.LibgdxSprite;
@@ -71,7 +72,7 @@ public class BombSprite extends LibgdxSprite {
     Color fillColor = flashBright ? FLASH_FILL_COLOR : FILL_COLOR;
     Color outlineColor = flashBright ? FLASH_OUTLINE_COLOR : OUTLINE_COLOR;
 
-    ShapeRenderer sr = ctx.shapeRenderer;
+    ShapeRenderer sr = RenderResources.get().getShapeRenderer();
     sr.setProjectionMatrix(batch.getProjectionMatrix());
 
     Gdx.gl.glEnable(GL20.GL_BLEND);

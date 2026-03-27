@@ -3,7 +3,6 @@ package com.noiprocs.ui.libgdx.hud.panel;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -24,7 +23,7 @@ import com.noiprocs.gameplay.control.command.UpgradeItemCommand;
 import com.noiprocs.gameplay.world.BlackSmithConfigLoader;
 import com.noiprocs.gameplay.world.BlackSmithConfigLoader.UpgradeRecipe;
 import com.noiprocs.gameplay.world.BlackSmithConfigLoader.UpgradeRecipe.MaterialEntry;
-import com.noiprocs.resources.ItemTextureManager;
+import com.noiprocs.resources.RenderResources;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
 import com.noiprocs.ui.libgdx.hud.widget.ItemSlotStyle;
 import com.noiprocs.ui.libgdx.hud.widget.ItemSlotWidget;
@@ -39,11 +38,9 @@ public class BlackSmithHUD {
   private static final int PLAYER_INVENTORY_SIZE = 9;
 
   private final HUDManager hudManager;
-  private final BitmapFont font;
   private final Table rootTable;
   private final ItemSlotStyle slotStyle;
   private final Viewport viewport;
-  private final ItemTextureManager itemTextureManager;
   private final Table mainContainer;
 
   private String blacksmithModelId;
@@ -58,17 +55,10 @@ public class BlackSmithHUD {
   private Texture backgroundTexture;
   private Texture panelTexture;
 
-  public BlackSmithHUD(
-      HUDManager hudManager,
-      Viewport viewport,
-      BitmapFont font,
-      ItemSlotStyle slotStyle,
-      ItemTextureManager itemTextureManager) {
+  public BlackSmithHUD(HUDManager hudManager, Viewport viewport, ItemSlotStyle slotStyle) {
     this.hudManager = hudManager;
     this.viewport = viewport;
-    this.font = font;
     this.slotStyle = slotStyle;
-    this.itemTextureManager = itemTextureManager;
     this.mainContainer = new Table();
     this.rootTable = new Table();
     this.rootTable.setFillParent(true);
@@ -151,7 +141,7 @@ public class BlackSmithHUD {
     playerInventoryNameLabels = new Label[PLAYER_INVENTORY_SIZE];
 
     for (int i = 0; i < PLAYER_INVENTORY_SIZE; i++) {
-      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, false);
       playerInventorySlots[i] = slot;
 
       Label nameLabel = new Label("", makeLabelStyle(Color.WHITE));
@@ -216,7 +206,7 @@ public class BlackSmithHUD {
     Table row = new Table();
     row.left();
 
-    ItemSlotWidget inputSlot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+    ItemSlotWidget inputSlot = new ItemSlotWidget(slotStyle, false);
     try {
       Class<?> inputCls = Class.forName(recipe.inputItemClass);
       inputSlot.setItem(inputCls, simpleItemName(recipe.inputItemClass), 1);
@@ -229,7 +219,7 @@ public class BlackSmithHUD {
     arrow.setFontScale(0.85f);
     row.add(arrow).width(20).padRight(4);
 
-    ItemSlotWidget outputSlot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+    ItemSlotWidget outputSlot = new ItemSlotWidget(slotStyle, false);
     try {
       Class<?> outputCls = Class.forName(recipe.outputItemClass);
       String outputName = simpleItemName(recipe.outputItemClass);
@@ -450,7 +440,7 @@ public class BlackSmithHUD {
 
   private Label.LabelStyle makeLabelStyle(Color color) {
     Label.LabelStyle style = new Label.LabelStyle();
-    style.font = font;
+    style.font = RenderResources.get().getHudFont();
     style.fontColor = color;
     return style;
   }

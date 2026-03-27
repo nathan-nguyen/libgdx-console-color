@@ -23,7 +23,7 @@ import com.noiprocs.core.model.item.receipt.Crafter;
 import com.noiprocs.core.model.item.receipt.CraftingReceipt;
 import com.noiprocs.core.model.item.receipt.CraftingReceipt.MaterialEntry;
 import com.noiprocs.core.model.mob.character.PlayerModel;
-import com.noiprocs.resources.ItemTextureManager;
+import com.noiprocs.resources.RenderResources;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
 import com.noiprocs.ui.libgdx.hud.ItemDragDropHandler;
 import com.noiprocs.ui.libgdx.hud.widget.ItemSlotStyle;
@@ -36,12 +36,10 @@ import java.util.Map;
 /** Crafting HUD screen. Displays recipe list and required materials for crafting items. */
 public class CraftingHUD {
   private final HUDManager hudManager;
-  private final BitmapFont font;
   private final Table rootTable;
   private final ItemSlotStyle slotStyle;
   private final Viewport viewport;
   private final ItemDragDropHandler dragDropManager;
-  private final ItemTextureManager itemTextureManager;
   private Texture backgroundTexture;
 
   // UI Components
@@ -54,19 +52,12 @@ public class CraftingHUD {
   private final List<ItemSlotWidget> recipeButtons;
   private int selectedRecipeIndex = -1;
 
-  public CraftingHUD(
-      HUDManager hudManager,
-      Viewport viewport,
-      BitmapFont font,
-      ItemSlotStyle slotStyle,
-      ItemTextureManager itemTextureManager) {
+  public CraftingHUD(HUDManager hudManager, Viewport viewport, ItemSlotStyle slotStyle) {
     this.hudManager = hudManager;
     this.viewport = viewport;
-    this.font = font;
     this.rootTable = new Table();
     this.rootTable.setFillParent(true);
     this.slotStyle = slotStyle;
-    this.itemTextureManager = itemTextureManager;
     this.dragDropManager = new ItemDragDropHandler();
     this.recipeList = new ArrayList<>();
     this.recipeButtons = new ArrayList<>();
@@ -138,7 +129,7 @@ public class CraftingHUD {
 
     // Title
     Label.LabelStyle labelStyle = new Label.LabelStyle();
-    labelStyle.font = font;
+    labelStyle.font = RenderResources.get().getHudFont();
     labelStyle.fontColor = Color.WHITE;
     Label titleLabel = new Label("CRAFTING", labelStyle);
     titleLabel.setFontScale(1.2f);
@@ -153,7 +144,7 @@ public class CraftingHUD {
 
     // Label
     Label.LabelStyle labelStyle = new Label.LabelStyle();
-    labelStyle.font = font;
+    labelStyle.font = RenderResources.get().getHudFont();
     labelStyle.fontColor = Color.WHITE;
     Label label = new Label("Recipes", labelStyle);
     panel.add(label).padBottom(10);
@@ -175,6 +166,7 @@ public class CraftingHUD {
 
   private Table createMaterialsPanel() {
     Table panel = new Table();
+    BitmapFont font = RenderResources.get().getHudFont();
 
     // Label
     Label.LabelStyle labelStyle = new Label.LabelStyle();
@@ -279,7 +271,7 @@ public class CraftingHUD {
     recipeButtons.clear();
 
     Label.LabelStyle labelStyle = new Label.LabelStyle();
-    labelStyle.font = font;
+    labelStyle.font = RenderResources.get().getHudFont();
     labelStyle.fontColor = Color.WHITE;
 
     for (int i = 0; i < recipeList.size(); i++) {
@@ -289,7 +281,7 @@ public class CraftingHUD {
       String recipeName = toDisplayName(itemClass);
 
       // Icon slot showing the recipe output item
-      ItemSlotWidget recipeSlot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+      ItemSlotWidget recipeSlot = new ItemSlotWidget(slotStyle, false);
       recipeSlot.setItem(itemClass, recipeName, 1);
       recipeSlot.setSelected(i == selectedRecipeIndex);
 
@@ -344,7 +336,7 @@ public class CraftingHUD {
 
     // Label
     Label.LabelStyle labelStyle = new Label.LabelStyle();
-    labelStyle.font = font;
+    labelStyle.font = RenderResources.get().getHudFont();
     labelStyle.fontColor = Color.WHITE;
     Label label = new Label("Required Materials", labelStyle);
     materialsPanel.add(label).padBottom(10);
@@ -391,7 +383,7 @@ public class CraftingHUD {
       String materialName = toDisplayName(material.itemClass);
 
       // Create a slot showing the required material
-      ItemSlotWidget materialSlot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+      ItemSlotWidget materialSlot = new ItemSlotWidget(slotStyle, false);
       materialSlot.setItem(material.itemClass, materialName, needed);
 
       // Name label below the icon

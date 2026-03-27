@@ -28,6 +28,7 @@ import com.noiprocs.core.model.item.Item;
 import com.noiprocs.core.model.item.ItemCategory;
 import com.noiprocs.core.model.mob.character.PlayerModel;
 import com.noiprocs.resources.ItemTextureManager;
+import com.noiprocs.resources.RenderResources;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
 import com.noiprocs.ui.libgdx.hud.ItemDragDropHandler;
 import com.noiprocs.ui.libgdx.hud.widget.ItemIconRenderer;
@@ -47,13 +48,11 @@ public class EquipmentHUD {
   private static final Logger logger = LoggerFactory.getLogger(EquipmentHUD.class);
 
   private final HUDManager hudManager;
-  private final BitmapFont font;
   private final Table rootTable;
   private final ItemSlotStyle slotStyle;
   private final Viewport viewport;
   private final ItemDragDropHandler dragDropManager;
   private final DragAndDrop dragAndDrop;
-  private final ItemTextureManager itemTextureManager;
   private Texture backgroundTexture;
 
   // Equipment slots
@@ -79,19 +78,12 @@ public class EquipmentHUD {
   private static final int INVENTORY_SIZE = 9; // Player inventory has 9 slots
   private static final int HOTBAR_SIZE = 4; // First 4 slots are hotbar slots
 
-  public EquipmentHUD(
-      HUDManager hudManager,
-      Viewport viewport,
-      BitmapFont font,
-      ItemSlotStyle slotStyle,
-      ItemTextureManager itemTextureManager) {
+  public EquipmentHUD(HUDManager hudManager, Viewport viewport, ItemSlotStyle slotStyle) {
     this.hudManager = hudManager;
     this.viewport = viewport;
-    this.font = font;
     this.rootTable = new Table();
     this.rootTable.setFillParent(true);
     this.slotStyle = slotStyle;
-    this.itemTextureManager = itemTextureManager;
     this.equipmentSlots = new HashMap<>();
     this.slotTypeToCategory = new HashMap<>();
     this.dragDropManager = new ItemDragDropHandler();
@@ -173,6 +165,7 @@ public class EquipmentHUD {
 
   private Table createHeader() {
     Table header = new Table();
+    BitmapFont font = RenderResources.get().getPanelFont();
 
     // Title
     Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
@@ -209,6 +202,9 @@ public class EquipmentHUD {
 
   private Table createEquipmentPanel() {
     Table panel = new Table();
+    RenderResources renderResources = RenderResources.get();
+    BitmapFont font = renderResources.getPanelFont();
+    ItemTextureManager itemTextureManager = renderResources.getItemTextureManager();
 
     // Label
     Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
@@ -220,7 +216,7 @@ public class EquipmentHUD {
 
     // Create equipment slots for each armor piece
     for (String slotType : EQUIPMENT_SLOT_TYPES) {
-      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, false);
       TextureRegion slotRegion = itemTextureManager.getEquipmentSlotTexture(slotType);
       if (slotRegion != null) {
         slot.setEmptySlotTexture(slotRegion);
@@ -246,6 +242,7 @@ public class EquipmentHUD {
 
   private Table createStatsPanel() {
     Table panel = new Table();
+    BitmapFont font = RenderResources.get().getPanelFont();
 
     Label.LabelStyle titleStyle = new Label.LabelStyle(font, Color.WHITE);
     Label title = new Label("Stats", titleStyle);
@@ -284,6 +281,7 @@ public class EquipmentHUD {
 
   private Table createInventoryPanel() {
     Table panel = new Table();
+    BitmapFont font = RenderResources.get().getPanelFont();
 
     // Label
     Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
@@ -297,7 +295,7 @@ public class EquipmentHUD {
     inventorySlots = new ItemSlotWidget[INVENTORY_SIZE];
     inventoryNameLabels = new Label[INVENTORY_SIZE];
     for (int i = 0; i < INVENTORY_SIZE; i++) {
-      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, false);
       inventorySlots[i] = slot;
 
       // Mark first 4 slots as hotbar slots
@@ -329,7 +327,7 @@ public class EquipmentHUD {
     panel.add(trashLabel).colspan(INVENTORY_GRID_COLUMNS).padTop(6).padBottom(2);
     panel.row();
 
-    trashSlot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+    trashSlot = new ItemSlotWidget(slotStyle, false);
     panel
         .add(trashSlot)
         .size(ItemSlotWidget.DIMENSION, ItemSlotWidget.DIMENSION)
@@ -415,6 +413,10 @@ public class EquipmentHUD {
   }
 
   private void setupDragAndDrop() {
+    RenderResources renderResources = RenderResources.get();
+    BitmapFont font = renderResources.getHudFont();
+    ItemTextureManager itemTextureManager = renderResources.getItemTextureManager();
+
     // Setup drag sources and drop targets for equipment slots
     for (Map.Entry<String, ItemSlotWidget> entry : equipmentSlots.entrySet()) {
       String slotType = entry.getKey();

@@ -30,6 +30,7 @@ import com.noiprocs.core.model.item.ItemCategory;
 import com.noiprocs.core.model.mob.character.HumanoidModel;
 import com.noiprocs.core.model.mob.character.PlayerModel;
 import com.noiprocs.resources.ItemTextureManager;
+import com.noiprocs.resources.RenderResources;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
 import com.noiprocs.ui.libgdx.hud.ItemDragDropHandler;
 import com.noiprocs.ui.libgdx.hud.widget.ItemIconRenderer;
@@ -42,13 +43,11 @@ import com.noiprocs.ui.libgdx.hud.widget.ItemSlotWidget;
  */
 public class InventoryHUD {
   private final HUDManager hudManager;
-  private final BitmapFont font;
   private final Table rootTable;
   private final ItemSlotStyle slotStyle;
   private final Viewport viewport;
   private final ItemDragDropHandler dragDropManager;
   private final DragAndDrop dragAndDrop;
-  private final ItemTextureManager itemTextureManager;
   private Texture backgroundTexture;
   private Texture panelTexture;
   private final Table mainContainer;
@@ -80,19 +79,12 @@ public class InventoryHUD {
   private Label healthValueLabel;
   private Label speedValueLabel;
 
-  public InventoryHUD(
-      HUDManager hudManager,
-      Viewport viewport,
-      BitmapFont font,
-      ItemSlotStyle slotStyle,
-      ItemTextureManager itemTextureManager) {
+  public InventoryHUD(HUDManager hudManager, Viewport viewport, ItemSlotStyle slotStyle) {
     this.hudManager = hudManager;
     this.viewport = viewport;
-    this.font = font;
     this.rootTable = new Table();
     this.rootTable.setFillParent(true);
     this.slotStyle = slotStyle;
-    this.itemTextureManager = itemTextureManager;
     this.dragDropManager = new ItemDragDropHandler();
     this.dragAndDrop = new DragAndDrop();
     this.mainContainer = new Table();
@@ -139,6 +131,7 @@ public class InventoryHUD {
   }
 
   private void rebuildUI() {
+    BitmapFont font = RenderResources.get().getPanelFont();
     mainContainer.clear();
 
     Model containerModel = GameContext.get().modelManager.getModel(containerModelId);
@@ -243,7 +236,8 @@ public class InventoryHUD {
     Table header = new Table();
 
     // Title
-    Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
+    Label.LabelStyle labelStyle =
+        new Label.LabelStyle(RenderResources.get().getPanelFont(), Color.WHITE);
     String title = "CONTAINER";
     if (containerModelId != null) {
       Model containerModel = GameContext.get().modelManager.getModel(containerModelId);
@@ -261,6 +255,7 @@ public class InventoryHUD {
   }
 
   private Table createPlayerInventoryPanel() {
+    BitmapFont font = RenderResources.get().getPanelFont();
     Table panel = new Table();
     panel.top();
 
@@ -277,7 +272,7 @@ public class InventoryHUD {
     playerInventorySlots = new ItemSlotWidget[PLAYER_INVENTORY_SIZE];
     playerInventoryNameLabels = new Label[PLAYER_INVENTORY_SIZE];
     for (int i = 0; i < PLAYER_INVENTORY_SIZE; i++) {
-      playerInventorySlots[i] = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+      playerInventorySlots[i] = new ItemSlotWidget(slotStyle, false);
       playerInventoryNameLabels[i] = ItemSlotWidget.generateNameLabel(nameLabelStyle);
 
       Table slotEntry = new Table();
@@ -303,13 +298,14 @@ public class InventoryHUD {
   private Table createContainerPanel() {
     Table panel = new Table();
 
-    Label.LabelStyle nameLabelStyle = new Label.LabelStyle(font, Color.WHITE);
+    Label.LabelStyle nameLabelStyle =
+        new Label.LabelStyle(RenderResources.get().getPanelFont(), Color.WHITE);
 
     // Create container slots in a 3x3 grid (9 slots total)
     containerSlots = new ItemSlotWidget[containerSize];
     containerNameLabels = new Label[containerSize];
     for (int i = 0; i < containerSize; i++) {
-      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, false);
       containerSlots[i] = slot;
       containerNameLabels[i] = ItemSlotWidget.generateNameLabel(nameLabelStyle);
 
@@ -332,6 +328,10 @@ public class InventoryHUD {
   }
 
   private Table createEquipmentPanel() {
+    RenderResources renderResources = RenderResources.get();
+    BitmapFont font = renderResources.getPanelFont();
+    ItemTextureManager itemTextureManager = renderResources.getItemTextureManager();
+
     Table panel = new Table();
 
     // Label
@@ -342,10 +342,10 @@ public class InventoryHUD {
     panel.row();
 
     // Create equipment slots
-    helmetSlot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
-    chestPlateSlot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
-    leggingSlot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
-    bootSlot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+    helmetSlot = new ItemSlotWidget(slotStyle, false);
+    chestPlateSlot = new ItemSlotWidget(slotStyle, false);
+    leggingSlot = new ItemSlotWidget(slotStyle, false);
+    bootSlot = new ItemSlotWidget(slotStyle, false);
 
     // Set slot icons as placeholders
     TextureRegion helmetRegion = itemTextureManager.getEquipmentSlotTexture("HELMET");
@@ -404,6 +404,7 @@ public class InventoryHUD {
   }
 
   private Table createStatsPanel(HumanoidModel humanoidModel) {
+    BitmapFont font = RenderResources.get().getPanelFont();
     Table panel = new Table();
 
     Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
@@ -452,6 +453,7 @@ public class InventoryHUD {
   }
 
   private void setupDragAndDrop() {
+    RenderResources renderResources = RenderResources.get();
     // Clear existing drag and drop bindings
     dragAndDrop.clear();
 
@@ -493,7 +495,10 @@ public class InventoryHUD {
               slot.setDragging(true);
 
               payload.setDragActor(
-                  ItemSlotWidget.createDragActor(slot.getItem(), font, itemTextureManager));
+                  ItemSlotWidget.createDragActor(
+                      slot.getItem(),
+                      renderResources.getHudFont(),
+                      renderResources.getItemTextureManager()));
 
               return payload;
             }
@@ -604,6 +609,10 @@ public class InventoryHUD {
         || bootSlot == null) {
       return;
     }
+
+    RenderResources renderResources = RenderResources.get();
+    BitmapFont font = renderResources.getHudFont();
+    ItemTextureManager itemTextureManager = renderResources.getItemTextureManager();
 
     ItemSlotWidget[] equipmentSlots = {helmetSlot, chestPlateSlot, leggingSlot, bootSlot};
     String[] equipmentSlotTypes = {"HELMET", "CHEST PLATE", "LEGGING", "BOOT"};

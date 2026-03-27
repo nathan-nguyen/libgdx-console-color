@@ -6,6 +6,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -46,8 +47,6 @@ public class GameScreen implements Screen {
   private final Viewport viewport;
   // Orthographic projection matrix applied to the SpriteBatch and ShapeRenderer each frame.
   private final OrthographicCamera camera;
-  // Shared GPU resources (SpriteBatch, fonts, ShapeRenderer, item textures) owned by LibGDXApp.
-  private final RenderResources renderResources;
   private final InputController inputController;
   private final SettingsManager settingsManager;
   private final Stage virtualControlsStage;
@@ -73,7 +72,6 @@ public class GameScreen implements Screen {
   public GameScreen(
       Viewport viewport,
       OrthographicCamera camera,
-      RenderResources renderResources,
       InputController inputController,
       SettingsManager settingsManager,
       Stage virtualControlsStage,
@@ -85,7 +83,6 @@ public class GameScreen implements Screen {
       String platform) {
     this.viewport = viewport;
     this.camera = camera;
-    this.renderResources = renderResources;
     this.inputController = inputController;
     this.settingsManager = settingsManager;
     this.virtualControlsStage = virtualControlsStage;
@@ -115,8 +112,7 @@ public class GameScreen implements Screen {
             virtualHeight,
             (model, playerModel, minX, maxX, minY, maxY) ->
                 occlusionAlphaResolver.resolve(
-                    model, playerModel, screenWidth, virtualHeight, minX, maxX, minY, maxY),
-            renderResources.getShapeRenderer());
+                    model, playerModel, screenWidth, virtualHeight, minX, maxX, minY, maxY));
     libgdxTextureRenderer = new LibgdxTextureRenderer(renderContext, settingsManager);
     consoleCharRenderer =
         new ConsoleCharRenderer(screenHeight, screenWidth, virtualHeight, occlusionAlphaResolver);
@@ -148,27 +144,14 @@ public class GameScreen implements Screen {
 
     setupUI();
 
-    hudManager =
-        new HUDManager(
-            viewport,
-            renderResources.getPanelFont(),
-            renderResources.getHudFont(),
-            renderResources.getItemTextureManager(),
-            settingsManager,
-            this::toggleMenu);
+    hudManager = new HUDManager(viewport, settingsManager, this::toggleMenu);
     menuOverlay.setOnClose(() -> hudManager.setButtonsVisible(true));
 
     setupInputMultiplexer();
   }
 
   private void setupUI() {
-    menuOverlay =
-        new MenuOverlay(
-            settingsManager,
-            showMainMenu,
-            renderResources.getHudFont(),
-            viewport,
-            renderResources.getBatch());
+    menuOverlay = new MenuOverlay(settingsManager, showMainMenu, viewport);
   }
 
   // HUD stage is first so it consumes touch events before the menu overlay sees them.
@@ -196,7 +179,7 @@ public class GameScreen implements Screen {
 
     ScreenUtils.clear(0f, 0f, 0f, 1f);
     camera.update();
-    SpriteBatch batch = renderResources.getBatch();
+    SpriteBatch batch = RenderResources.get().getBatch();
     batch.setProjectionMatrix(camera.combined);
     renderWorld(batch);
 
@@ -219,6 +202,8 @@ public class GameScreen implements Screen {
 
     batch.begin();
     backgroundRenderer.render(batch, offsetX, offsetY);
+    RenderResources renderResources = RenderResources.get();
+
     // Renderers may tint the batch color; restore it after the loop.
     Color originalColor = batch.getColor().cpy();
     for (Model model : renderableModels) {
@@ -233,9 +218,9 @@ public class GameScreen implements Screen {
     batch.end();
 
     if (settingsManager.isDebugMode()) {
-      renderResources.getShapeRenderer().setProjectionMatrix(camera.combined);
-      hitboxDebugRenderer.render(
-          renderResources.getShapeRenderer(), renderableModels, offsetX, offsetY);
+      ShapeRenderer shapeRenderer = renderResources.getShapeRenderer();
+      shapeRenderer.setProjectionMatrix(camera.combined);
+      hitboxDebugRenderer.render(shapeRenderer, renderableModels, offsetX, offsetY);
     }
   }
 
@@ -280,7 +265,7 @@ public class GameScreen implements Screen {
       gameThread = null;
     }
 
-    if (gameContext != null && gameContext.gameMode == GameMode.STANDALONE) {
+    if (gameContext.gameMode == GameMode.STANDALONE) {
       ((ServerModelManager) gameContext.modelManager).saveGameData();
     }
 
@@ -296,7 +281,6 @@ public class GameScreen implements Screen {
       backgroundRenderer.dispose();
       backgroundRenderer = null;
     }
-    gameContext = null;
     libgdxTextureRenderer = null;
   }
 }

@@ -19,10 +19,9 @@ import com.noiprocs.core.control.command.InputCommand;
 import com.noiprocs.core.model.item.Inventory;
 import com.noiprocs.core.model.item.Item;
 import com.noiprocs.core.model.mob.character.PlayerModel;
-import com.noiprocs.resources.ItemTextureManager;
+import com.noiprocs.resources.RenderResources;
 import com.noiprocs.settings.HotbarLocation;
 import com.noiprocs.settings.SettingsManager;
-import com.noiprocs.ui.libgdx.hud.widget.DebugWidget;
 import com.noiprocs.ui.libgdx.hud.widget.ItemSlotStyle;
 import com.noiprocs.ui.libgdx.hud.widget.ItemSlotWidget;
 import com.noiprocs.ui.libgdx.hud.widget.StatusEffectsWidget;
@@ -41,15 +40,19 @@ public class PlayerInfoHUD extends Table {
 
   private HotbarLocation hotbarLocation = HotbarLocation.TOP;
 
-  public PlayerInfoHUD(
-      BitmapFont font, ItemTextureManager itemTextureManager, SettingsManager settingsManager) {
-    this.healthBar = new HealthBarActor(font);
-    this.statusEffects = new StatusEffectsWidget(itemTextureManager.getStatusEffectTextures());
+  public PlayerInfoHUD(SettingsManager settingsManager) {
+    RenderResources renderResources = RenderResources.get();
+    BitmapFont font = renderResources.getHudFont();
+
+    this.healthBar = new HealthBarActor();
+    this.statusEffects =
+        new StatusEffectsWidget(renderResources.getItemTextureManager().getStatusEffectTextures());
     this.hotbarSlots = new ItemSlotWidget[HOTBAR_SIZE];
 
     Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
-    this.hotbarTable = createHotBarPanel(font, itemTextureManager);
+    this.hotbarTable = createHotBarPanel();
     this.debugLabel = new Label("", labelStyle);
+    this.debugLabel.setVisible(false);
 
     settingsManager.subscribe(
         () -> {
@@ -65,17 +68,15 @@ public class PlayerInfoHUD extends Table {
     buildLayout(HotbarLocation.TOP);
   }
 
-  private Table createHotBarPanel(BitmapFont font, ItemTextureManager itemTextureManager) {
+  private Table createHotBarPanel() {
     ItemSlotStyle slotStyle = ItemSlotStyle.createDefault();
     disposableList.add(slotStyle);
 
     Table panel = new Table();
-    // TODO (gnik): Remove after force quantity label position to be correct
-    panel.setBackground(DebugWidget.getDrawableBackground());
 
     for (int i = 0; i < HOTBAR_SIZE; i++) {
       final int slotIndex = i;
-      hotbarSlots[i] = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+      hotbarSlots[i] = new ItemSlotWidget(slotStyle, false);
       hotbarSlots[i].setHotbarSlot(true);
       hotbarSlots[i].addListener(
           new ClickListener() {
@@ -150,15 +151,13 @@ public class PlayerInfoHUD extends Table {
     private static final Color BG_COLOR = new Color(0.2f, 0.2f, 0.2f, 1f);
 
     private final Texture roundedTexture;
-    private final BitmapFont font;
     private final GlyphLayout glyphLayout = new GlyphLayout();
     private float ratio = 1f;
     private Color barColor = Color.GREEN;
     private int health = 0;
     private int maxHealth = 0;
 
-    HealthBarActor(BitmapFont font) {
-      this.font = font;
+    HealthBarActor() {
       this.roundedTexture =
           createRoundedRectTexture((int) BAR_WIDTH, (int) BAR_HEIGHT, CORNER_RADIUS);
     }
@@ -194,6 +193,7 @@ public class PlayerInfoHUD extends Table {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
+      BitmapFont font = RenderResources.get().getHudFont();
       float x = getX(), y = getY();
 
       batch.setColor(BG_COLOR);

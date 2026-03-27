@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.noiprocs.LibGDXApp;
 import com.noiprocs.resources.GameResource;
+import com.noiprocs.resources.RenderResources;
 import com.noiprocs.resources.ResourceLoader;
 import com.noiprocs.ui.libgdx.util.UIStyleHelper;
 
@@ -34,12 +35,13 @@ public class MainMenuScreen implements Screen {
   @Override
   public void show() {
     backgroundTexture = ResourceLoader.loadTexture(GameResource.BACKGROUND_MAIN_MENU);
+    RenderResources renderResources = RenderResources.get();
 
     // Create stage for UI
-    stage = new Stage(app.getViewport(), app.getRenderResources().getBatch());
+    stage = new Stage(app.getViewport(), renderResources.getBatch());
 
     // Create skin for UI elements
-    skin = UIStyleHelper.createSkin(app.getRenderResources().getHudFont());
+    skin = UIStyleHelper.createSkin(renderResources.getHudFont());
 
     // Create UI table
     Table table = new Table();
@@ -112,7 +114,7 @@ public class MainMenuScreen implements Screen {
     float scale = Math.max(w / backgroundTexture.getWidth(), h / backgroundTexture.getHeight());
     float drawW = backgroundTexture.getWidth() * scale;
     float drawH = backgroundTexture.getHeight() * scale;
-    SpriteBatch batch = app.getRenderResources().getBatch();
+    SpriteBatch batch = RenderResources.get().getBatch();
     batch.setProjectionMatrix(app.getViewport().getCamera().combined);
     batch.begin();
     batch.draw(backgroundTexture, (w - drawW) / 2f, (h - drawH) / 2f, drawW, drawH);

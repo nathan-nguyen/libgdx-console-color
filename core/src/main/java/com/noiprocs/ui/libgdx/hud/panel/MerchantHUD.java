@@ -3,7 +3,6 @@ package com.noiprocs.ui.libgdx.hud.panel;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -26,7 +25,7 @@ import com.noiprocs.gameplay.control.command.SellItemCommand;
 import com.noiprocs.gameplay.model.mob.MerchantModel;
 import com.noiprocs.gameplay.world.MerchantConfigLoader;
 import com.noiprocs.gameplay.world.MerchantConfigLoader.ItemEntry;
-import com.noiprocs.resources.ItemTextureManager;
+import com.noiprocs.resources.RenderResources;
 import com.noiprocs.ui.libgdx.hud.HUDManager;
 import com.noiprocs.ui.libgdx.hud.widget.ItemSlotStyle;
 import com.noiprocs.ui.libgdx.hud.widget.ItemSlotWidget;
@@ -47,11 +46,9 @@ public class MerchantHUD {
   private static final int PLAYER_INVENTORY_SIZE = 9;
 
   private final HUDManager hudManager;
-  private final BitmapFont font;
   private final Table rootTable;
   private final ItemSlotStyle slotStyle;
   private final Viewport viewport;
-  private final ItemTextureManager itemTextureManager;
   private final Table mainContainer;
 
   private String merchantModelId;
@@ -72,17 +69,10 @@ public class MerchantHUD {
   private Texture backgroundTexture;
   private Texture panelTexture;
 
-  public MerchantHUD(
-      HUDManager hudManager,
-      Viewport viewport,
-      BitmapFont font,
-      ItemSlotStyle slotStyle,
-      ItemTextureManager itemTextureManager) {
+  public MerchantHUD(HUDManager hudManager, Viewport viewport, ItemSlotStyle slotStyle) {
     this.hudManager = hudManager;
     this.viewport = viewport;
-    this.font = font;
     this.slotStyle = slotStyle;
-    this.itemTextureManager = itemTextureManager;
     this.mainContainer = new Table();
     this.rootTable = new Table();
     this.rootTable.setFillParent(true);
@@ -174,7 +164,7 @@ public class MerchantHUD {
     playerInventoryNameLabels = new Label[PLAYER_INVENTORY_SIZE];
 
     for (int i = 0; i < PLAYER_INVENTORY_SIZE; i++) {
-      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+      ItemSlotWidget slot = new ItemSlotWidget(slotStyle, false);
       playerInventorySlots[i] = slot;
 
       Label nameLabel = new Label("", makeLabelStyle(Color.WHITE));
@@ -231,7 +221,7 @@ public class MerchantHUD {
       ItemEntry entry = items.get(i);
       int stock = merchant != null ? merchant.getStock(entry.itemClass) : 0;
 
-      ItemSlotWidget iconSlot = new ItemSlotWidget(slotStyle, font, false, itemTextureManager);
+      ItemSlotWidget iconSlot = new ItemSlotWidget(slotStyle, false);
       shopSlots[i] = iconSlot;
 
       try {
@@ -562,7 +552,7 @@ public class MerchantHUD {
 
   private Label.LabelStyle makeLabelStyle(Color color) {
     Label.LabelStyle style = new Label.LabelStyle();
-    style.font = font;
+    style.font = RenderResources.get().getHudFont();
     style.fontColor = color;
     return style;
   }

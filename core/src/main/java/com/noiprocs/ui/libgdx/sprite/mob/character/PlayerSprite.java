@@ -23,6 +23,7 @@ import com.noiprocs.gameplay.model.item.AxeItem;
 import com.noiprocs.gameplay.model.mob.BlackSmithModel;
 import com.noiprocs.gameplay.model.mob.MerchantModel;
 import com.noiprocs.input.ThrowAimState;
+import com.noiprocs.resources.RenderResources;
 import com.noiprocs.resources.UIConfig;
 import com.noiprocs.ui.libgdx.sprite.LibgdxRenderContext;
 import com.noiprocs.ui.libgdx.sprite.LibgdxSprite;
@@ -174,7 +175,7 @@ public class PlayerSprite extends LibgdxSprite {
     float ebrsx = isoScreenX(ePosX + h, ePosY + w, ctx);
     float ebrsy = isoScreenY(ePosX + h, ePosY + w, ctx);
 
-    ShapeRenderer sr = ctx.shapeRenderer;
+    ShapeRenderer sr = RenderResources.get().getShapeRenderer();
     beginShapeRendering(batch, ctx);
 
     // Fill: start cap + end cap + 4 connecting strips
@@ -256,7 +257,7 @@ public class PlayerSprite extends LibgdxSprite {
     float brsy = isoScreenY(posX + h, posY + w, ctx);
 
     Color color = valid ? Color.GREEN : Color.RED;
-    ShapeRenderer sr = ctx.shapeRenderer;
+    ShapeRenderer sr = RenderResources.get().getShapeRenderer();
 
     beginShapeRendering(batch, ctx);
 
@@ -290,7 +291,7 @@ public class PlayerSprite extends LibgdxSprite {
 
   private static void beginShapeRendering(SpriteBatch batch, LibgdxRenderContext ctx) {
     batch.end();
-    ctx.shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
+    RenderResources.get().getShapeRenderer().setProjectionMatrix(batch.getProjectionMatrix());
     Gdx.gl.glEnable(GL20.GL_BLEND);
     Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
   }

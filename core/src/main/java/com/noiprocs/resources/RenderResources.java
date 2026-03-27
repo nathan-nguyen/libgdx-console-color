@@ -5,6 +5,15 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class RenderResources {
+  private static RenderResources instance;
+
+  public static RenderResources get() {
+    if (instance == null) {
+      instance = new RenderResources();
+    }
+    return instance;
+  }
+
   private final SpriteBatch batch;
   private final BitmapFont font;
   private final BitmapFont hudFont;
@@ -12,7 +21,7 @@ public class RenderResources {
   private final ItemTextureManager itemTextureManager;
   private final ShapeRenderer shapeRenderer;
 
-  public RenderResources() {
+  private RenderResources() {
     batch = new SpriteBatch();
     FontGenerator fontGenerator = new FontGenerator();
     font = fontGenerator.generateMonospaceFont();
@@ -53,5 +62,7 @@ public class RenderResources {
     panelFont.dispose();
     itemTextureManager.dispose();
     shapeRenderer.dispose();
+
+    instance = null;
   }
 }

@@ -14,14 +14,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.noiprocs.resources.ItemTextureManager;
+import com.noiprocs.resources.RenderResources;
 
 public class ItemSlotWidget extends Table {
   public static final int DIMENSION = 36;
   public static final int ITEM_NAME_HEIGHT = 21;
   public static final float ITEM_NAME_FONT_SCALE = 0.45f;
   private final ItemSlotStyle style;
-  private final BitmapFont font;
-  private final ItemTextureManager itemTextureManager;
 
   private Object item;
   private Class<?> itemClass;
@@ -37,14 +36,8 @@ public class ItemSlotWidget extends Table {
   private boolean isHovered;
   private boolean isDragging;
 
-  public ItemSlotWidget(
-      ItemSlotStyle style,
-      BitmapFont font,
-      boolean showItemName,
-      ItemTextureManager itemTextureManager) {
+  public ItemSlotWidget(ItemSlotStyle style, boolean showItemName) {
     this.style = style;
-    this.font = font;
-    this.itemTextureManager = itemTextureManager;
     this.showItemName = showItemName;
     this.item = null;
     this.quantity = 0;
@@ -55,6 +48,7 @@ public class ItemSlotWidget extends Table {
   }
 
   private void setupUI() {
+    BitmapFont font = RenderResources.get().getPanelFont();
     this.setSize(DIMENSION, DIMENSION);
     this.pad(2);
     this.setTouchable(Touchable.enabled);
@@ -141,6 +135,7 @@ public class ItemSlotWidget extends Table {
   }
 
   private void updateDisplay() {
+    ItemTextureManager itemTextureManager = RenderResources.get().getItemTextureManager();
     if (item == null) {
       if (emptySlotTexture != null) {
         iconImage.setDrawable(new TextureRegionDrawable(emptySlotTexture));

@@ -24,7 +24,7 @@ import com.noiprocs.core.model.mob.character.PlayerModel;
 import com.noiprocs.gameplay.model.mob.BlackSmithModel;
 import com.noiprocs.gameplay.model.mob.MerchantModel;
 import com.noiprocs.resources.GameResource;
-import com.noiprocs.resources.ItemTextureManager;
+import com.noiprocs.resources.RenderResources;
 import com.noiprocs.resources.ResourceLoader;
 import com.noiprocs.settings.SettingsManager;
 import com.noiprocs.ui.libgdx.hud.panel.BlackSmithHUD;
@@ -39,13 +39,10 @@ import com.noiprocs.ui.libgdx.util.UIStyleHelper;
 /** Central coordinator for HUD system. Manages which HUD is active and handles rendering. */
 public class HUDManager {
   private final Stage hudStage;
-  private final BitmapFont font;
   private final ItemSlotStyle sharedSlotStyle;
-  private final ItemTextureManager itemTextureManager;
   private final Skin skin;
   private final PlayerInfoHUD playerInfoHUD;
   private final Table buttonTable;
-  private final SettingsManager settingsManager;
 
   private HUDMode currentMode;
   private Actor currentModalActor;
@@ -57,22 +54,16 @@ public class HUDManager {
   private MerchantHUD merchantHUD;
   private BlackSmithHUD blackSmithHUD;
 
-  public HUDManager(
-      Viewport viewport,
-      BitmapFont panelFont,
-      BitmapFont hudFont,
-      ItemTextureManager itemTextureManager,
-      SettingsManager settingsManager,
-      Runnable onMenuToggle) {
-    this.font = panelFont;
+  public HUDManager(Viewport viewport, SettingsManager settingsManager, Runnable onMenuToggle) {
+    RenderResources renderResources = RenderResources.get();
+    BitmapFont hudFont = renderResources.getHudFont();
+
     this.hudStage = new Stage(viewport);
     this.currentMode = HUDMode.NONE;
     this.sharedSlotStyle = ItemSlotStyle.createDefault();
-    this.itemTextureManager = itemTextureManager;
-    this.settingsManager = settingsManager;
-    this.skin = UIStyleHelper.createSkin(hudFont);
+    this.skin = UIStyleHelper.createSkin(renderResources.getHudFont());
 
-    this.playerInfoHUD = new PlayerInfoHUD(hudFont, itemTextureManager, settingsManager);
+    this.playerInfoHUD = new PlayerInfoHUD(settingsManager);
     this.buttonTable = buildButtonTable(onMenuToggle);
 
     hudStage.addActor(playerInfoHUD);
@@ -130,8 +121,7 @@ public class HUDManager {
     closeModal();
 
     if (equipmentHUD == null) {
-      equipmentHUD =
-          new EquipmentHUD(this, hudStage.getViewport(), font, sharedSlotStyle, itemTextureManager);
+      equipmentHUD = new EquipmentHUD(this, hudStage.getViewport(), sharedSlotStyle);
     }
 
     equipmentHUD.refresh();
@@ -142,11 +132,11 @@ public class HUDManager {
 
   /** Opens the crafting HUD. */
   public void openCraftingHUD() {
+    RenderResources renderResources = RenderResources.get();
     closeModal();
 
     if (craftingHUD == null) {
-      craftingHUD =
-          new CraftingHUD(this, hudStage.getViewport(), font, sharedSlotStyle, itemTextureManager);
+      craftingHUD = new CraftingHUD(this, hudStage.getViewport(), sharedSlotStyle);
     }
 
     craftingHUD.refresh();
@@ -160,8 +150,7 @@ public class HUDManager {
     closeModal();
 
     if (merchantHUD == null) {
-      merchantHUD =
-          new MerchantHUD(this, hudStage.getViewport(), font, sharedSlotStyle, itemTextureManager);
+      merchantHUD = new MerchantHUD(this, hudStage.getViewport(), sharedSlotStyle);
     }
 
     merchantHUD.setMerchant(merchantModelId);
@@ -176,9 +165,7 @@ public class HUDManager {
     closeModal();
 
     if (blackSmithHUD == null) {
-      blackSmithHUD =
-          new BlackSmithHUD(
-              this, hudStage.getViewport(), font, sharedSlotStyle, itemTextureManager);
+      blackSmithHUD = new BlackSmithHUD(this, hudStage.getViewport(), sharedSlotStyle);
     }
 
     blackSmithHUD.setBlacksmith(blacksmithModelId);
@@ -197,8 +184,7 @@ public class HUDManager {
     closeModal();
 
     if (inventoryHUD == null) {
-      inventoryHUD =
-          new InventoryHUD(this, hudStage.getViewport(), font, sharedSlotStyle, itemTextureManager);
+      inventoryHUD = new InventoryHUD(this, hudStage.getViewport(), sharedSlotStyle);
     }
 
     inventoryHUD.setContainer(containerModelId);

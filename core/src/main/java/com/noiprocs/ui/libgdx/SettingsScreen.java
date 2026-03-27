@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldFilter;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.noiprocs.LibGDXApp;
+import com.noiprocs.resources.RenderResources;
 import com.noiprocs.settings.SettingsManager;
 import com.noiprocs.ui.libgdx.util.UIStyleHelper;
 
@@ -39,11 +40,12 @@ public class SettingsScreen implements Screen {
 
   @Override
   public void show() {
+    RenderResources renderResources = RenderResources.get();
     // Create stage for UI
-    stage = new Stage(app.getViewport(), app.getRenderResources().getBatch());
+    stage = new Stage(app.getViewport(), renderResources.getBatch());
 
     // Create skin for UI elements
-    skin = UIStyleHelper.createSkin(app.getRenderResources().getHudFont());
+    skin = UIStyleHelper.createSkin(renderResources.getHudFont());
 
     // Get current settings
     SettingsManager settings = app.getSettingsManager();

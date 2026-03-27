@@ -21,7 +21,6 @@ public class LibGDXApp extends Game {
   protected float virtualWidth;
   protected float virtualHeight;
 
-  protected RenderResources renderResources;
   private OrthographicCamera camera;
   private Viewport viewport;
   private Stage virtualControlsStage;
@@ -46,11 +45,6 @@ public class LibGDXApp extends Game {
   /** Get the camera for rendering virtual controls. */
   public OrthographicCamera getCamera() {
     return camera;
-  }
-
-  /** Get the shared rendering resources (batch, fonts). */
-  public RenderResources getRenderResources() {
-    return renderResources;
   }
 
   /** Get the input controller. */
@@ -85,7 +79,6 @@ public class LibGDXApp extends Game {
     viewport = new FitViewport(virtualWidth, virtualHeight, camera);
     viewport.apply();
 
-    renderResources = new RenderResources();
     ConsoleUIConfig.CLEAR_SCREEN = false;
 
     // Initialize settings manager
@@ -116,7 +109,6 @@ public class LibGDXApp extends Game {
         new GameScreen(
             viewport,
             camera,
-            renderResources,
             getInputController(),
             settingsManager,
             virtualControlsStage,
@@ -134,7 +126,6 @@ public class LibGDXApp extends Game {
         new GameScreen(
             viewport,
             camera,
-            renderResources,
             getInputController(),
             settingsManager,
             virtualControlsStage,
@@ -148,6 +139,6 @@ public class LibGDXApp extends Game {
 
   @Override
   public void dispose() {
-    renderResources.dispose();
+    RenderResources.get().dispose();
   }
 }

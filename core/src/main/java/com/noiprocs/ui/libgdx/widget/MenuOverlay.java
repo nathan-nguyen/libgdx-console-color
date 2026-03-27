@@ -2,8 +2,6 @@ package com.noiprocs.ui.libgdx.widget;
 
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -23,6 +21,7 @@ import com.noiprocs.core.GameContext;
 import com.noiprocs.core.GameMode;
 import com.noiprocs.core.control.command.DisconnectCommand;
 import com.noiprocs.gameplay.control.command.ExitMazeCommand;
+import com.noiprocs.resources.RenderResources;
 import com.noiprocs.settings.HotbarLocation;
 import com.noiprocs.settings.SettingsManager;
 import com.noiprocs.ui.libgdx.util.UIStyleHelper;
@@ -37,14 +36,10 @@ public class MenuOverlay extends Table {
   private final Stage stage;
   private Runnable onClose;
 
-  public MenuOverlay(
-      SettingsManager settingsManager,
-      Runnable onMainMenu,
-      BitmapFont font,
-      Viewport viewport,
-      SpriteBatch batch) {
-    this.skin = UIStyleHelper.createSkin(font);
-    this.stage = new Stage(viewport, batch);
+  public MenuOverlay(SettingsManager settingsManager, Runnable onMainMenu, Viewport viewport) {
+    RenderResources renderResources = RenderResources.get();
+    this.skin = UIStyleHelper.createSkin(renderResources.getHudFont());
+    this.stage = new Stage(viewport, renderResources.getBatch());
     this.stage.addActor(this);
     setFillParent(true);
     setVisible(false);

@@ -7,6 +7,7 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.noiprocs.LibGDXApp;
 import com.noiprocs.input.InputController;
+import com.noiprocs.resources.RenderResources;
 import com.noiprocs.resources.UIConfig;
 
 /** Launches the Android application with touch controls. */
@@ -69,7 +70,7 @@ class AndroidApp extends LibGDXApp {
     touchInputController = new TouchInputController(getViewport());
     virtualControlRenderer = new VirtualControlRenderer(getSettingsManager());
 
-    virtualControlsStage = new Stage(getViewport(), renderResources.getBatch());
+    virtualControlsStage = new Stage(getViewport(), RenderResources.get().getBatch());
     virtualControlsStage.addActor(
         new VirtualControlsActor(virtualControlRenderer, touchInputController));
     setVirtualControlsStage(virtualControlsStage);
